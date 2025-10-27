@@ -1,0 +1,36 @@
+{
+	"schemaVersion": 1,
+	"id": "${name}",
+	"version": "${version}",
+	"name": "${name}",
+	"description": "${description}",
+	"authors": [
+		"Phanisment"
+	],
+	"contact": {
+		"sources": "https://github.com/Phanisment0"
+	},
+	"license": "MIT",
+	"icon": "icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"io.phanisment.urars.UrArs"
+		],
+		"server": [
+			"io.phanisment.urars.UrArs"
+		]
+	},
+	"mixins": [
+		"${name}.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.0",
+		"minecraft": "~1.21.1",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

@@ -1,0 +1,9 @@
+ex:
+  conditions:
+  - day true
+  skills:
+  - message{m=This is Day time} @self
+
+hi:
+  skills:
+  - message{m=Hello World!} @self
