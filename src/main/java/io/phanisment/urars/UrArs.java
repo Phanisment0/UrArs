@@ -2,7 +2,6 @@ package io.phanisment.urars;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.resource.ResourceType;
 
 import org.slf4j.LoggerFactory;

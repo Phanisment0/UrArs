@@ -2,22 +2,15 @@ package io.phanisment.urars.skill;
 
 import net.minecraft.util.Identifier;
 
-import io.phanisment.urars.config.YamlConfig;
-import io.phanisment.urars.config.ConfigSection;
 import io.phanisment.urars.skill.annotation.ConditionInfo;
 import io.phanisment.urars.skill.annotation.MechanicInfo;
 import io.phanisment.urars.skill.annotation.TargeterInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
-import io.phanisment.urars.skill.config.SkillConfigSection;
 import io.phanisment.urars.util.AnnotationScanner;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Optional;
 
 public final class SkillManager {
@@ -31,6 +24,7 @@ public final class SkillManager {
 		skills.clear();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static void loadClasses() {
 		AnnotationScanner.find("urars", "io.phanisment.urars.skill.mechanics", MechanicInfo.class).forEach(clazz -> {
 			var info = clazz.getAnnotation(MechanicInfo.class);

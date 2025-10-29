@@ -1,11 +1,11 @@
 package io.phanisment.urars.config;
 
 import io.phanisment.urars.skill.config.SkillLineConfig;
+
 import static io.phanisment.urars.UrArs.LOGGER;
 
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 import java.text.NumberFormat;

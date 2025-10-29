@@ -2,7 +2,6 @@ package io.phanisment.urars.skill;
 
 import net.minecraft.entity.Entity;
 
-import io.phanisment.urars.skill.SkillManager;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.skill.target.IEntityTarget;
 import io.phanisment.urars.skill.target.ILocationTarget;
@@ -18,7 +17,7 @@ public class SkillMechanic {
 		this.config = config;
 		
 		String context = config.getContext();
-		if ((context != null || context.isEmpty()) && context.startsWith("@")) {
+		if (context != null && context.startsWith("@")) {
 			var target_config = new SkillLineConfig(context.substring(1));
 			try {
 				this.targeter = SkillManager.getTargeter(target_config);

@@ -4,7 +4,6 @@ import net.minecraft.entity.Entity;
 
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Collection;
 
 public class SkillContext {
 	private final Entity entity;

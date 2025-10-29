@@ -6,9 +6,6 @@ import io.phanisment.urars.skill.config.SkillLineConfig;
 
 import static io.phanisment.urars.UrArs.LOGGER;
 
-import java.util.Collection;
-import java.util.Optional;
-
 public abstract class SkillCondition {
 	private final SkillLineConfig config;
 	

@@ -53,6 +53,7 @@ public class ConfigSection {
 		return this.getSectionList(key, new ArrayList<>());
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<ConfigSection> getSectionList(String key, List<ConfigSection> def) {
 		if (this.get(key) instanceof List<?> list) {
 			List<ConfigSection> result = new ArrayList<>();

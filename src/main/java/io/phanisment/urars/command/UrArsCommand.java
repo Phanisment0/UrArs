@@ -14,7 +14,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import static net.minecraft.server.command.CommandManager.literal;
 import static net.minecraft.server.command.CommandManager.argument;
 
-import io.phanisment.urars.skill.Skill;
 import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.SkillManager;
 import io.phanisment.urars.skill.SkillCondition;

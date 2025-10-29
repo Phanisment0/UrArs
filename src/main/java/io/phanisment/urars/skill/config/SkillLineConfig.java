@@ -3,7 +3,6 @@ package io.phanisment.urars.skill.config;
 import io.phanisment.urars.config.LineConfig;
 import io.phanisment.urars.skill.SkillManager;
 import io.phanisment.urars.skill.SkillMechanic;
-import io.phanisment.urars.skill.SkillTargeter;
 import io.phanisment.urars.skill.SkillCondition;
 
 import java.util.List;

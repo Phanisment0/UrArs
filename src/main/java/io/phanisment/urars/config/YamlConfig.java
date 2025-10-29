@@ -54,7 +54,7 @@ public class YamlConfig extends ConfigSection {
 	 * @throws IOException if file is not found or not a file
 	 */
 	public YamlConfig(File io) throws IOException {
-		this.file = file;
+		this.file = io;
 		load();
 	}
 	
