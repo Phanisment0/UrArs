@@ -28,8 +28,7 @@ public class ConfigSection {
 	
 	public Identifier getIdentifier(String key, Identifier def) {
 		String value = this.getString(key);
-		if (value != null) return Identifier.of(value);
-		return def;
+		return value != null ? Identifier.of(value) : def;
 	}
 	
 	public List<LineConfig> getLineList(String key) {
@@ -44,6 +43,8 @@ public class ConfigSection {
 				else result.add(new LineConfig(String.valueOf(value)));
 			}
 			return result;
+		} else if (this.get(key) instanceof String value) {
+			return List.of(new LineConfig(value));
 		}
 		return def;
 	}
@@ -79,6 +80,8 @@ public class ConfigSection {
 				else result.add(String.valueOf(value));
 			}
 			return result;
+		} else if (this.get(key) instanceof String value) {
+			return List.of(value);
 		}
 		return def;
 	}
@@ -161,7 +164,7 @@ public class ConfigSection {
 	
 	public SkillConfigSection getAsSkillSection() {
 		var section = new SkillConfigSection();
-		section.serialize().putAll(this.data);
+		section.serialize().putAll(data);
 		return section;
 	}
 	

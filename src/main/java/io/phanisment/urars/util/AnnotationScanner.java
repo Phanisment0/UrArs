@@ -13,7 +13,19 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
+/**
+ * Simple util class for scanner.
+ */
 public final class AnnotationScanner {
+	/**
+	 * Get all class as object on the package location
+	 * 
+	 * @param mod_id Your mod id
+	 * @param package_path Target package that you want get the classes
+	 * @param annotation_class get specific class with this annotation
+	 * 
+	 * @return list of target package classes.
+	 */
 	public static <T extends Annotation> List<Class<?>> find(String mod_id, String package_path, Class<T> annotation_class) {
 		List<Class<?>> result = new ArrayList<>();
 		

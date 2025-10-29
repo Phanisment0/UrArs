@@ -1,6 +1,11 @@
 package io.phanisment.urars.skill;
 
+import net.minecraft.util.Identifier;
+
 import io.phanisment.urars.skill.config.SkillLineConfig;
+
+import static io.phanisment.urars.UrArs.LOGGER;
+
 import java.util.Collection;
 import java.util.Optional;
 
@@ -20,22 +25,23 @@ public abstract class SkillCondition {
 		
 		String[] part = context.split(" ", 2);
 		String type = part[0].toLowerCase();
+		var skill_id = Identifier.of(part[1]);
 		switch (type) {
 			case "true":
 				return result;
 			case "false":
 				return !result;
 			case "cast":
-				if (part.length > 1) SkillManager.getSkill(part[1]).ifPresent(skill -> skill.cast(ctx));
+				if (part.length > 1) SkillManager.getSkill(skill_id).ifPresent(skill -> skill.cast(ctx));
 				return result;
 			case "castinstead":
-				if (result && part.length > 1) SkillManager.getSkill(part[1]).ifPresent(skill -> skill.cast(ctx));
+				if (result && part.length > 1) SkillManager.getSkill(skill_id).ifPresent(skill -> skill.cast(ctx));
 				return false;
 			case "orelse":
-				if (!result && part.length > 1) SkillManager.getSkill(part[1]).ifPresent(skill -> skill.cast(ctx));
+				if (!result && part.length > 1) SkillManager.getSkill(skill_id).ifPresent(skill -> skill.cast(ctx));
 				return false;
 			default:
-				System.out.println("Unknown condition action");
+				LOGGER.warn("Unknown condition action of {}", type);
 		}
 		
 		return result;

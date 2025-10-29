@@ -1,6 +1,7 @@
 package io.phanisment.urars.config;
 
 import io.phanisment.urars.skill.config.SkillLineConfig;
+import static io.phanisment.urars.UrArs.LOGGER;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -42,7 +43,7 @@ public class LineConfig {
 					}
 				}
 			}
-			if (depth != 0) System.out.println("Bracket unbalance!");
+			if (depth != 0) LOGGER.warn("LineConfig - Bracket unbalance! Line='{}'", line);
 			
 			if (last_bracket + 1 < line.length()) this.context = line.substring(last_bracket + 1).trim();
 			this.key = line.substring(0, first_bracket).trim();

@@ -1,10 +1,9 @@
 package io.phanisment.urars.skill;
 
-import io.phanisment.urars.UrArs;
+import net.minecraft.util.Identifier;
+
 import io.phanisment.urars.config.YamlConfig;
 import io.phanisment.urars.config.ConfigSection;
-import io.phanisment.urars.pack.PackManager;
-import io.phanisment.urars.pack.Pack;
 import io.phanisment.urars.skill.annotation.ConditionInfo;
 import io.phanisment.urars.skill.annotation.MechanicInfo;
 import io.phanisment.urars.skill.annotation.TargeterInfo;
@@ -26,31 +25,7 @@ public final class SkillManager {
 	private static final Map<String, Class<? extends SkillTargeter>> targeters = new HashMap<>();
 	private static final Map<String, Class<? extends SkillCondition>> conditions = new HashMap<>();
 	
-	private static final Map<String, Skill> skills = new HashMap<>();
-	
-	public static void load() {
-		unload();
-		System.out.println("Load Skills");
-		for (Pack pack : PackManager.getPacks()) {
-			File skill_folder = new File(pack.file(), "skills");
-			if (!skill_folder.exists()) skill_folder.mkdirs();
-			
-			File[] files = skill_folder.listFiles((dir, name) -> name.endsWith(".yml"));
-			for (File file : files) {
-				try {
-					var config = new YamlConfig(file);
-					for (String id : config.getKeys()) {
-						SkillConfigSection section = config.getSection(id).getAsSkillSection();
-						var skill = new Skill(id, pack, section);
-						skills.put(id, skill);
-						System.out.println("Registered skill: " + id);
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
+	private static final Map<Identifier, Skill> skills = new HashMap<>();
 	
 	public static void unload() {
 		skills.clear();
@@ -82,11 +57,11 @@ public final class SkillManager {
 		});
 	}
 	
-	public static Optional<Skill> getSkill(String key) {
-		return Optional.ofNullable(skills.get(key));
+	public static Optional<Skill> getSkill(Identifier id) {
+		return Optional.ofNullable(skills.get(id));
 	}
 	
-	public static Set<String> getSkills() {
+	public static Set<Identifier> getSkills() {
 		return skills.keySet();
 	}
 	
@@ -121,6 +96,12 @@ public final class SkillManager {
 		if (clazz == null) return Optional.empty();
 		var condition = (SkillCondition)clazz.getDeclaredConstructor(SkillLineConfig.class).newInstance(config);
 		return Optional.of(condition);
+	}
+	
+	public static boolean registerSkill(Identifier id, Skill skill) {
+		if (skills.containsKey(id)) return false;
+		skills.put(id, skill);
+		return true;
 	}
 	
 	public static boolean registerMechanic(String key, Class<? extends SkillMechanic> mechanic) {

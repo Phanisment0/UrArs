@@ -1,14 +1,16 @@
 {
 	"schemaVersion": 1,
-	"id": "${name}",
+	"id": "urars",
 	"version": "${version}",
-	"name": "${name}",
-	"description": "${description}",
+	"name": "Your Ars",
+	"description": "",
 	"authors": [
 		"Phanisment"
 	],
 	"contact": {
-		"sources": "https://github.com/Phanisment0"
+		"wiki": "https://phanisment0.github.io/UrArs-Wiki",
+		"sources": "https://github.com/Phanisment0/UrArs",
+		"discord": "https://discord.gg/CXuYvt6F6c"
 	},
 	"license": "MIT",
 	"icon": "icon.png",
@@ -16,21 +18,15 @@
 	"entrypoints": {
 		"main": [
 			"io.phanisment.urars.UrArs"
-		],
-		"server": [
-			"io.phanisment.urars.UrArs"
 		]
 	},
 	"mixins": [
-		"${name}.mixins.json"
+		"urars.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.16.0",
 		"minecraft": "~1.21.1",
 		"java": ">=21",
 		"fabric-api": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
 	}
 }
