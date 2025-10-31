@@ -7,7 +7,7 @@ import java.lang.annotation.ElementType;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface ConditionInfo {
+public @interface RegistryInfo {
 	public String key() default "";
 	public String[] aliases() default {};
 	public String author() default "";

@@ -46,6 +46,12 @@ processResources {
 	}
 }
 
+tasks.javadoc {
+	options.links("https://maven.fabricmc.net/docs/yarn-1.21.1+build.3/")
+	options.links("https://maven.fabricmc.net/docs/fabric-loader-0.17.3/")
+	options.links("https://javadoc.io/doc/org.yaml/snakeyaml/latest/")
+}
+
 tasks.withType(JavaCompile).configureEach {
 	it.options.release = 21
 }

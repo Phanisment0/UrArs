@@ -1,0 +1,3 @@
+ex:
+  skills:
+  - message{m=Hi!} @self

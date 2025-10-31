@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class ConfigSection {
+public class ConfigSection implements IConfig {
 	protected final Map<String, Object> data = new HashMap<>();
 	
 	public boolean contains(String key) {
@@ -87,60 +87,88 @@ public class ConfigSection {
 		return def;
 	}
 	
+	/** {@inheritDoc} */
+	@Override
 	public Integer getInt(String key) {
 		return this.getInt(key, 0);
 	}
 	
+	/** {@inheritDoc} */
+	@Override
 	public Integer getInt(String key, Integer def) {
 		return this.getNumber(key, def).intValue();
 	}
 	
+	/** {@inheritDoc} */
+	@Override
 	public Float getFloat(String key) {
 		return this.getFloat(key, 0.0f);
 	}
 	
+	/** {@inheritDoc} */
+	@Override
 	public Float getFloat(String key, Float def) {
 		return this.getNumber(key, def).floatValue();
 	}
 	
+	/** {@inheritDoc} */
+	@Override
 	public Double getDouble(String key) {
 		return this.getDouble(key, 0.0d);
 	}
 	
+	/** {@inheritDoc} */
+	@Override
 	public Double getDouble(String key, Double def) {
 		return this.getNumber(key, def).doubleValue();
 	}
 	
+	/** {@inheritDoc} */
+	@Override
 	public Long getLong(String key) {
 		return this.getLong(key, 0l);
 	}
 	
+	/** {@inheritDoc} */
+	@Override
 	public Long getLong(String key, Long def) {
 		return this.getNumber(key, def).longValue();
 	}
 	
+	/** {@inheritDoc} */
+	@Override
 	public String getString(String key) {
 		return this.getString(key, null);
 	}
 	
+	/** {@inheritDoc} */
+	@Override
 	public String getString(String key, String def) {
 		if (this.get(key) instanceof String value) return value;
 		return def;
 	}
 	
+	/** {@inheritDoc} */
+	@Override
 	public Number getNumber(String key) {
 		return this.getNumber(key, 0);
 	}
 	
+	/** {@inheritDoc} */
+	@Override
 	public Number getNumber(String key, Number def) {
 		if (this.get(key) instanceof Number value) return value;
 		return def;
 	}
 	
+	/** {@inheritDoc} */
+	@Override
 	public Boolean getBoolean(String key) {
 		return this.getBoolean(key, false);
 	}
 	
+	/** {@inheritDoc} */
+	@Override
 	public Boolean getBoolean(String key, Boolean def) {
 		if (this.get(key) instanceof Boolean value) return value;
 		return def;

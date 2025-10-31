@@ -4,12 +4,12 @@ import net.minecraft.entity.Entity;
 
 import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.SkillTargeter;
-import io.phanisment.urars.skill.annotation.TargeterInfo;
+import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import java.util.Collection;
 import java.util.HashSet;
 
-@TargeterInfo(author="Phanisment", key="self", aliases={"caster", "s"})
+@RegistryInfo(author="Phanisment", key="self", aliases={"caster", "s"})
 public class SelfTargeter extends SkillTargeter {
 	public SelfTargeter(SkillLineConfig config) {
 		super(config);

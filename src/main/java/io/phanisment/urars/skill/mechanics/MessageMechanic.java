@@ -5,11 +5,11 @@ import net.minecraft.entity.player.PlayerEntity;
 
 import io.phanisment.urars.skill.SkillMechanic;
 import io.phanisment.urars.skill.SkillContext;
-import io.phanisment.urars.skill.annotation.MechanicInfo;
+import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.skill.target.INoTarget;
 
-@MechanicInfo(author="Phanisment", key="message", aliases={"msg", "send"})
+@RegistryInfo(author="Phanisment", key="message", aliases={"msg", "send"})
 public class MessageMechanic extends SkillMechanic implements INoTarget {
 	private final String message;
 	private final boolean overlay;

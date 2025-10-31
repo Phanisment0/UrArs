@@ -9,7 +9,7 @@ import io.phanisment.urars.skill.target.INoTarget;
 
 import java.util.Optional;
 
-public class SkillMechanic {
+public class SkillMechanic implements ISkillAction {
 	protected final SkillLineConfig config;
 	protected Optional<SkillTargeter> targeter = Optional.empty();
 	

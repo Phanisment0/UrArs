@@ -11,6 +11,7 @@ import io.phanisment.urars.skill.SkillManager;
 import io.phanisment.urars.skill.config.SkillConfigSection;
 
 import static io.phanisment.urars.UrArs.ID;
+import static io.phanisment.urars.UrArs.LOGGER;
 
 import java.util.Map;
 import java.io.InputStream;
@@ -41,7 +42,9 @@ public final class SkillResource implements SimpleSynchronousResourceReloadListe
 					SkillManager.registerSkill(Identifier.of(id.getNamespace(), name), skill);
 				}
 			} catch (Exception e) {
+				LOGGER.error("Unexpected error", e);
 			}
 		}
+		LOGGER.info("Loaded " + SkillManager.getSkills().size() + " skills");
 	}
 }

@@ -8,6 +8,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -31,7 +32,7 @@ public class UrArsCommand {
 		dispatcher.register((LiteralArgumentBuilder<ServerCommandSource>)literal("urars")
 		.requires(source -> source.hasPermissionLevel(2))
 		.then(literal("cast")
-			.then(argument("skill", StringArgumentType.word())
+			.then(argument("skill", IdentifierArgumentType.identifier())
 				.suggests(UrArsCommand::cast_suggest)
 				.executes(UrArsCommand::cast)
 			)
@@ -49,8 +50,11 @@ public class UrArsCommand {
 	}
 	
 	private static CompletableFuture<Suggestions> cast_suggest(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) {
+		String remaining = builder.getRemaining().toLowerCase();
+		
 		for (Identifier id : SkillManager.getSkills()) {
-			builder.suggest(id.toString());
+			String skill = id.toString();
+			if (skill.startsWith(remaining)) builder.suggest(skill);
 		}
 		return builder.buildFuture();
 	}
@@ -60,8 +64,8 @@ public class UrArsCommand {
 		ServerPlayerEntity player = source.getPlayer();
 		if (player == null) return 0;
 		
-		String skill_id = StringArgumentType.getString(ctx, "skill");
-		SkillManager.getSkill(Identifier.of(skill_id)).ifPresentOrElse(skill -> {
+		Identifier skill_id = IdentifierArgumentType.getIdentifier(ctx, "skill");
+		SkillManager.getSkill(skill_id).ifPresentOrElse(skill -> {
 			skill.cast(new SkillContext(player));
 			source.sendFeedback(() -> Text.literal("§aCast skill: " + skill_id), false);
 		}, () -> {

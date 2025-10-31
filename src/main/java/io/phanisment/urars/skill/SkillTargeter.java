@@ -5,7 +5,7 @@ import net.minecraft.entity.Entity;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import java.util.Collection;
 
-public abstract class SkillTargeter {
+public abstract class SkillTargeter implements ISkillAction {
 	protected final SkillLineConfig config;
 	
 	public SkillTargeter(SkillLineConfig config) {

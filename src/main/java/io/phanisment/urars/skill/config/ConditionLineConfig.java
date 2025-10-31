@@ -1,5 +1,7 @@
-package io.phanisment.urars.skill.config;
+/*
+  This class is not used for now.
 
+package io.phanisment.urars.skill.config;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -82,3 +84,4 @@ public class ConditionLineConfig {
 		return parts.toString() + " " + action;
 	}
 }
+*/

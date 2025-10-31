@@ -6,7 +6,7 @@ import io.phanisment.urars.skill.config.SkillLineConfig;
 
 import static io.phanisment.urars.UrArs.LOGGER;
 
-public abstract class SkillCondition {
+public abstract class SkillCondition implements ISkillAction {
 	private final SkillLineConfig config;
 	
 	public SkillCondition(SkillLineConfig config) {

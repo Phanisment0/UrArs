@@ -2,17 +2,20 @@ package io.phanisment.urars.skill;
 
 import net.minecraft.util.Identifier;
 
-import io.phanisment.urars.skill.annotation.ConditionInfo;
-import io.phanisment.urars.skill.annotation.MechanicInfo;
-import io.phanisment.urars.skill.annotation.TargeterInfo;
+import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.util.AnnotationScanner;
+
+import static io.phanisment.urars.UrArs.ID;
 
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.Optional;
 
+/**
+ * Class for managing skill registration, class registration and get the registered.
+ */
 public final class SkillManager {
 	private static final Map<String, Class<? extends SkillMechanic>> mechanics = new HashMap<>();
 	private static final Map<String, Class<? extends SkillTargeter>> targeters = new HashMap<>();
@@ -20,99 +23,177 @@ public final class SkillManager {
 	
 	private static final Map<Identifier, Skill> skills = new HashMap<>();
 	
+	private SkillManager() {
+	}
+	
+	/**
+	 * Clear all registered data in skill manager.
+	 */
 	public static void unload() {
 		skills.clear();
 	}
 	
+	/**
+	 * Register all class inside mod jar. (WARNING don't use this method to load the clas again)
+	 */
 	@SuppressWarnings("unchecked")
 	public static void loadClasses() {
-		AnnotationScanner.find("urars", "io.phanisment.urars.skill.mechanics", MechanicInfo.class).forEach(clazz -> {
-			var info = clazz.getAnnotation(MechanicInfo.class);
-			mechanics.put(info.key().toLowerCase(), (Class<? extends SkillMechanic>)clazz);
-			for (String alias : info.aliases()) {
-				mechanics.put(alias.toLowerCase(), (Class<? extends SkillMechanic>)clazz);
-			}
-		});
-		
-		AnnotationScanner.find("urars", "io.phanisment.urars.skill.targeters", TargeterInfo.class).forEach(clazz -> {
-			var info = clazz.getAnnotation(TargeterInfo.class);
-			targeters.put(info.key().toLowerCase(), (Class<? extends SkillTargeter>)clazz);
-			for (String alias : info.aliases()) {
-				targeters.put(alias.toLowerCase(), (Class<? extends SkillTargeter>)clazz);
-			}
-		});
-		
-		AnnotationScanner.find("urars", "io.phanisment.urars.skill.conditions", ConditionInfo.class).forEach(clazz -> {
-			var info = clazz.getAnnotation(ConditionInfo.class);
-			conditions.put(info.key().toLowerCase(), (Class<? extends SkillCondition>)clazz);
-			for (String alias : info.aliases()) {
-				conditions.put(alias.toLowerCase(), (Class<? extends SkillCondition>)clazz);
-			}
-		});
+		registerClasses("io.phanisment.urars.skill.conditions", conditions, SkillCondition.class);
+		registerClasses("io.phanisment.urars.skill.mechanics", mechanics, SkillMechanic.class);
+		registerClasses("io.phanisment.urars.skill.targeters", targeters, SkillTargeter.class);
 	}
 	
+	/**
+	 * Get registered skill.
+	 * 
+	 * @param id Id of the skill
+	 * @return   Registered skill
+	 */
 	public static Optional<Skill> getSkill(Identifier id) {
 		return Optional.ofNullable(skills.get(id));
 	}
 	
+	/**
+	 * Get id of all registered skills.
+	 */
 	public static Set<Identifier> getSkills() {
 		return skills.keySet();
 	}
 	
+	/**
+	 * Get registered mechanic class.
+	 * 
+	 * @param key Name of mechanic
+	 * @return    The mechanic class
+	 */
 	public static Class<? extends SkillMechanic> getMechanic(String key) {
 		return mechanics.get(key.toLowerCase());
 	}
 	
+	/**
+	 * Get new instance of mechanic class.
+	 * 
+	 * @param config Required parameters to create new instance 
+	 * @return       Mechanic instance
+	 */
 	public static Optional<SkillMechanic> getMechanic(SkillLineConfig config) throws Exception {
-		Class<? extends SkillMechanic> clazz = getMechanic(config.getKey());
-		if (clazz == null) return Optional.empty();
-		var mechanic = (SkillMechanic)clazz.getDeclaredConstructor(SkillLineConfig.class).newInstance(config);
-		return Optional.of(mechanic);
+		return newInstance(getMechanic(config.getKey()), config);
 	}
 	
+	/**
+	 * Get registered targeter class.
+	 * 
+	 * @param key Name of targeter
+	 * @return    The targeter class
+	 */
 	public static Class<? extends SkillTargeter> getTargeter(String key) {
 		return targeters.get(key.toLowerCase());
 	}
 	
+	/**
+	 * Get new instance of targeter class.
+	 * 
+	 * @param config Required parameters to create new instance 
+	 * @return       Targeter instance
+	 */
 	public static Optional<SkillTargeter> getTargeter(SkillLineConfig config) throws Exception {
-		Class<? extends SkillTargeter> clazz = getTargeter(config.getKey());
-		if (clazz == null) return Optional.empty();
-		var targeter = (SkillTargeter)clazz.getDeclaredConstructor(SkillLineConfig.class).newInstance(config);
-		return Optional.of(targeter);
+		return newInstance(getTargeter(config.getKey()), config);
 	}
 	
+	/**
+	 * Get registered condition class.
+	 * 
+	 * @param key Name of condition
+	 * @return    The condition class
+	 */
 	public static Class<? extends SkillCondition> getCondition(String key) {
 		return conditions.get(key.toLowerCase());
 	}
 	
+	/**
+	 * Get new instance of condition class.
+	 * 
+	 * @param config Required parameters to create new instance 
+	 * @return       Condition instance
+	 */
 	public static Optional<SkillCondition> getCondition(SkillLineConfig config) throws Exception {
-		Class<? extends SkillCondition> clazz = getCondition(config.getKey());
-		if (clazz == null) return Optional.empty();
-		var condition = (SkillCondition)clazz.getDeclaredConstructor(SkillLineConfig.class).newInstance(config);
-		return Optional.of(condition);
+	return newInstance(getCondition(config.getKey()), config);
 	}
 	
+	/**
+	 * Register skill.
+	 * 
+	 * @param id    Id skill
+	 * @param skill Skill data
+	 * @return      True if skill id is absent and false if skill id is registered
+	 */
 	public static boolean registerSkill(Identifier id, Skill skill) {
-		if (skills.containsKey(id)) return false;
-		skills.put(id, skill);
-		return true;
+		return skills.putIfAbsent(id, skill) == null;
 	}
 	
+	/**
+	 * Register mechanic class.
+	 * 
+	 * @param key      Name mechanic 
+	 * @param mechanic Mechanic class
+	 * @return         True if mechanic key is absent and false if mechanic key is registered
+	 */
 	public static boolean registerMechanic(String key, Class<? extends SkillMechanic> mechanic) {
-		if (mechanics.containsKey(key)) return false;
-		mechanics.put(key, mechanic);
-		return true;
+		return mechanics.putIfAbsent(key.toLowerCase(), mechanic) == null;
 	}
 	
+	/**
+	 * Register targeter class.
+	 * 
+	 * @param key      Name targeter 
+	 * @param targeter Targeter class
+	 * @return         True if mechanic key is absent and false if mechanic key is registered
+	 */
 	public static boolean registerTargeter(String key, Class<? extends SkillTargeter> targeter) {
-		if (targeters.containsKey(key)) return false;
-		targeters.put(key, targeter);
-		return true;
+		return targeters.putIfAbsent(key.toLowerCase(), targeter) == null;
 	}
 	
+	/**
+	 * Register mechanic class.
+	 * 
+	 * @param key       Name mechanic 
+	 * @param condition Mechanic class
+	 * @return          True if mechanic key is absent and false if mechanic key is registered
+	 */
 	public static boolean registerCondition(String key, Class<? extends SkillCondition> condition) {
-		if (conditions.containsKey(key)) return false;
-		conditions.put(key, condition);
-		return true;
+		return conditions.putIfAbsent(key.toLowerCase(), condition) == null;
 	}
+	
+	/**
+	 * Create new instance form the class.
+	 * 
+	 * @param clazz  Target class to create the instance 
+	 * @param config Required parameter for the class
+	 * @param <T> Class type
+	 * @return New instance of class
+	 */
+	private static <T> Optional<T> newInstance(Class<? extends T> clazz, SkillLineConfig config) throws Exception {
+		return Optional.ofNullable(clazz.getDeclaredConstructor(SkillLineConfig.class).newInstance(config));
+	}
+	
+	/**
+	 * Register all class with annotation {@link RegistryInfo} in target package.
+	 * 
+	 * @param path       Target package
+	 * @param registry   Target Registry data
+	 * @parsm base_class Extended class
+	 */
+	@SuppressWarnings("unchecked")
+	private static <T> void registerClasses(String path, Map<String, Class<? extends T>> registry, Class<T> base_class) {
+		for (Class<?> clazz : AnnotationScanner.find(ID, path, RegistryInfo.class)) {
+			if (!base_class.isAssignableFrom(clazz)) return;
+			RegistryInfo info = clazz.getAnnotation(RegistryInfo.class);
+			if (info == null) return;
+			
+			registry.put(info.key().toLowerCase(), (Class<? extends T>)clazz);
+			for (String alias : info.aliases()) {
+				registry.put(alias.toLowerCase(), (Class<? extends T>)clazz);
+			}
+		}
+	} 
 }

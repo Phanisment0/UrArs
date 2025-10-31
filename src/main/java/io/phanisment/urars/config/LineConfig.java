@@ -11,12 +11,38 @@ import java.util.ArrayList;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
-public class LineConfig {
+/**
+ * Represents a configuration line parsed from a text-based configuration format.
+ * 
+ * A line can contain:
+ * <ul>
+ *   <li>A {@code key} (identifier)</li>
+ *   <li>An optional set of arguments in curly brackets: {@code {key1=value1;key2=value2}}</li>
+ *   <li>An optional {@code context} value (remaining part after arguments)</li>
+ * </ul>
+ *
+ * Example format:
+ * <pre>
+ * fireball{power=3;speed=1.2} @target
+ * </pre>
+ *
+ * This class can parse such a line and provide easy access to values as strings,
+ * numbers, booleans, lists, or even sub-config lines.
+ */
+public class LineConfig implements IConfig {
 	protected Map<String, String> args = new HashMap<>();
 	protected String line_raw;
 	protected String context;
 	protected String key;
 	
+	/**
+	 * Constructs a {@link LineConfig} with explicit parameters.
+	 *
+	 * @param line_raw Raw line string before parsing
+	 * @param key The main key or identifier
+	 * @param context Additional context after the arguments
+	 * @param args Map of argument key-value pairs
+	 */
 	public LineConfig(String line_raw, String key, String context, Map<String, String> args) {
 		this.line_raw = line_raw;
 		this.key = key;
@@ -24,6 +50,11 @@ public class LineConfig {
 		this.args = args;
 	}
 	
+	/**
+	 * Parse the string to useable data.
+	 * 
+	 * @param line String that want to parse
+	 */
 	public LineConfig(String line) {
 		this.line_raw = line;
 		int depth = 0;
@@ -63,6 +94,13 @@ public class LineConfig {
 		if (split.length > 1) this.context = split[1].trim();
 	}
 	
+	/**
+	 * Split string inside bracket with ignoring bracket inside it.
+	 * 
+	 * @param input String to split 
+	 * @param by Character used to split
+	 * @return List of split string
+	 */
 	public static List<String> split(String input, char by) {
 		List<String> part = new ArrayList<>();
 		var curr = new StringBuilder();
@@ -88,14 +126,28 @@ public class LineConfig {
 		return part;
 	}
 	
+	// String ////////////////
+	/**
+	 * Get with aliases.
+	 * @param key String array that want to get 
+	 * @return The first array slot key in data
+	 */
 	public String getString(String[] key) {
 		return this.getString(key, null);
 	}
 	
+	/** {@inheritDoc} */
+	@Override
 	public String getString(String key) {
 		return this.getString(key, null);
 	}
 	
+	/**
+	 * Get with aliases.
+	 * @param key String array that want to get 
+	 * @param def Default value want to return
+	 * @return The first array slot key in data
+	 */
 	public String getString(String[] key, String def) {
 		for (String k : key) {
 			if (!this.args.containsKey(k)) continue;
@@ -104,20 +156,36 @@ public class LineConfig {
 		return def;
 	}
 	
+	/** {@inheritDoc} */
+	@Override
 	public String getString(String key, String def) {
 		if (this.args.containsKey(key)) return this.args.get(key);
 		return def;
 	}
 	
-	public boolean getBoolean(String[] key) {
+	// Boolean ////////////////
+	/**
+	 * Get with aliases.
+	 * @param key String array that want to get 
+	 * @return The first array slot key in data
+	 */
+	public Boolean getBoolean(String[] key) {
 		return this.getBoolean(key, false);
 	}
 	
-	public boolean getBoolean(String key) {
+	/** {@inheritDoc} */
+	@Override
+	public Boolean getBoolean(String key) {
 		return this.getBoolean(key, false);
 	}
 	
-	public boolean getBoolean(String[] key, boolean def) {
+	/**
+	 * Get with aliases.
+	 * @param key String array that want to get 
+	 * @param def Default value want to return
+	 * @return The first array slot key in data
+	 */
+	public Boolean getBoolean(String[] key, Boolean def) {
 		for (String k : key) {
 			if (!this.args.containsKey(k)) continue;
 			return this.getBoolean(k, def);
@@ -125,20 +193,36 @@ public class LineConfig {
 		return def;
 	}
 	
-	public boolean getBoolean(String key, boolean def) {
+	/** {@inheritDoc} */
+	@Override
+	public Boolean getBoolean(String key, Boolean def) {
 		if (!this.args.containsKey(key)) return def;
 		String value = this.args.get(key);
-		return value.equalsIgnoreCase("true");
+		return Boolean.valueOf(value);
 	}
 	
+	// Number ////////////////
+	/**
+	 * Get with aliases.
+	 * @param key String array that want to get 
+	 * @return The first array slot key in data
+	 */
 	public Number getNumber(String[] key) {
 		return this.getNumber(key, 0);
 	}
 	
+	/** {@inheritDoc} */
+	@Override
 	public Number getNumber(String key) {
 		return this.getNumber(key, 0);
 	}
 	
+	/**
+	 * Get with aliases.
+	 * @param key String array that want to get 
+	 * @param def Default value want to return
+	 * @return The first array slot key in data
+	 */
 	public Number getNumber(String[] key, Number def) {
 		for (String k : key) {
 			if (!this.args.containsKey(k)) continue;
@@ -147,6 +231,8 @@ public class LineConfig {
 		return def;
 	}
 	
+	/** {@inheritDoc} */
+	@Override
 	public Number getNumber(String key, Number def) {
 		if (!this.args.containsKey(key)) return def;
 		String value = this.args.get(key);
@@ -157,14 +243,159 @@ public class LineConfig {
 		}
 	}
 	
+	// Integer ////////////////
+	/**
+	 * Get with aliases.
+	 * @param key String array that want to get 
+	 * @return The first array slot key in data
+	 */
+	public Integer getInt(String[] key) {
+		return this.getInt(key, 0);
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public Integer getInt(String key) {
+		return this.getInt(key, 0);
+	}
+	
+	/**
+	 * Get with aliases.
+	 * @param key String array that want to get 
+	 * @param def Default value want to return
+	 * @return The first array slot key in data
+	 */
+	public Integer getInt(String[] key, Integer def) {
+		return this.getNumber(key, def).intValue();
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public Integer getInt(String key, Integer def) {
+		return this.getNumber(key, def).intValue();
+	}
+	
+	// Float ////////////////
+	/**
+	 * Get with aliases.
+	 * @param key String array that want to get 
+	 * @return The first array slot key in data
+	 */
+	public Float getFloat(String[] key) {
+		return this.getFloat(key, 0.0f);
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public Float getFloat(String key) {
+		return this.getFloat(key, 0.0f);
+	}
+	
+	/**
+	 * Get with aliases.
+	 * @param key String array that want to get 
+	 * @param def Default value want to return
+	 * @return The first array slot key in data
+	 */
+	public Float getFloat(String[] key, Float def) {
+		return this.getNumber(key, def).floatValue();
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public Float getFloat(String key, Float def) {
+		return this.getNumber(key, def).floatValue();
+	}
+	
+	// Double ////////////////
+	/**
+	 * Get with aliases.
+	 * @param key String array that want to get 
+	 * @return The first array slot key in data
+	 */
+	public Double getDouble(String[] key) {
+		return this.getDouble(key, 0.0d);
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public Double getDouble(String key) {
+		return this.getDouble(key, 0.0d);
+	}
+	
+	/**
+	 * Get with aliases.
+	 * @param key String array that want to get 
+	 * @param def Default value want to return
+	 * @return The first array slot key in data
+	 */
+	public Double getDouble(String[] key, Double def) {
+		return this.getNumber(key, def).doubleValue();
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public Double getDouble(String key, Double def) {
+		return this.getNumber(key, def).doubleValue();
+	}
+	
+	// Long ////////////////
+	/**
+	 * Get with aliases.
+	 * @param key String array that want to get 
+	 * @return The first array slot key in data
+	 */
+	public Long getLong(String[] key) {
+		return this.getLong(key, 0l);
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public Long getLong(String key) {
+		return this.getLong(key, 0l);
+	}
+	
+	/**
+	 * Get with aliases.
+	 * @param key String array that want to get 
+	 * @param def Default value want to return
+	 * @return The first array slot key in data
+	 */
+	public Long getLong(String[] key, Long def) {
+		return this.getNumber(key, def).longValue();
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public Long getLong(String key, Long def) {
+		return this.getNumber(key, def).longValue();
+	}
+	
+	// List ////////////////
+	/**
+	 * Get with aliases.
+	 * @param key String array that want to get 
+	 * @return The first array slot key in data
+	 */
 	public List<String> getList(String[] key) {
 		return this.getList(key, new ArrayList<>());
 	}
 	
+	/**
+	 * Get string line value in key.
+	 * @param key Target key want to get
+	 * @return String line value
+	 */
 	public List<String> getList(String key) {
 		return this.getList(key, new ArrayList<>());
 	}
 	
+	/**
+	 * Get with aliases.
+	 * @param key String array that want to get 
+	 * @param def Default value want to return
+	 * @return The first array slot key in data
+	 */
 	public List<String> getList(String[] key, List<String> def) {
 		for (var k : key) {
 			if (!this.args.containsKey(k)) continue;
@@ -173,6 +404,12 @@ public class LineConfig {
 		return def;
 	}
 	
+	/**
+	 * Get string line value in key.
+	 * @param key Target key want to get
+	 * @param def Default value want to return
+	 * @return String line value
+	 */
 	public List<String> getList(String key, List<String> def) {
 		String value = this.args.get(key);
 		if (value == null || value.isEmpty()) return def;
@@ -187,14 +424,31 @@ public class LineConfig {
 		return list;
 	}
 	
+	// LineList ////////////////
+	/**
+	 * Get with aliases.
+	 * @param key String array that want to get 
+	 * @return The first array slot key in data
+	 */
 	public List<LineConfig> getLineList(String[] key) {
 		return this.getLineList(key, new ArrayList<>());
 	}
 	
+	/**
+	 * Get string value in key then convert to {@link LineConfig}.
+	 * @param key Target key want to get
+	 * @return String line value
+	 */
 	public List<LineConfig> getLineList(String key) {
 		return this.getLineList(key, new ArrayList<>());
 	}
 	
+	/**
+	 * Get with aliases.
+	 * @param key String array that want to get 
+	 * @param def Default value want to return
+	 * @return The first array slot key in data
+	 */
 	public List<LineConfig> getLineList(String[] key, List<LineConfig> def) {
 		for (String k : key) {
 			if (!this.args.containsKey(k)) continue;
@@ -203,6 +457,12 @@ public class LineConfig {
 		return def;
 	}
 	
+	/**
+	 * Get string value in key then convert to {@link LineConfig}.
+	 * @param key Target key want to get
+	 * @param def Default value want to return
+	 * @return String line value
+	 */
 	public List<LineConfig> getLineList(String key, List<LineConfig> def) {
 		String value = this.args.get(key);
 		if (value == null || value.isEmpty()) return def;
@@ -217,31 +477,56 @@ public class LineConfig {
 		return list;
 	}
 	
+	/**
+	 * Get result parsed of argument.
+	 * @return Map of value
+	 */
 	public Map<String, String> getArgs() {
 		return this.args;
 	}
 	
+	/**
+	 * Get the string before first bracket.
+	 * @return First string of parsed string
+	 */
 	public String getKey() {
 		return this.key;
 	}
 	
+	/**
+	 * Get the string after last bracket.
+	 * @return Last string of parsed string
+	 */
 	public String getContext() {
 		return this.context;
 	}
 	
+	/**
+	 * Get the unparsed string.
+	 * @return Raw parse string
+	 */
 	public String getRaw() {
 		return this.line_raw;
 	}
 	
+	/**
+	 * Convert to {@link SkillLineConfig}
+	 * @return Copy this data to new instance inside the class {@link SkillLineConfig}
+	 */
 	public SkillLineConfig getAsSkillLine() {
 		return new SkillLineConfig(line_raw, key, context, args);
 	}
 	
+	/**
+	 * Check if the argument is list.
+	 * @return True if argument is list
+	 */
 	public boolean isList(String key) {
 		String value = this.args.get(key);
 		return value != null && value.startsWith("[") && value.endsWith("]");
 	}
 	
+	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return "{key=" + key  + ", args=" + args + ", context=" + context + "}";

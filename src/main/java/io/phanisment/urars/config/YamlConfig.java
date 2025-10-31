@@ -11,16 +11,22 @@ import java.io.InputStream;
 import java.io.IOException;
 
 /**
- * Yaml I/O input for {@link ConfigSection}.
+ * Implementation of {@link ConfigSection} that provides
+ * support for reading and writing YAML configuration files.
+ * <p>
+ * This class uses the SnakeYAML library to parse YAML
+ * content from various sources such as {@link InputStream},
+ * {@link Reader}, {@link String}, or {@link File}.
+ * </p>
  */
 public class YamlConfig extends ConfigSection {
 	private static final Yaml yaml = new Yaml();
 	private File file;
 	
 	/**
-	 * Load data with {@link InputStream}.
-	 * 
-	 * @param io new instance with data on the I/O
+	 * Creates a new {@link YamlConfig} by loading data from an {@link InputStream}.
+	 *
+	 * @param io the input stream containing YAML data
 	 */
 	public YamlConfig(InputStream io) {
 		Map<String, Object> map = yaml.load(io);
@@ -28,9 +34,9 @@ public class YamlConfig extends ConfigSection {
 	}
 	
 	/**
-	 * Load data with {@link Reader}.
-	 * 
-	 * @param io new instance with data on the I/O
+	 * Creates a new {@link YamlConfig} by loading data from a {@link Reader}.
+	 *
+	 * @param io the reader providing YAML data
 	 */
 	public YamlConfig(Reader io) {
 		Map<String, Object> map = yaml.load(io);
@@ -38,9 +44,9 @@ public class YamlConfig extends ConfigSection {
 	}
 	
 	/**
-	 * Load data with string.
-	 * 
-	 * @param string new instance with data on string
+	 * Creates a new {@link YamlConfig} by loading data from a YAML-formatted string.
+	 *
+	 * @param string the YAML string to load
 	 */
 	public YamlConfig(String string) {
 		Map<String, Object> map = yaml.load(string);
@@ -48,16 +54,29 @@ public class YamlConfig extends ConfigSection {
 	}
 	
 	/**
-	 * Load data with {@link Reader}.
-	 * 
-	 * @param io new instance with data on the IO
-	 * @throws IOException if file is not found or not a file
+	 * Creates a new {@link YamlConfig} that reads from a file on disk.
+	 * <p>
+	 * This constructor automatically calls {@link #load()} to read
+	 * the file content if it exists.
+	 * </p>
+	 *
+	 * @param io the file to read the YAML configuration from
+	 * @throws IOException if the file cannot be read
 	 */
 	public YamlConfig(File io) throws IOException {
 		this.file = io;
 		load();
 	}
 	
+	/**
+	 * Loads the YAML configuration from the associated {@link #file}.
+	 * <p>
+	 * If the file does not exist, this method will simply return
+	 * without throwing an exception.
+	 * </p>
+	 *
+	 * @throws IOException if an error occurs while reading the file
+	 */
 	public void load() throws IOException {
 		if (!file.exists()) return;
 		try (var reader = new FileReader(file)) {
@@ -65,7 +84,14 @@ public class YamlConfig extends ConfigSection {
 			if (map != null) data.putAll(map);
 		}
 	}
-	
+	/**
+	 * Saves the current configuration data into the associated {@link #file}.
+	 * <p>
+	 * If the file does not exist, it will be created automatically.
+	 * </p>
+	 *
+	 * @throws IOException if an error occurs while writing to the file
+	 */
 	public void save() throws IOException {
 		try (var writer = new FileWriter(file)) {
 			yaml.dump(data, writer);
