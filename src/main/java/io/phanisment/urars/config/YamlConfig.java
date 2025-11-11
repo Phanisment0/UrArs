@@ -29,8 +29,7 @@ public class YamlConfig extends ConfigSection {
 	 * @param io the input stream containing YAML data
 	 */
 	public YamlConfig(InputStream io) {
-		Map<String, Object> map = yaml.load(io);
-		if (map != null) data.putAll(map);
+		this((Map<String, Object>)yaml.load(io));
 	}
 	
 	/**
@@ -39,8 +38,7 @@ public class YamlConfig extends ConfigSection {
 	 * @param io the reader providing YAML data
 	 */
 	public YamlConfig(Reader io) {
-		Map<String, Object> map = yaml.load(io);
-		if (map != null) data.putAll(map);
+		this((Map<String, Object>)yaml.load(io));
 	}
 	
 	/**
@@ -49,8 +47,7 @@ public class YamlConfig extends ConfigSection {
 	 * @param string the YAML string to load
 	 */
 	public YamlConfig(String string) {
-		Map<String, Object> map = yaml.load(string);
-		if (map != null) data.putAll(map);
+		this((Map<String, Object>)yaml.load(string));
 	}
 	
 	/**
@@ -66,6 +63,18 @@ public class YamlConfig extends ConfigSection {
 	public YamlConfig(File io) throws IOException {
 		this.file = io;
 		load();
+	}
+	
+	public YamlConfig(Map<String, Object> map) {
+		this.data.putAll(map);
+	}
+	
+	public void setFile(File file) {
+		this.file = file;
+	}
+	
+	public File getFile() {
+		return this.file;
 	}
 	
 	/**

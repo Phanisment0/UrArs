@@ -17,6 +17,13 @@ application {
 repositories {
 	mavenLocal()
 	mavenCentral()
+	maven {
+		url "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
+		content {
+			includeGroupByRegex("software\\.bernie.*")
+			includeGroup("com.eliotlash.mclib")
+		}
+	}
 }
 
 dependencies {
@@ -26,7 +33,9 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	
-	modImplementation include("org.yaml:snakeyaml:${project.snakeyaml_version}")
+	modImplementation include("software.bernie.geckolib:geckolib-fabric-${project.minecraft_version}:${project.geckolib_version}")
+	implementation include("org.yaml:snakeyaml:${project.snakeyaml_version}")
+	implementation "com.eliotlash.mclib:mclib:20"
 }
 
 test {
@@ -47,9 +56,9 @@ processResources {
 }
 
 tasks.javadoc {
-	options.links("https://maven.fabricmc.net/docs/yarn-1.21.1+build.3/")
-	options.links("https://maven.fabricmc.net/docs/fabric-loader-0.17.3/")
-	options.links("https://javadoc.io/doc/org.yaml/snakeyaml/latest/")
+//options.links("https://maven.fabricmc.net/docs/yarn-1.21.1+build.3/")
+//options.links("https://maven.fabricmc.net/docs/fabric-loader-0.17.3/")
+//options.links("https://javadoc.io/doc/org.yaml/snakeyaml/latest/")
 }
 
 tasks.withType(JavaCompile).configureEach {

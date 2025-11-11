@@ -174,14 +174,6 @@ public class ConfigSection implements IConfig {
 		return def;
 	}
 	
-	public Set<String> getKeys() {
-		return data.keySet();
-	}
-	
-	public Collection<Object> getValues() {
-		return data.values();
-	}
-	
 	public ConfigSection getSection(String key) {
 		if (this.get(key) instanceof Map map) {
 			var section = new ConfigSection();
@@ -195,6 +187,14 @@ public class ConfigSection implements IConfig {
 		var section = new SkillConfigSection();
 		section.serialize().putAll(data);
 		return section;
+	}
+	
+	public Set<String> getKeys() {
+		return data.keySet();
+	}
+	
+	public Collection<Object> getValues() {
+		return data.values();
 	}
 	
 	public void set(String key, Object value) {

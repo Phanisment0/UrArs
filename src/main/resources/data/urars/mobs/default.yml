@@ -1,0 +1,8 @@
+default:
+  type: entity
+  resource:
+    model: urars:geo/configurable_entity.geo.json
+    texture: urars:textures/entity/configurable_entity.png
+    animation: urars:animations/configurable_entity.animation.json
+  mechanics:
+  - remove{delay=200} @self ~onSpawn

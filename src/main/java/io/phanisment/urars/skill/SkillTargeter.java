@@ -7,6 +7,7 @@ import java.util.Collection;
 
 public abstract class SkillTargeter implements ISkillAction {
 	protected final SkillLineConfig config;
+	protected boolean isLocation = false;
 	
 	public SkillTargeter(SkillLineConfig config) {
 		this.config = config;

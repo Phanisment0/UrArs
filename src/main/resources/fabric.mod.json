@@ -18,6 +18,9 @@
 	"entrypoints": {
 		"main": [
 			"io.phanisment.urars.UrArs"
+		],
+		"client": [
+			"io.phanisment.urars.UrArs"
 		]
 	},
 	"mixins": [

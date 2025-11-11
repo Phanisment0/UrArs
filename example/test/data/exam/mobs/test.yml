@@ -1,0 +1,12 @@
+slash:
+  type: entity
+  resource:
+    model: exam:geo/flat.geo.json
+    texture: exam:textures/entity/slash_1.png
+  mechanics:
+  - texture{t=exam:textures/entity/slash_2.png;delay=1} @self ~onSpawn
+  - texture{t=exam:textures/entity/slash_3.png;delay=2} @self ~onSpawn
+  - texture{t=exam:textures/entity/slash_4.png;delay=3} @self ~onSpawn
+  - texture{t=exam:textures/entity/slash_5.png;delay=4} @self ~onSpawn
+  - texture{t=exam:textures/entity/slash_6.png;delay=5} @self ~onSpawn
+  - remove{delay=6} @self ~onSpawn

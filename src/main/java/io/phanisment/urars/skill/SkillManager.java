@@ -17,13 +17,21 @@ import java.util.Optional;
  * Class for managing skill registration, class registration and get the registered.
  */
 public final class SkillManager {
+	private static final Map<String, Class<? extends SkillCondition>> conditions = new HashMap<>();
 	private static final Map<String, Class<? extends SkillMechanic>> mechanics = new HashMap<>();
 	private static final Map<String, Class<? extends SkillTargeter>> targeters = new HashMap<>();
-	private static final Map<String, Class<? extends SkillCondition>> conditions = new HashMap<>();
 	
 	private static final Map<Identifier, Skill> skills = new HashMap<>();
 	
 	private SkillManager() {
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static void load() {
+		registerClasses("io.phanisment.urars.skill.conditions", conditions, SkillCondition.class);
+		registerClasses("io.phanisment.urars.skill.mechanics", mechanics, SkillMechanic.class);
+		registerClasses("io.phanisment.urars.skill.targeters", targeters, SkillTargeter.class);
+		registerClasses("io.phanisment.urars.skill.trigger", targeters, SkillTargeter.class);
 	}
 	
 	/**
@@ -31,16 +39,6 @@ public final class SkillManager {
 	 */
 	public static void unload() {
 		skills.clear();
-	}
-	
-	/**
-	 * Register all class inside mod jar. (WARNING don't use this method to load the clas again)
-	 */
-	@SuppressWarnings("unchecked")
-	public static void loadClasses() {
-		registerClasses("io.phanisment.urars.skill.conditions", conditions, SkillCondition.class);
-		registerClasses("io.phanisment.urars.skill.mechanics", mechanics, SkillMechanic.class);
-		registerClasses("io.phanisment.urars.skill.targeters", targeters, SkillTargeter.class);
 	}
 	
 	/**

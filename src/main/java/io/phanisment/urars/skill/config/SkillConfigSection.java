@@ -25,6 +25,15 @@ public class SkillConfigSection extends ConfigSection {
 				}
 			}
 			return result;
+		} else if (this.get(key) instanceof String value) {
+			List<SkillMechanic> result = new ArrayList<>();
+			var line = new SkillLineConfig(value);
+			try {
+				SkillManager.getMechanic(line).ifPresent(mechanic -> result.add(mechanic));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return result;
 		}
 		return def;
 	}
@@ -44,6 +53,15 @@ public class SkillConfigSection extends ConfigSection {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+			}
+			return result;
+		} else if (this.get(key) instanceof String value) {
+			var line = new SkillLineConfig(value);
+			List<SkillCondition> result = new ArrayList<>();
+			try {
+				SkillManager.getCondition(line).ifPresent(condition -> result.add(condition));
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 			return result;
 		}

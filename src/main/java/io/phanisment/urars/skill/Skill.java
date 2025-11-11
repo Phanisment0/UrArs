@@ -4,6 +4,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.resource.Resource;
 
 import io.phanisment.urars.skill.config.SkillConfigSection;
+import io.phanisment.urars.skill.mechanics.DelayMechanic;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class Skill {
 		this.config = config;
 		
 		this.conditions = config.getConditions("conditions");
-		this.mechanics = config.getMechanics("skills");
+		this.mechanics = config.getMechanics("mechanics");
 	}
 	
 	public void cast(SkillContext ctx) {
@@ -29,7 +30,13 @@ public class Skill {
 			if (!result) return;
 		}
 		
+		long delay = 0l;
 		for (SkillMechanic mechanic : mechanics) {
+			if (mechanic instanceof DelayMechanic delay_mechanic) {
+				delay += delay_mechanic.getDelay();
+				continue;
+			}
+			if (delay > 0l) mechanic.addDelay(delay);
 			mechanic.execute(ctx);
 		}
 	}
