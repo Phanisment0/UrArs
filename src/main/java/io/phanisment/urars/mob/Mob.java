@@ -4,7 +4,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.resource.Resource;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.nbt.NbtCompound;
 
 import io.phanisment.urars.mob.type.ConfigurableEntity;
 import io.phanisment.urars.skill.SkillContext;
@@ -13,10 +12,7 @@ import io.phanisment.urars.skill.TriggerType;
 import io.phanisment.urars.skill.config.SkillConfigSection;
 import io.phanisment.urars.skill.mechanics.DelayMechanic;
 
-import static io.phanisment.urars.UrArs.ID;
-
 import java.util.List;
-import java.util.Optional;
 
 public class Mob {
 	private final Identifier id;

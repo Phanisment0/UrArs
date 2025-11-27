@@ -61,7 +61,7 @@ public class SkillMechanic implements ISkillAction {
 			for (Entity target : skill_targeter.getTarget(ctx)) {
 				if (this instanceof INoTarget no_target && target == null) no_target.cast(ctx);
 				if (this instanceof IEntityTarget entity_target && target != null) entity_target.castAtEntity(ctx, target);
-				if (this instanceof ILocationTarget location_target && target != null && skill_targeter.isLocation) location_target.castAtLocation(ctx, target.getWorld(), target.getPos());
+				if (this instanceof ILocationTarget location_target && target != null && skill_targeter.is_location) location_target.castAtLocation(ctx, target.getWorld(), target.getPos());
 			}
 		} else if (this instanceof INoTarget no_target) no_target.cast(ctx);
 	}

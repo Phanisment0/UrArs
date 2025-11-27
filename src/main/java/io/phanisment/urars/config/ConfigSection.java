@@ -174,6 +174,7 @@ public class ConfigSection implements IConfig {
 		return def;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public ConfigSection getSection(String key) {
 		if (this.get(key) instanceof Map map) {
 			var section = new ConfigSection();

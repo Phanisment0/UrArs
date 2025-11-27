@@ -6,8 +6,6 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.Resource;
 
 import io.phanisment.urars.config.YamlConfig;
-import io.phanisment.urars.skill.Skill;
-import io.phanisment.urars.skill.SkillManager;
 import io.phanisment.urars.skill.config.SkillConfigSection;
 import io.phanisment.urars.mob.MobManager;
 import io.phanisment.urars.mob.Mob;

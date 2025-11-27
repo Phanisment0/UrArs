@@ -28,6 +28,7 @@ public class YamlConfig extends ConfigSection {
 	 *
 	 * @param io the input stream containing YAML data
 	 */
+	@SuppressWarnings("unchecked")
 	public YamlConfig(InputStream io) {
 		this((Map<String, Object>)yaml.load(io));
 	}
@@ -37,6 +38,7 @@ public class YamlConfig extends ConfigSection {
 	 *
 	 * @param io the reader providing YAML data
 	 */
+	@SuppressWarnings("unchecked")
 	public YamlConfig(Reader io) {
 		this((Map<String, Object>)yaml.load(io));
 	}
@@ -46,6 +48,7 @@ public class YamlConfig extends ConfigSection {
 	 *
 	 * @param string the YAML string to load
 	 */
+	@SuppressWarnings("unchecked")
 	public YamlConfig(String string) {
 		this((Map<String, Object>)yaml.load(string));
 	}

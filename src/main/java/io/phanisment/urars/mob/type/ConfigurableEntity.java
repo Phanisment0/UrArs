@@ -6,7 +6,6 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.world.World;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
-import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 
@@ -20,7 +19,6 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import io.phanisment.urars.mob.Mob;
 import io.phanisment.urars.mob.MobManager;
 import io.phanisment.urars.mob.MobConstant;
-import io.phanisment.urars.skill.config.SkillConfigSection;
 
 import java.util.Optional;
 

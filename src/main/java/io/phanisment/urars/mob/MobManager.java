@@ -42,7 +42,7 @@ public final class MobManager {
 	}
 	
 	private static <T extends Entity> EntityType<T> register(Identifier id, EntityType.Builder<T> type) {
-		return (EntityType)Registry.register(Registries.ENTITY_TYPE, id, type.build(id.getPath()));
+		return (EntityType<T>)Registry.register(Registries.ENTITY_TYPE, id, type.build(id.getPath()));
 	}
 	
 	static {
