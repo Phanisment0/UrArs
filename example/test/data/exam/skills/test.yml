@@ -1,10 +1,10 @@
 ex:
-  mechanics:
-  - message{m=Hi!} @self
+	mechanics:
+	- message{m=Hi!} @self
 
 del:
-  mechanics:
-  - message{m=Hi!}
-  - delay 10
-  - message{m=Im waiting for 10 tick}
-  - message{m=Im Waiting for 15 tick;delay=5}
+	mechanics:
+	- message{m=Hi!}
+	- delay 10
+	- message{m=Im waiting for 10 tick}
+	- message{m=Im Waiting for 15 tick;delay=5}

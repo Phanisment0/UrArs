@@ -9,17 +9,14 @@ import io.phanisment.urars.skill.config.SkillLineConfig;
 import java.util.Collection;
 import java.util.HashSet;
 
-@RegistryInfo(author="Phanisment", key="self")
-public class SelfTargeter extends SkillTargeter {
-	public SelfTargeter(SkillLineConfig config) {
+@RegistryInfo(author="Phanisment", key="none")
+public class NoneTargeter extends SkillTargeter {
+	public NoneTargeter(SkillLineConfig config) {
 		super(config);
 	}
 	
 	@Override
 	public Collection<Entity> getTarget(SkillContext ctx) {
-		Collection<Entity> target = new HashSet<>();
-		Entity caster = ctx.getCaster();
-		if (caster != null) target.add(caster);
-		return target;
+		return new HashSet<>();
 	}
 }

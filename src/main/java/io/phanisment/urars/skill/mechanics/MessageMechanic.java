@@ -11,7 +11,7 @@ import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.skill.target.INoTarget;
 import io.phanisment.urars.skill.target.IEntityTarget;
 
-@RegistryInfo(author="Phanisment", key="message", aliases={"msg", "send"})
+@RegistryInfo(author="Phanisment", key="message")
 public class MessageMechanic extends SkillMechanic implements INoTarget, IEntityTarget {
 	private final String message;
 	private final boolean overlay;

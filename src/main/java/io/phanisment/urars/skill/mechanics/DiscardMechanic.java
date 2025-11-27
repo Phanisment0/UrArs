@@ -11,9 +11,9 @@ import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.skill.target.INoTarget;
 import io.phanisment.urars.skill.target.IEntityTarget;
 
-@RegistryInfo(author="Phanisment", key="remove", aliases={"discard"})
-public class RemoveMechanic extends SkillMechanic implements INoTarget, IEntityTarget {
-	public RemoveMechanic(SkillLineConfig config) {
+@RegistryInfo(author="Phanisment", key="discard")
+public class DiscardMechanic extends SkillMechanic implements INoTarget, IEntityTarget {
+	public DiscardMechanic(SkillLineConfig config) {
 		super(config);
 	}
 	

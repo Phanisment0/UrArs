@@ -9,10 +9,11 @@ import io.phanisment.urars.skill.config.SkillLineConfig;
 import java.util.Collection;
 import java.util.HashSet;
 
-@RegistryInfo(author="Phanisment", key="self")
-public class SelfTargeter extends SkillTargeter {
-	public SelfTargeter(SkillLineConfig config) {
+@RegistryInfo(author="Phanisment", key="selflocation")
+public class SelfLocationTargeter extends SkillTargeter {
+	public SelfLocationTargeter(SkillLineConfig config) {
 		super(config);
+		this.is_location = true;
 	}
 	
 	@Override
