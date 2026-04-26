@@ -1,14 +1,12 @@
 package io.phanisment.urars.skill.mechanics;
 
-import net.minecraft.text.Text;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-
 import io.phanisment.urars.skill.SkillMechanic;
 import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.skill.target.INoTarget;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import io.phanisment.urars.skill.target.IEntityTarget;
 
 @RegistryInfo(author="Phanisment", key="discard")
@@ -24,7 +22,7 @@ public class DiscardMechanic extends SkillMechanic implements INoTarget, IEntity
 	
 	@Override
 	public void castAtEntity(SkillContext ctx, Entity target) {
-		if (target instanceof PlayerEntity) return;
+		if (target instanceof Player) return;
 		target.discard();
 	}
 }

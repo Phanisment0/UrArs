@@ -1,17 +1,17 @@
 package io.phanisment.urars.skill;
 
-import net.minecraft.util.Identifier;
-import net.minecraft.resource.Resource;
-
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.resources.Identifier;
 import io.phanisment.urars.skill.config.SkillConfigSection;
 import io.phanisment.urars.skill.mechanics.DelayMechanic;
 
 import java.util.List;
 
 public class Skill {
-	private final Identifier id;
-	private final Resource resource;
-	private final SkillConfigSection config;
+	public final Identifier id;
+	public final Resource resource;
+	public final SkillConfigSection config;
+	
 	private final List<SkillCondition> conditions;
 	private final List<SkillMechanic> mechanics;
 	

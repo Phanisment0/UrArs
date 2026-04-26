@@ -1,6 +1,6 @@
 package io.phanisment.urars.skill.targeters;
 
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 
 import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.SkillTargeter;

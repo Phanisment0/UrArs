@@ -5,7 +5,7 @@ import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 
-@RegistryInfo(author="Phanisment", key="onground", aliases={"isonground", "ground"})
+@RegistryInfo(author="Phanisment", key="onground")
 public class OnGroundCondition extends SkillCondition {
 	public OnGroundCondition(SkillLineConfig config) {
 		super(config);
@@ -13,6 +13,6 @@ public class OnGroundCondition extends SkillCondition {
 	
 	@Override
 	public boolean check(SkillContext ctx) {
-		return ctx.getCaster().isOnGround();
+		return ctx.getCaster().onGround();
 	}
 }

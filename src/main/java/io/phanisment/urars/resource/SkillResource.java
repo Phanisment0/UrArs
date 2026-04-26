@@ -1,50 +1,54 @@
 package io.phanisment.urars.resource;
 
-import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
-import net.minecraft.util.Identifier;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.Resource;
+import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 import io.phanisment.urars.config.YamlConfig;
 import io.phanisment.urars.skill.Skill;
 import io.phanisment.urars.skill.SkillManager;
 import io.phanisment.urars.skill.config.SkillConfigSection;
 
-import static io.phanisment.urars.UrArs.ID;
 import static io.phanisment.urars.UrArs.LOGGER;
 
-import java.util.Map;
-import java.io.InputStream;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
 
-/**
- * Get folder skills in datapack and then register the skill to SkillManager.
- */
-public final class SkillResource implements SimpleSynchronousResourceReloadListener {
+public final class SkillResource implements PreparableReloadListener {
+
 	@Override
-	public Identifier getFabricId() {
-		return Identifier.of(ID, "skill_data");
+	public CompletableFuture<Void> reload(SharedState state, Executor prepare_exc, PreparationBarrier prep, Executor reload_exc) {
+		ResourceManager manager = state.resourceManager();
+		return CompletableFuture.runAsync(() -> load(manager), prepare_exc)
+		 .thenCompose(prep::wait)
+		 .thenRunAsync(this::apply, reload_exc);
 	}
-	
-	@Override
-	public void reload(ResourceManager manager) {
-		SkillManager.unload();
-		
-		Map<Identifier, Resource> resources = manager.findResources("skills", path -> path.getPath().endsWith(".yml"));
-		for (Map.Entry<Identifier, Resource> entry : resources.entrySet()) {
+
+	// Load all file with extension `.yml` in file skills
+	private void load(ResourceManager manager) {
+		Map<Identifier, Resource> list_resource =	manager.listResources("skills", id -> id.getPath().endsWith(".yml"));
+		for (var entry : list_resource.entrySet()) {
 			Identifier id = entry.getKey();
 			Resource resource = entry.getValue();
-			
-			try (InputStream stream = resource.getInputStream()) {
+			try (var stream = resource.open()) {
 				var config = new YamlConfig(stream);
 				for (String name : config.getKeys()) {
 					SkillConfigSection section = config.getSection(name).getAsSkillSection();
 					var skill = new Skill(id, resource, section);
-					SkillManager.registerSkill(Identifier.of(id.getNamespace(), name), skill);
+					SkillManager.registerSkill(Identifier.fromNamespaceAndPath(id.getNamespace(), name), skill);
 				}
-			} catch (Exception e) {
-				LOGGER.error("Unexpected error", e);
+			} catch (IOException err) {
+				LOGGER.warn("File is not loaded", err);
 			}
 		}
-		LOGGER.info("Loaded " + SkillManager.getSkills().size() + " skills");
+	}
+
+	// If done parsing the file, will be applied
+	private void apply() {
+		int count = 0; // Just a pesudo data length
+		LOGGER.info("Loaded " + count + " skills");
 	}
 }

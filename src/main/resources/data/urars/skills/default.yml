@@ -1,3 +1,0 @@
-default:
-  mechanics:
-  - message{m=Hello World!} @self

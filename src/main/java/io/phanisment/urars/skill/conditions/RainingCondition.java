@@ -13,6 +13,6 @@ public class RainingCondition extends SkillCondition {
 	
 	@Override
 	public boolean check(SkillContext ctx) {
-		return ctx.getCaster().getWorld().isRaining();
+		return ctx.getCaster().level().isRaining();
 	}
 }

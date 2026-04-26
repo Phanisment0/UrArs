@@ -1,76 +1,41 @@
 plugins {
-	id "fabric-loom" version "1.11-SNAPSHOT"
-	id "application"
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
 }
 
-version = project.version
+version = project.mod_version
 group = project.maven_group
 
-base {
-	archivesName = project.name
-}
-
-application {
-	mainClass = project.main_class
-}
-
 repositories {
-	mavenLocal()
 	mavenCentral()
-	maven {
-		url "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
-		content {
-			includeGroupByRegex("software\\.bernie.*")
-			includeGroup("com.eliotlash.mclib")
-		}
-	}
 }
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	
-	modImplementation include("software.bernie.geckolib:geckolib-fabric-${project.minecraft_version}:${project.geckolib_version}")
-	implementation include("org.yaml:snakeyaml:${project.snakeyaml_version}")
-	implementation "com.eliotlash.mclib:mclib:20"
-}
-
-test {
-	useJUnitPlatform()
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	implementation include("org.yaml:snakeyaml:${project.snakeyml_version}")
 }
 
 processResources {
-	def props = [
-		"version": project.version
-	]
-	inputs.properties(props)
-	filesMatching("fabric.mod.json") {
-		expand(props)
-	}
-	from("LICENSE") {
-		into(".")
-	}
-}
+	inputs.property "version", project.version
 
-tasks.javadoc {
-//options.links("https://maven.fabricmc.net/docs/yarn-1.21.1+build.3/")
-//options.links("https://maven.fabricmc.net/docs/fabric-loader-0.17.3/")
-//options.links("https://javadoc.io/doc/org.yaml/snakeyaml/latest/")
+	filesMatching("fabric.mod.json") {
+		expand "version": inputs.properties.version
+	}
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 21
+	it.options.release = 25
 }
 
 java {
-	withSourcesJar()
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {
-	inputs.property "archivesName", project.base.archivesName
+	inputs.property "projectName", project.name
+	from("LICENSE") {
+		rename { "${it}_${project.name}"}
+	}
 }

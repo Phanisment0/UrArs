@@ -1,12 +1,11 @@
 package io.phanisment.urars.skill;
 
-import net.minecraft.util.Identifier;
-
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.util.AnnotationScanner;
+import net.minecraft.resources.Identifier;
 
-import static io.phanisment.urars.UrArs.ID;
+import static io.phanisment.urars.UrArs.MOD_ID;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -26,7 +25,6 @@ public final class SkillManager {
 	private SkillManager() {
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static void load() {
 		registerClasses("io.phanisment.urars.skill.conditions", conditions, SkillCondition.class);
 		registerClasses("io.phanisment.urars.skill.mechanics", mechanics, SkillMechanic.class);
@@ -183,7 +181,7 @@ public final class SkillManager {
 	 */
 	@SuppressWarnings("unchecked")
 	private static <T> void registerClasses(String path, Map<String, Class<? extends T>> registry, Class<T> base_class) {
-		for (Class<?> clazz : AnnotationScanner.find(ID, path, RegistryInfo.class)) {
+		for (Class<?> clazz : AnnotationScanner.find(MOD_ID, path, RegistryInfo.class)) {
 			if (!base_class.isAssignableFrom(clazz)) return;
 			RegistryInfo info = clazz.getAnnotation(RegistryInfo.class);
 			if (info == null) return;

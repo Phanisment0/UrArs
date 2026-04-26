@@ -1,8 +1,9 @@
 package io.phanisment.urars.skill;
 
-import net.minecraft.entity.Entity;
-
 import java.util.Map;
+
+import net.minecraft.world.entity.Entity;
+
 import java.util.HashMap;
 
 public class SkillContext {
@@ -19,6 +20,10 @@ public class SkillContext {
 	}
 	
 	public Entity getCaster() {
-		return this.entity;
+		return entity;
+	}
+
+	public Map<String, Object> getVariables() {
+		return variables;
 	}
 }

@@ -1,6 +1,6 @@
 package io.phanisment.urars.skill;
 
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.util.Location;
@@ -20,7 +20,7 @@ public abstract class SkillTargeter implements ISkillAction {
 	public Collection<Location> getLocation(SkillContext ctx) {
 		List<Location> locs = new ArrayList<>();
 		for (Entity entity : getTarget(ctx)) {
-			locs.add(new Location(entity.getWorld(), entity.getPos()));
+			locs.add(new Location(entity.level(), entity.position()));
 		}
 		return locs;
 	}

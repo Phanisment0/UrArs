@@ -1,8 +1,7 @@
 package io.phanisment.urars.skill;
 
-import net.minecraft.util.Identifier;
-
 import io.phanisment.urars.skill.config.SkillLineConfig;
+import net.minecraft.resources.Identifier;
 
 import static io.phanisment.urars.UrArs.LOGGER;
 
@@ -22,7 +21,7 @@ public abstract class SkillCondition implements ISkillAction {
 		
 		String[] part = context.split(" ", 2);
 		String type = part[0].toLowerCase();
-		var skill_id = Identifier.of(part[1]);
+		Identifier skill_id = Identifier.parse(part[1]);
 		switch (type) {
 			case "true":
 				return result;

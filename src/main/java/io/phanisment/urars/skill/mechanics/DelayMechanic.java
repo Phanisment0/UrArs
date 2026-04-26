@@ -1,10 +1,6 @@
 package io.phanisment.urars.skill.mechanics;
 
-import net.minecraft.text.Text;
-import net.minecraft.entity.player.PlayerEntity;
-
 import io.phanisment.urars.skill.SkillMechanic;
-import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 

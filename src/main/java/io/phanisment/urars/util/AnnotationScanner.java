@@ -2,8 +2,6 @@ package io.phanisment.urars.util;
 
 import net.fabricmc.loader.api.FabricLoader;
 
-import static io.phanisment.urars.UrArs.LOGGER;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -16,10 +14,15 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Utility for find annotation class in specific package inside mod jar.
  */
 public final class AnnotationScanner {
+	private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationScanner.class);
+
 	private AnnotationScanner() {
 	}
 
@@ -40,9 +43,7 @@ public final class AnnotationScanner {
 			
 			try (InputStream input = Files.newInputStream(Path.of(decoded_path)); JarInputStream jar_stream = new JarInputStream(input)) {
 				JarEntry entry;
-				while ((entry = jar_stream.getNextJarEntry()) != null) {
-					if (isTargetClass(entry, path)) loadIfAnnotated(entry, annotation, results);
-				}
+				while ((entry = jar_stream.getNextJarEntry()) != null) if (isTargetClass(entry, path)) loadIfAnnotated(entry, annotation, results);
 			}
 		} catch (IOException e) {
 			LOGGER.error("[AnnotationScanner] Failed to read the jar", e);
@@ -54,14 +55,12 @@ public final class AnnotationScanner {
 	private static boolean isTargetClass(JarEntry entry, String path) {
 		return entry.getName().endsWith(".class") && entry.getName().replace('/', '.').startsWith(path);
 	}
-	
+
 	private static <T extends Annotation> void loadIfAnnotated(JarEntry entry, Class<T> annotation, List<Class<?>> results) {
 		String class_name = entry.getName().replace('/', '.').replace(".class", "");
 		try {
 			Class<?> clazz = Class.forName(class_name, false, AnnotationScanner.class.getClassLoader());
-			if (clazz.isAnnotationPresent(annotation)) {
-				results.add(clazz);
-			}
+			if (clazz.isAnnotationPresent(annotation)) results.add(clazz);
 		} catch (LinkageError | ClassNotFoundException ignored) {
 			// Ignored
 		}

@@ -1,12 +1,11 @@
 package io.phanisment.urars.skill;
 
-import net.minecraft.entity.Entity;
-
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.skill.target.IEntityTarget;
 import io.phanisment.urars.skill.target.ILocationTarget;
 import io.phanisment.urars.skill.target.INoTarget;
 import io.phanisment.urars.util.TickScheduler;
+import net.minecraft.world.entity.Entity;
 
 import java.util.Optional;
 
@@ -61,7 +60,7 @@ public class SkillMechanic implements ISkillAction {
 			for (Entity target : skill_targeter.getTarget(ctx)) {
 				if (this instanceof INoTarget no_target && target == null) no_target.cast(ctx);
 				if (this instanceof IEntityTarget entity_target && target != null) entity_target.castAtEntity(ctx, target);
-				if (this instanceof ILocationTarget location_target && target != null && skill_targeter.is_location) location_target.castAtLocation(ctx, target.getWorld(), target.getPos());
+				if (this instanceof ILocationTarget location_target && target != null && skill_targeter.is_location) location_target.castAtLocation(ctx, target.level(), target.position());
 			}
 		} else if (this instanceof INoTarget no_target) no_target.cast(ctx);
 	}

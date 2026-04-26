@@ -1,8 +1,7 @@
 package io.phanisment.urars.config;
 
-import net.minecraft.util.Identifier;
-
 import io.phanisment.urars.skill.config.SkillConfigSection;
+import net.minecraft.resources.Identifier;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -28,7 +27,7 @@ public class ConfigSection implements IConfig {
 	
 	public Identifier getIdentifier(String key, Identifier def) {
 		String value = this.getString(key);
-		return value != null ? Identifier.of(value) : def;
+		return value != null ? Identifier.parse(value) : def;
 	}
 	
 	public List<LineConfig> getLineList(String key) {
