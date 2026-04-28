@@ -3,7 +3,6 @@ package io.phanisment.urars.skill;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.resources.Identifier;
 import io.phanisment.urars.skill.config.SkillConfigSection;
-import io.phanisment.urars.skill.mechanics.DelayMechanic;
 
 import java.util.List;
 
@@ -25,19 +24,7 @@ public class Skill {
 	}
 	
 	public void cast(SkillContext ctx) {
-		for (SkillCondition condition : conditions) {
-			boolean result = condition.execute(ctx);
-			if (!result) return;
-		}
-		
-		long delay = 0l;
-		for (SkillMechanic mechanic : mechanics) {
-			if (mechanic instanceof DelayMechanic delay_mechanic) {
-				delay += delay_mechanic.getDelay();
-				continue;
-			}
-			if (delay > 0l) mechanic.addDelay(delay);
-			mechanic.execute(ctx);
-		}
+		if (!conditions.stream().allMatch(c -> c.execute(ctx))) return;
+		mechanics.forEach(mechanic -> mechanic.execute(ctx));
 	}
 }

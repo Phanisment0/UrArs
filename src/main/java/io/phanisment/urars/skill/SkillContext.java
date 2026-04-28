@@ -9,6 +9,8 @@ import java.util.HashMap;
 public class SkillContext {
 	private final Entity entity;
 	private final Map<String, Object> variables;
+
+	public long global_delay = 0;
 	
 	public SkillContext(Entity entity) {
 		this(entity, new HashMap<>());

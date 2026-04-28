@@ -7,12 +7,26 @@ group = project.maven_group
 
 repositories {
 	mavenCentral()
-}
+//exclusiveContent {
+//	forRepository {
+//		maven {
+//			name = 'GeckoLib'
+//			url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+//		}
+//	}
+//	filter { 
+//		includeGroup('software.bernie.geckolib')
+//	}
+//}
+}	
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	
+//implementation include("software.bernie.geckolib:geckolib-fabric-${project.minecraft_version}:${project.geckolib_version}")
+
 	implementation include("org.yaml:snakeyaml:${project.snakeyml_version}")
 }
 

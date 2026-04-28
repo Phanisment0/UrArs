@@ -47,14 +47,12 @@ public class SkillMechanic implements ISkillAction {
 	}
 	
 	public void execute(SkillContext ctx) {
-		if (delay > 0l) {
-			TickScheduler.wait(this.delay, () -> this.cast(ctx));
-			return;
-		}
-		this.cast(ctx);
+		long total_delay = this.delay + ctx.global_delay;
+		if (total_delay > 0l) TickScheduler.wait(this.delay, () -> this.executeAtTarget(ctx));
+		else this.executeAtTarget(ctx);
 	}
 	
-	private void cast(SkillContext ctx) {
+	private void executeAtTarget(SkillContext ctx) {
 		if (this.targeter.isPresent()) {
 			SkillTargeter skill_targeter = targeter.get();
 			for (Entity target : skill_targeter.getTarget(ctx)) {
