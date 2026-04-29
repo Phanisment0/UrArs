@@ -48,7 +48,7 @@ public class SkillMechanic implements ISkillAction {
 	
 	public void execute(SkillContext ctx) {
 		long total_delay = this.delay + ctx.global_delay;
-		if (total_delay > 0l) TickScheduler.wait(this.delay, () -> this.executeAtTarget(ctx));
+		if (total_delay > 0l) TickScheduler.wait(total_delay, () -> this.executeAtTarget(ctx));
 		else this.executeAtTarget(ctx);
 	}
 	

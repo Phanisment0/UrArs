@@ -20,7 +20,6 @@ public class DelayMechanic extends SkillMechanic {
 
 	@Override
 	public void execute(SkillContext ctx) {
-		super.execute(ctx);
 		ctx.global_delay += execute_offset;
-	} 
+	}
 }

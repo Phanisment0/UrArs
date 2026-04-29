@@ -6,8 +6,6 @@ import org.slf4j.LoggerFactory;
 import io.phanisment.urars.resource.SkillResource;
 import io.phanisment.urars.skill.SkillManager;
 import io.phanisment.urars.util.TickScheduler;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -22,22 +20,19 @@ public class UrArs implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		SkillManager.load();
 		ResourceLoader.get(PackType.SERVER_DATA).registerReloadListener(Identifier.fromNamespaceAndPath(MOD_ID, "skill"), new SkillResource());
 		ServerLifecycleEvents.SERVER_STARTING.register(this::serverStart);
 		ServerLifecycleEvents.SERVER_STOPPED.register(this::serverStop);
 	}
 
-	@Environment(EnvType.SERVER)
 	private void serverStart(MinecraftServer server) {
 		ServerTickEvents.END_SERVER_TICK.register(this::tick);
-		SkillManager.load();
 	}
 
-	@Environment(EnvType.SERVER)
 	private void serverStop(MinecraftServer server) {
 	}
 
-	@Environment(EnvType.SERVER)
 	private void tick(MinecraftServer server) {
 		TickScheduler.init();
 	}
