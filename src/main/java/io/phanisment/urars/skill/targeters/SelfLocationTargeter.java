@@ -19,7 +19,7 @@ public class SelfLocationTargeter extends SkillTargeter {
 	@Override
 	public Collection<Entity> getTarget(SkillContext ctx) {
 		Collection<Entity> target = new HashSet<>();
-		Entity caster = ctx.getCaster();
+		Entity caster = ctx.entity();
 		if (caster != null) target.add(caster);
 		return target;
 	}

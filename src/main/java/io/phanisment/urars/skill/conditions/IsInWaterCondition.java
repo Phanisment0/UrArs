@@ -13,6 +13,6 @@ public class IsInWaterCondition extends SkillCondition {
 	
 	@Override
 	public boolean check(SkillContext ctx) {
-		return ctx.getCaster().isInWater();
+		return ctx.entity().isInWater();
 	}
 }

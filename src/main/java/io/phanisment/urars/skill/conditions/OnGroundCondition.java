@@ -13,6 +13,6 @@ public class OnGroundCondition extends SkillCondition {
 	
 	@Override
 	public boolean check(SkillContext ctx) {
-		return ctx.getCaster().onGround();
+		return ctx.entity().onGround();
 	}
 }

@@ -10,15 +10,16 @@ import static io.phanisment.urars.UrArs.MOD_ID;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Optional;
 
 /**
  * Class for managing skill registration, class registration and get the registered.
  */
 public final class SkillManager {
-	private static final Map<String, Class<? extends SkillCondition>> conditions = new HashMap<>();
-	private static final Map<String, Class<? extends SkillMechanic>> mechanics = new HashMap<>();
-	private static final Map<String, Class<? extends SkillTargeter>> targeters = new HashMap<>();
+	private static final Map<String, Class<? extends SkillCondition>> conditions = new ConcurrentHashMap<>();
+	private static final Map<String, Class<? extends SkillMechanic>> mechanics = new ConcurrentHashMap<>();
+	private static final Map<String, Class<? extends SkillTargeter>> targeters = new ConcurrentHashMap<>();
 	
 	private static final Map<Identifier, Skill> skills = new HashMap<>();
 	
@@ -45,7 +46,7 @@ public final class SkillManager {
 	 * @param id Id of the skill
 	 * @return   Registered skill
 	 */
-	public static Optional<Skill> getSkill(Identifier id) {
+	public static Optional<Skill> getSkill(final Identifier id) {
 		return Optional.ofNullable(skills.get(id));
 	}
 	
@@ -180,7 +181,7 @@ public final class SkillManager {
 	 * @parsm base_class Extended class
 	 */
 	@SuppressWarnings("unchecked")
-	private static <T> void registerClasses(String path, Map<String, Class<? extends T>> registry, Class<T> base_class) {
+	public static <T> void registerClasses(String path, Map<String, Class<? extends T>> registry, Class<T> base_class) {
 		for (Class<?> clazz : AnnotationScanner.find(MOD_ID, path, RegistryInfo.class)) {
 			if (!base_class.isAssignableFrom(clazz)) return;
 			RegistryInfo info = clazz.getAnnotation(RegistryInfo.class);

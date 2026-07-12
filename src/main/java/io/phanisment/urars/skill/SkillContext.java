@@ -21,11 +21,11 @@ public class SkillContext {
 		this.variables = variables;
 	}
 	
-	public Entity getCaster() {
+	public Entity entity() {
 		return entity;
 	}
 
-	public Map<String, Object> getVariables() {
+	public Map<String, Object> variables() {
 		return variables;
 	}
 }

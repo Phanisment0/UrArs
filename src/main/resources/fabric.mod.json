@@ -12,9 +12,9 @@
 	},
 	"license": "MIT",
 	"icon": "icon.png",
-	"environment": "*",
+	"environment": "server",
 	"entrypoints": {
-		"main": [
+		"server": [
 			"io.phanisment.urars.UrArs"
 		]
 	},

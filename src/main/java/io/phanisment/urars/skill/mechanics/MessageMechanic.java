@@ -23,7 +23,7 @@ public class MessageMechanic extends SkillMechanic implements INoTarget, IEntity
 	
 	@Override
 	public void cast(SkillContext ctx) {
-		this.castAtEntity(ctx, ctx.getCaster());
+		this.castAtEntity(ctx, ctx.entity());
 	}
 	
 	@Override

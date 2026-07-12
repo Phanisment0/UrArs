@@ -18,7 +18,7 @@ public class EntityInNearTargeter extends SkillTargeter {
 
 	@Override
 	public Collection<Entity> getTarget(SkillContext ctx) {
-		Entity caster = ctx.getCaster();
+		Entity caster = ctx.entity();
 		if (caster == null) return null;
 		AABB area = caster.getBoundingBox().inflate(radius);
 		return caster.level().getEntities(caster, area, entity -> entity.isAlive());

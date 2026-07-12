@@ -1,1 +1,0 @@
-Read this if you want continue the development

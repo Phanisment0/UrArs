@@ -7,11 +7,13 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
+import io.phanisment.urars.mobs.MobManager;
 import io.phanisment.urars.skill.SkillCondition;
 import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.SkillManager;
 import io.phanisment.urars.skill.SkillMechanic;
 import io.phanisment.urars.skill.config.SkillLineConfig;
+import io.phanisment.urars.util.Location;
 import net.minecraft.commands.arguments.IdentifierArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -45,7 +47,39 @@ public class UrArsCommand {
 			.then(argument("line", StringArgumentType.greedyString())
 				.executes(UrArsCommand::condition)
 			)
+		)
+		.then(literal("spawn")
+			.then(argument("mob", IdentifierArgument.id())
+				.suggests(UrArsCommand::spawn_suggest)
+				.executes(UrArsCommand::spawn)
+			)
 		));
+	}
+
+	private static CompletableFuture<Suggestions> spawn_suggest(CommandContext<CommandSourceStack>  context, SuggestionsBuilder builder) {
+		String remaining = builder.getRemaining().toLowerCase();
+		
+		for (Identifier id : MobManager.getMobs()) {
+			String mob = id.toString();
+			if (mob.startsWith(remaining)) builder.suggest(mob);
+		}
+		return builder.buildFuture();
+	}
+	
+	private static int spawn(CommandContext<CommandSourceStack>  ctx) {
+		CommandSourceStack source = ctx.getSource();
+		ServerPlayer player = source.getPlayer();
+		if (player == null) return 0;
+		
+		Identifier mob_id = IdentifierArgument.getId(ctx, "mob");
+		MobManager.getMob(mob_id).ifPresentOrElse(mob -> {
+			mob.spawn(new Location(source.getLevel(), player.position()));
+			source.sendSuccess(() -> Component.literal("Spawned mob: " + mob_id), false);
+		}, () -> {
+			source.sendSuccess(() -> Component.literal("Unknown mob: " + mob_id), false);
+		});
+		
+		return 1;
 	}
 	
 	private static CompletableFuture<Suggestions> cast_suggest(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
