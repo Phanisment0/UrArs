@@ -3,8 +3,6 @@ package io.phanisment.urars;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.phanisment.urars.resource.MobResource;
-import io.phanisment.urars.resource.SkillResource;
 import io.phanisment.urars.skill.SkillManager;
 import io.phanisment.urars.util.TickScheduler;
 import net.fabricmc.api.DedicatedServerModInitializer;
@@ -26,8 +24,7 @@ public class UrArs implements DedicatedServerModInitializer {
 	@Override
 	public void onInitializeServer() {
 		SkillManager.load();
-		ResourceLoader.get(PackType.SERVER_DATA).registerReloadListener(of("skill"), new SkillResource());
-		ResourceLoader.get(PackType.SERVER_DATA).registerReloadListener(of("mob"), new MobResource());
+		ResourceLoader.get(PackType.SERVER_DATA).registerReloadListener(of("resource_data"), new UrarsResource());
 		ServerLifecycleEvents.SERVER_STARTING.register(this::serverStart);
 		ServerLifecycleEvents.SERVER_STOPPED.register(this::serverStop);
 	}

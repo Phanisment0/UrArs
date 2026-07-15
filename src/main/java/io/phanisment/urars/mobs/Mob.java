@@ -1,7 +1,5 @@
 package io.phanisment.urars.mobs;
 
-import static io.phanisment.urars.UrArs.LOGGER;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,24 +8,23 @@ import io.phanisment.urars.skill.SkillMechanic;
 import io.phanisment.urars.skill.TriggerType;
 import io.phanisment.urars.skill.config.SkillConfigSection;
 import io.phanisment.urars.util.Location;
-import net.minecraft.nbt.CompoundTag;
+import io.phanisment.urars.util.MobBuilder;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.SpawnGroupData;
 
 public class Mob {
 	private final Identifier id;
+	@SuppressWarnings("unused")
 	private final Resource resource;
+	@SuppressWarnings("unused")
 	private final SkillConfigSection config;
 
+	@SuppressWarnings("unused")
 	private Identifier type;
 	private List<SkillMechanic> mechanics = new ArrayList<>();
 
-	public Mob(Identifier id, Resource resource, SkillConfigSection config) {
+	public Mob(final Identifier id, final Resource resource, final SkillConfigSection config) {
 		this.id = id;
 		this.resource = resource;
 		this.config = config;
@@ -36,30 +33,18 @@ public class Mob {
 		this.mechanics = config.getMechanics("mechanics");
 	}
 
-	public void spawn(Location loc) {
-		var nbt = new CompoundTag();
-		nbt.putString("urars:mob_type", type.toString());
-
-		Entity entity = EntityType.loadEntityRecursive(nbt, loc.level(), EntitySpawnReason.COMMAND, e -> {
-			e.snapTo(loc.pos());
+	public void spawn(final Location loc) {
+		Entity entity = MobBuilder.create(id, loc).beforeSpawn(e -> {
 			this.cast(TriggerType.ON_PRE_SPAWN, new SkillContext(e));
-			return e;
-		});
-
-		if (entity == null) {
-			LOGGER.warn("Unknown entity type: " + type);
-			return;
-		}
-		
-		if (entity instanceof net.minecraft.world.entity.Mob mob) mob.finalizeSpawn((ServerLevel)loc.level(), ((ServerLevel)loc.level()).getCurrentDifficultyAt(entity.blockPosition()), EntitySpawnReason.COMMAND, (SpawnGroupData)null);
+		}).spawn();
 		this.cast(TriggerType.ON_SPAWN, new SkillContext(entity));
 	}
 
-	private void cast(TriggerType trigger, SkillContext ctx) {
+	private void cast(final TriggerType trigger, final SkillContext ctx) {
 		this.cast(trigger.toString(), ctx);
 	}
 
-	private void cast(String trigger, SkillContext ctx) {
+	private void cast(final String trigger, final SkillContext ctx) {
 		for (SkillMechanic mechanic : mechanics) {
 			if (!trigger.equalsIgnoreCase(mechanic.getTrigger())) continue;
 			mechanic.execute(ctx);
