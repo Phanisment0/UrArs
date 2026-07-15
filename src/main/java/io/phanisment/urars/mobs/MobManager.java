@@ -11,7 +11,10 @@ public final class MobManager {
 	private static final Map<Identifier, Mob> mobs = new ConcurrentHashMap<>();
 
 	private MobManager() {
+	}
 
+	public static void unload() {
+		mobs.clear();
 	}
 
 	public static boolean registerMob(Identifier id, Mob mob) {

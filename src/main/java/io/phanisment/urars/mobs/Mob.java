@@ -3,6 +3,7 @@ package io.phanisment.urars.mobs;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.phanisment.urars.UrArsComponents;
 import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.SkillMechanic;
 import io.phanisment.urars.skill.TriggerType;
@@ -20,7 +21,6 @@ public class Mob {
 	@SuppressWarnings("unused")
 	private final SkillConfigSection config;
 
-	@SuppressWarnings("unused")
 	private Identifier type;
 	private List<SkillMechanic> mechanics = new ArrayList<>();
 
@@ -34,20 +34,18 @@ public class Mob {
 	}
 
 	public void spawn(final Location loc) {
-		Entity entity = MobBuilder.create(id, loc).beforeSpawn(e -> {
+		Entity entity = MobBuilder.create(type, loc).beforeSpawn(e -> {
+			UrArsComponents.MOB.get(e).id(id.toString());
 			this.cast(TriggerType.ON_PRE_SPAWN, new SkillContext(e));
 		}).spawn();
 		this.cast(TriggerType.ON_SPAWN, new SkillContext(entity));
 	}
 
-	private void cast(final TriggerType trigger, final SkillContext ctx) {
-		this.cast(trigger.toString(), ctx);
+	public void cast(final TriggerType trigger, final SkillContext ctx) {
+		this.cast(trigger.alias(), ctx);
 	}
 
-	private void cast(final String trigger, final SkillContext ctx) {
-		for (SkillMechanic mechanic : mechanics) {
-			if (!trigger.equalsIgnoreCase(mechanic.getTrigger())) continue;
-			mechanic.execute(ctx);
-		}
+	public void cast(final String trigger, final SkillContext ctx) {
+		for (SkillMechanic mechanic : mechanics) if (trigger.equalsIgnoreCase(mechanic.getTrigger())) mechanic.execute(ctx);
 	}
 }

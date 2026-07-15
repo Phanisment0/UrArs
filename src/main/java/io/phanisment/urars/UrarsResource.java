@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+import org.jspecify.annotations.NonNull;
+
 import io.phanisment.urars.config.YamlConfig;
 import io.phanisment.urars.mobs.Mob;
 import io.phanisment.urars.mobs.MobManager;
@@ -20,8 +22,9 @@ import net.minecraft.server.packs.resources.ResourceManager;
 
 public final class UrarsResource implements PreparableReloadListener {
 
+	@NonNull
 	@Override
-	public CompletableFuture<Void> reload(SharedState state, Executor prepare_exc, PreparationBarrier prep, Executor reload_exc) {
+	public CompletableFuture<Void> reload(@NonNull SharedState state, @NonNull Executor prepare_exc, @NonNull PreparationBarrier prep, @NonNull Executor reload_exc) {
 		ResourceManager manager = state.resourceManager();
 		return CompletableFuture.runAsync(() -> {
 			loadSkills(manager);
@@ -33,6 +36,7 @@ public final class UrarsResource implements PreparableReloadListener {
 	}
 
 	private void loadSkills(ResourceManager manager) {
+		SkillManager.unload();
 		Map<Identifier, Resource> list_resource =	manager.listResources("skills", id -> id.getPath().endsWith(".yml"));
 		for (var entry : list_resource.entrySet()) {
 			Identifier path = entry.getKey();
@@ -52,6 +56,7 @@ public final class UrarsResource implements PreparableReloadListener {
 	}
 
 	private void loadMobs(ResourceManager manager) {
+		MobManager.unload();
 		Map<Identifier, Resource> list_resource =	manager.listResources("mobs", id -> id.getPath().endsWith(".yml"));
 		for (var entry : list_resource.entrySet()) {
 			Identifier path = entry.getKey();
@@ -76,6 +81,6 @@ public final class UrarsResource implements PreparableReloadListener {
 	}
 
 	private void appliedMobs() {
-		LOGGER.info("Loaded " + MobManager.getMobs().size() + " skills");
+		LOGGER.info("Loaded " + MobManager.getMobs().size() + " mobs");
 	}
 }

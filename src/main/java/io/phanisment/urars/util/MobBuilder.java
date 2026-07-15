@@ -1,5 +1,8 @@
 package io.phanisment.urars.util;
 
+import static io.phanisment.urars.UrArs.LOGGER;
+
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.jspecify.annotations.NonNull;
@@ -21,7 +24,7 @@ public final class MobBuilder {
 	private Consumer<Entity> before_spawn;
 	private boolean silent_spawn = false;
 
-	private MobBuilder(EntityType<?> type, Location location) {
+	private MobBuilder(@NonNull EntityType<?> type, @NonNull Location location) {
 		this.type = type;
 		this.location = location;
 	}
@@ -31,8 +34,9 @@ public final class MobBuilder {
 	}
 
 	public static MobBuilder create(final Identifier id, Location location) throws IllegalArgumentException {
-		EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.getOptional(id).orElseThrow(() -> new IllegalArgumentException("Unknown entity type: " + id));
-		return new MobBuilder(type, location);
+		Optional<EntityType<?>> type = BuiltInRegistries.ENTITY_TYPE.getOptional(id);
+		if (!type.isPresent()) LOGGER.error("Unknown entity type: " + id);
+		return new MobBuilder(type.get(), location);
 	}
 
 	public MobBuilder location(final Location location) {
@@ -78,13 +82,13 @@ public final class MobBuilder {
 	}
 
 	public Entity spawn(final Entity entity) {
-		location.level().addFreshEntityWithPassengers(entity);
+		location.level().addFreshEntity(entity);
 		if ((entity instanceof Mob mob) && !silent_spawn) mob.playAmbientSound();
 		return entity;
 	}
 
 	public static Entity spawn(final Entity entity, final Location location) {
-		location.level().addFreshEntityWithPassengers(entity);
+		location.level().addFreshEntity(entity);
 		if (entity instanceof Mob mob) mob.playAmbientSound();
 		return entity;
 	}

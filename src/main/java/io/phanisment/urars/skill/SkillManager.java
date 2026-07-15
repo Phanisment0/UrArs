@@ -8,9 +8,9 @@ import net.minecraft.resources.Identifier;
 import static io.phanisment.urars.UrArs.MOD_ID;
 
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
 import java.util.Optional;
 
 /**
@@ -21,11 +21,12 @@ public final class SkillManager {
 	private static final Map<String, Class<? extends SkillMechanic>> mechanics = new ConcurrentHashMap<>();
 	private static final Map<String, Class<? extends SkillTargeter>> targeters = new ConcurrentHashMap<>();
 	
-	private static final Map<Identifier, Skill> skills = new HashMap<>();
+	private static final Map<Identifier, Skill> skills = new ConcurrentHashMap<>();
 	
 	private SkillManager() {
 	}
 	
+	@SuppressWarnings("null")
 	public static void load() {
 		registerClasses("io.phanisment.urars.skill.conditions", conditions, SkillCondition.class);
 		registerClasses("io.phanisment.urars.skill.mechanics", mechanics, SkillMechanic.class);
@@ -180,13 +181,11 @@ public final class SkillManager {
 	 * @param registry   Target Registry data
 	 * @parsm base_class Extended class
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "null" })
 	public static <T> void registerClasses(String path, Map<String, Class<? extends T>> registry, Class<T> base_class) {
 		for (Class<?> clazz : AnnotationScanner.find(MOD_ID, path, RegistryInfo.class)) {
 			if (!base_class.isAssignableFrom(clazz)) return;
 			RegistryInfo info = clazz.getAnnotation(RegistryInfo.class);
-			if (info == null) return;
-			
 			registry.put(info.key().toLowerCase(), (Class<? extends T>)clazz);
 			for (String alias : info.aliases()) {
 				registry.put(alias.toLowerCase(), (Class<? extends T>)clazz);

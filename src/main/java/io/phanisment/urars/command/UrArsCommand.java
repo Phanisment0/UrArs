@@ -14,93 +14,123 @@ import io.phanisment.urars.skill.SkillManager;
 import io.phanisment.urars.skill.SkillMechanic;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.util.Location;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.IdentifierArgument;
+import net.minecraft.commands.arguments.coordinates.Vec3Argument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 
 import static net.minecraft.commands.Commands.literal;
 import static net.minecraft.commands.Commands.argument;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * Custom command for this mod
- */
 public class UrArsCommand {
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-		dispatcher.register((LiteralArgumentBuilder<CommandSourceStack>)literal("urars")
-		.then(literal("cast")
-			.then(argument("skill", IdentifierArgument.id())
-				.suggests(UrArsCommand::cast_suggest)
-				.executes(UrArsCommand::cast)
+		dispatcher.register((LiteralArgumentBuilder<CommandSourceStack>) literal("urars")
+			.then(literal("cast")
+				.then(argument("skill", IdentifierArgument.id())
+					.suggests(UrArsCommand::cast_suggest)
+					.executes(UrArsCommand::cast_default)
+					.then(argument("targets", EntityArgument.entities())
+						.executes(UrArsCommand::castWithTargets)
+					)
+				)
 			)
-		)
-		.then(literal("mechanic")
-			.then(argument("line", StringArgumentType.greedyString())
-				.executes(UrArsCommand::mechanic)
+			
+			.then(literal("mechanic")
+				.then(argument("line", StringArgumentType.greedyString())
+					.executes(UrArsCommand::mechanic)
+				)
 			)
-		)
-		.then(literal("condition")
-			.then(argument("line", StringArgumentType.greedyString())
-				.executes(UrArsCommand::condition)
+			
+			.then(literal("condition")
+				.then(argument("line", StringArgumentType.greedyString())
+					.executes(UrArsCommand::condition)
+				)
 			)
-		)
-		.then(literal("spawn")
-			.then(argument("mob", IdentifierArgument.id())
-				.suggests(UrArsCommand::spawn_suggest)
-				.executes(UrArsCommand::spawn)
+			
+			.then(literal("spawn")
+				.then(argument("mob", IdentifierArgument.id())
+					.suggests(UrArsCommand::spawn_suggest)
+					.executes(UrArsCommand::spawn_default)
+					.then(argument("pos", Vec3Argument.vec3())
+						.executes(UrArsCommand::spawn_at_pos)
+					)
+				)
 			)
-		));
+		);
 	}
 
-	private static CompletableFuture<Suggestions> spawn_suggest(CommandContext<CommandSourceStack>  context, SuggestionsBuilder builder) {
+	private static CompletableFuture<Suggestions> spawn_suggest(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
 		String remaining = builder.getRemaining().toLowerCase();
-		
 		for (Identifier id : MobManager.getMobs()) {
 			String mob = id.toString();
 			if (mob.startsWith(remaining)) builder.suggest(mob);
 		}
 		return builder.buildFuture();
 	}
-	
-	private static int spawn(CommandContext<CommandSourceStack>  ctx) {
-		CommandSourceStack source = ctx.getSource();
-		ServerPlayer player = source.getPlayer();
-		if (player == null) return 0;
-		
-		Identifier mob_id = IdentifierArgument.getId(ctx, "mob");
-		MobManager.getMob(mob_id).ifPresentOrElse(mob -> {
-			mob.spawn(new Location(source.getLevel(), player.position()));
-			source.sendSuccess(() -> Component.literal("Spawned mob: " + mob_id), false);
-		}, () -> {
-			source.sendSuccess(() -> Component.literal("Unknown mob: " + mob_id), false);
-		});
-		
-		return 1;
-	}
-	
+
 	private static CompletableFuture<Suggestions> cast_suggest(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
 		String remaining = builder.getRemaining().toLowerCase();
-		
 		for (Identifier id : SkillManager.getSkills()) {
 			String skill = id.toString();
 			if (skill.startsWith(remaining)) builder.suggest(skill);
 		}
 		return builder.buildFuture();
 	}
-	
-	private static int cast(CommandContext<CommandSourceStack> ctx) {
+
+	private static int spawn_default(CommandContext<CommandSourceStack> ctx) {
 		CommandSourceStack source = ctx.getSource();
-		ServerPlayer player = source.getPlayer();
-		if (player == null) return 0;
+		Vec3 pos = source.getPosition();
+		return executeSpawn(source, pos, ctx);
+	}
+
+	private static int spawn_at_pos(CommandContext<CommandSourceStack> ctx) {
+		CommandSourceStack source = ctx.getSource();
+		Vec3 pos = Vec3Argument.getVec3(ctx, "pos");
+		return executeSpawn(source, pos, ctx);
+	}
+
+	private static int executeSpawn(CommandSourceStack source, Vec3 pos, CommandContext<CommandSourceStack> ctx) {
+		Identifier mob_id = IdentifierArgument.getId(ctx, "mob");
 		
+		MobManager.getMob(mob_id).ifPresentOrElse(mob -> {
+			mob.spawn(new Location(source.getLevel(), pos));
+			source.sendSuccess(() -> Component.literal(String.format("Successfully spawned " + mob_id)), true);
+		}, () -> {
+			source.sendFailure(Component.literal("Unknown mob: " + mob_id));
+		});
+		return 1;
+	}
+
+	private static int cast_default(CommandContext<CommandSourceStack> ctx) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		CommandSourceStack source = ctx.getSource();
+		ServerPlayer player = source.getPlayerOrException();
+		return executeCast(source, Collections.singleton(player), ctx);
+	}
+
+	private static int castWithTargets(CommandContext<CommandSourceStack> ctx) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		CommandSourceStack source = ctx.getSource();
+		Collection<? extends Entity> targets = EntityArgument.getEntities(ctx, "targets");
+		return executeCast(source, targets, ctx);
+	}
+
+	private static int executeCast(CommandSourceStack source, Collection<? extends Entity> targets, CommandContext<CommandSourceStack> ctx) {
 		Identifier skill_id = IdentifierArgument.getId(ctx, "skill");
+		
 		SkillManager.getSkill(skill_id).ifPresentOrElse(skill -> {
-			source.sendSuccess(() -> Component.literal("Cast Skill: " + skill_id), false);
-			skill.cast(new SkillContext(player));
+			source.sendSuccess(() -> Component.literal("Casting Skill: " + skill_id + " on " + targets.size() + " target(s)"), true);
+			for (Entity target : targets) {
+				skill.cast(new SkillContext(target));
+			}
 		}, () -> {
 			source.sendFailure(Component.literal("Unknown skill: " + skill_id));
 		});
