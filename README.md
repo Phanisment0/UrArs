@@ -1,2 +1,1 @@
-Java 21
-Gradle 9.4.1
+> Java 25 Gradle 9.4.1

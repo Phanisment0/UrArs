@@ -20,7 +20,7 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 
-public final class UrarsResource implements PreparableReloadListener {
+public final class UrArsResource implements PreparableReloadListener {
 
 	@NonNull
 	@Override

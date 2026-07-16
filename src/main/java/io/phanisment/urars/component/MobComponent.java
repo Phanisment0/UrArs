@@ -6,7 +6,7 @@ import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
-public class MobIdComponent implements CardinalComponent {
+public class MobComponent implements CardinalComponent {
 	private static final String KEY_ID = "id";
 	private String id;
 

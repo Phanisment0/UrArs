@@ -10,7 +10,7 @@
 	"contact": {
 		"sources": "https://github.com/Phanisment0/UrArs"
 	},
-	"license": "MIT",
+	"license": "CC0 1.0",
 	"icon": "icon.png",
 	"environment": "server",
 	"entrypoints": {

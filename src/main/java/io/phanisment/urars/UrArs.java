@@ -24,7 +24,7 @@ public class UrArs implements DedicatedServerModInitializer {
 	@Override
 	public void onInitializeServer() {
 		SkillManager.load();
-		ResourceLoader.get(PackType.SERVER_DATA).registerReloadListener(of("resource_data"), new UrarsResource());
+		ResourceLoader.get(PackType.SERVER_DATA).registerReloadListener(of("resource_data"), new UrArsResource());
 		ServerLifecycleEvents.SERVER_STARTING.register(this::serverStart);
 		ServerLifecycleEvents.SERVER_STOPPED.register(this::serverStop);
 	}
