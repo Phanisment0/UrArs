@@ -9,7 +9,10 @@ import io.phanisment.urars.skill.config.SkillLineConfig;
 import java.util.Collection;
 import java.util.HashSet;
 
-@RegistryInfo(author="Phanisment", key="self")
+@RegistryInfo(
+	author = "Phanisment",
+	key = "self"
+)
 public class SelfTargeter extends SkillTargeter {
 	public SelfTargeter(SkillLineConfig config) {
 		super(config);

@@ -5,7 +5,10 @@ import io.phanisment.urars.skill.SkillMechanic;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 
-@RegistryInfo(author="Phanisment", key="delay")
+@RegistryInfo(
+	author = "Phanisment",
+	key = "delay"
+)
 public class DelayMechanic extends SkillMechanic {
 	private Long execute_offset = 0l;
 

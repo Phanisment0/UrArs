@@ -9,7 +9,10 @@ import io.phanisment.urars.skill.config.SkillLineConfig;
 import java.util.Collection;
 import java.util.HashSet;
 
-@RegistryInfo(author="Phanisment", key="none")
+@RegistryInfo(
+	author = "Phanisment",
+	key = "none"
+)
 public class NoneTargeter extends SkillTargeter {
 	public NoneTargeter(SkillLineConfig config) {
 		super(config);

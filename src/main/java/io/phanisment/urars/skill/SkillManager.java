@@ -7,38 +7,48 @@ import net.minecraft.resources.Identifier;
 
 import static io.phanisment.urars.UrArs.MOD_ID;
 
+import java.lang.invoke.CallSite;
+import java.lang.invoke.LambdaMetafactory;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import java.util.Optional;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Class for managing skill registration, class registration and get the registered.
  */
+@SuppressWarnings("null")
 public final class SkillManager {
-	private static final Map<String, Class<? extends SkillCondition>> conditions = new ConcurrentHashMap<>();
-	private static final Map<String, Class<? extends SkillMechanic>> mechanics = new ConcurrentHashMap<>();
-	private static final Map<String, Class<? extends SkillTargeter>> targeters = new ConcurrentHashMap<>();
+	private static final Map<Identifier, SkillActionFactory<SkillCondition>> CONDITIONS;
+	private static final Map<String, Identifier> CONDITIONS_ALIASES;
+
+	private static final Map<Identifier, SkillActionFactory<SkillMechanic>> MECHANICS;
+	private static final Map<String, Identifier> MECHANICS_ALIASES;
 	
-	private static final Map<Identifier, Skill> skills = new ConcurrentHashMap<>();
+	private static final Map<Identifier, SkillActionFactory<SkillTargeter>> TARGETERS;
+	private static final Map<String, Identifier> TARGETERS_ALIASES;
+	
+	private static final Map<Identifier, Skill> SKILLS = new ConcurrentHashMap<>();
 	
 	private SkillManager() {
 	}
 	
-	@SuppressWarnings("null")
 	public static void load() {
-		registerClasses("io.phanisment.urars.skill.conditions", conditions, SkillCondition.class);
-		registerClasses("io.phanisment.urars.skill.mechanics", mechanics, SkillMechanic.class);
-		registerClasses("io.phanisment.urars.skill.targeters", targeters, SkillTargeter.class);
-		registerClasses("io.phanisment.urars.skill.trigger", targeters, SkillTargeter.class);
 	}
 	
 	/**
 	 * Clear all registered data in skill manager.
 	 */
 	public static void unload() {
-		skills.clear();
+		SKILLS.clear();
 	}
 	
 	/**
@@ -47,15 +57,30 @@ public final class SkillManager {
 	 * @param id Id of the skill
 	 * @return   Registered skill
 	 */
-	public static Optional<Skill> getSkill(final Identifier id) {
-		return Optional.ofNullable(skills.get(id));
+	@Nullable
+	public static Skill getSkill(final Identifier id) {
+		return SKILLS.get(id);
+	}
+
+	public static Optional<Skill> getSkillOptional(final Identifier id) {
+		return Optional.ofNullable(getSkill(id));
 	}
 	
 	/**
 	 * Get id of all registered skills.
 	 */
 	public static Set<Identifier> getSkills() {
-		return skills.keySet();
+		return SKILLS.keySet();
+	}
+
+	@Nullable
+	public static SkillMechanic getMechanic(final SkillLineConfig config) {
+		return getMechanic(config.getKey()).create(config);
+	}
+
+	@Nullable
+	public static SkillActionFactory<SkillMechanic> getMechanic(final String alias) {
+		return getMechanicId(MECHANICS_ALIASES.get(alias));
 	}
 	
 	/**
@@ -64,132 +89,108 @@ public final class SkillManager {
 	 * @param key Name of mechanic
 	 * @return    The mechanic class
 	 */
-	public static Class<? extends SkillMechanic> getMechanic(String key) {
-		return mechanics.get(key.toLowerCase());
+	@Nullable
+	public static SkillActionFactory<SkillMechanic> getMechanicId(final Identifier id) {
+		return MECHANICS.get(id);
 	}
-	
-	/**
-	 * Get new instance of mechanic class.
-	 * 
-	 * @param config Required parameters to create new instance 
-	 * @return       Mechanic instance
-	 */
-	public static Optional<SkillMechanic> getMechanic(SkillLineConfig config) throws Exception {
-		return newInstance(getMechanic(config.getKey()), config);
+
+	@Nullable
+	public static SkillCondition getCondition(final SkillLineConfig config) {
+		return getCondition(config.getKey()).create(config);
 	}
-	
-	/**
-	 * Get registered targeter class.
-	 * 
-	 * @param key Name of targeter
-	 * @return    The targeter class
-	 */
-	public static Class<? extends SkillTargeter> getTargeter(String key) {
-		return targeters.get(key.toLowerCase());
+
+	@Nullable
+	public static SkillActionFactory<SkillCondition> getCondition(final String alias) {
+		return getConditionId(CONDITIONS_ALIASES.get(alias));
 	}
-	
-	/**
-	 * Get new instance of targeter class.
-	 * 
-	 * @param config Required parameters to create new instance 
-	 * @return       Targeter instance
-	 */
-	public static Optional<SkillTargeter> getTargeter(SkillLineConfig config) throws Exception {
-		return newInstance(getTargeter(config.getKey()), config);
-	}
-	
+
 	/**
 	 * Get registered condition class.
 	 * 
 	 * @param key Name of condition
 	 * @return    The condition class
 	 */
-	public static Class<? extends SkillCondition> getCondition(String key) {
-		return conditions.get(key.toLowerCase());
+	@Nullable
+	public static SkillActionFactory<SkillCondition> getConditionId(final Identifier id) {
+		return CONDITIONS.get(id);
+	}
+
+	@Nullable
+	public static SkillTargeter getTargeter(final SkillLineConfig config) {
+		return getTargeter(config.getKey()).create(config);
+	}
+
+	@Nullable
+	public static SkillActionFactory<SkillTargeter> getTargeter(String alias) {
+		return getTargeterId(TARGETERS_ALIASES.get(alias));
+	}
+
+	/**
+	 * Get registered targeter class.
+	 * 
+	 * @param key Name of targeter
+	 * @return    The targeter class
+	 */
+	@Nullable
+	public static SkillActionFactory<SkillTargeter> getTargeterId(Identifier id) {
+		return TARGETERS.get(id);
 	}
 	
-	/**
-	 * Get new instance of condition class.
-	 * 
-	 * @param config Required parameters to create new instance 
-	 * @return       Condition instance
-	 */
-	public static Optional<SkillCondition> getCondition(SkillLineConfig config) throws Exception {
-	return newInstance(getCondition(config.getKey()), config);
-	}
-	
-	/**
-	 * Register skill.
-	 * 
-	 * @param id    Id skill
-	 * @param skill Skill data
-	 * @return      True if skill id is absent and false if skill id is registered
-	 */
 	public static boolean registerSkill(Identifier id, Skill skill) {
-		return skills.putIfAbsent(id, skill) == null;
+		return SKILLS.putIfAbsent(id, skill) == null;
 	}
-	
-	/**
-	 * Register mechanic class.
-	 * 
-	 * @param key      Name mechanic 
-	 * @param mechanic Mechanic class
-	 * @return         True if mechanic key is absent and false if mechanic key is registered
-	 */
-	public static boolean registerMechanic(String key, Class<? extends SkillMechanic> mechanic) {
-		return mechanics.putIfAbsent(key.toLowerCase(), mechanic) == null;
-	}
-	
-	/**
-	 * Register targeter class.
-	 * 
-	 * @param key      Name targeter 
-	 * @param targeter Targeter class
-	 * @return         True if mechanic key is absent and false if mechanic key is registered
-	 */
-	public static boolean registerTargeter(String key, Class<? extends SkillTargeter> targeter) {
-		return targeters.putIfAbsent(key.toLowerCase(), targeter) == null;
-	}
-	
-	/**
-	 * Register mechanic class.
-	 * 
-	 * @param key       Name mechanic 
-	 * @param condition Mechanic class
-	 * @return          True if mechanic key is absent and false if mechanic key is registered
-	 */
-	public static boolean registerCondition(String key, Class<? extends SkillCondition> condition) {
-		return conditions.putIfAbsent(key.toLowerCase(), condition) == null;
-	}
-	
-	/**
-	 * Create new instance form the class.
-	 * 
-	 * @param clazz  Target class to create the instance 
-	 * @param config Required parameter for the class
-	 * @param <T> Class type
-	 * @return New instance of class
-	 */
-	private static <T> Optional<T> newInstance(Class<? extends T> clazz, SkillLineConfig config) throws Exception {
-		return Optional.ofNullable(clazz.getDeclaredConstructor(SkillLineConfig.class).newInstance(config));
-	}
-	
-	/**
-	 * Register all class with annotation {@link RegistryInfo} in target package.
-	 * 
-	 * @param path       Target package
-	 * @param registry   Target Registry data
-	 * @parsm base_class Extended class
-	 */
-	@SuppressWarnings({ "unchecked", "null" })
-	public static <T> void registerClasses(String path, Map<String, Class<? extends T>> registry, Class<T> base_class) {
+
+	public static <T extends ISkillAction> ActionDataRegistery<T> scanClasses(String path, Class<T> base_class) {
+		var data = new ActionDataRegistery<T>();
+		var lookup = MethodHandles.lookup();
+
 		for (Class<?> clazz : AnnotationScanner.find(MOD_ID, path, RegistryInfo.class)) {
-			if (!base_class.isAssignableFrom(clazz)) return;
+			if (!base_class.isAssignableFrom(clazz)) continue;
+
+			@NonNull
 			RegistryInfo info = clazz.getAnnotation(RegistryInfo.class);
-			registry.put(info.key().toLowerCase(), (Class<? extends T>)clazz);
-			for (String alias : info.aliases()) {
-				registry.put(alias.toLowerCase(), (Class<? extends T>)clazz);
+
+			String raw_id = info.key().toLowerCase();
+			Identifier id = Identifier.tryParse(raw_id);
+
+			try {
+				MethodHandle constructor = lookup.findConstructor(clazz, MethodType.methodType(void.class, SkillLineConfig.class));
+				CallSite site = LambdaMetafactory.metafactory(
+					lookup,
+					"create", // Method name
+					MethodType.methodType(SkillActionFactory.class), // return type the factory
+					MethodType.methodType(ISkillAction.class, SkillLineConfig.class), // Signature method
+					constructor,
+					MethodType.methodType(clazz, SkillLineConfig.class) // Real signature class
+				);
+				SkillActionFactory<T> factory = (SkillActionFactory<T>)site.getTarget().invokeExact();
+
+				data.registry.put(id, factory);
+				data.aliases.put(raw_id, id);
+				for (String alias : info.aliases()) data.aliases.put(alias.toLowerCase(), id);
+			} catch (Throwable e) {
+				e.printStackTrace();
 			}
 		}
-	} 
+		return data;
+	}
+
+	public static class ActionDataRegistery<T extends ISkillAction> {
+		final Map<Identifier, SkillActionFactory<T>> registry = new HashMap<>();
+		final Map<String, Identifier> aliases = new HashMap<>();
+	}
+
+	static {
+		ActionDataRegistery<@NonNull SkillCondition> condition = scanClasses("io.phanisment.urars.skill.conditions", SkillCondition.class);
+		CONDITIONS = Collections.unmodifiableMap(condition.registry);
+		CONDITIONS_ALIASES = Collections.unmodifiableMap(condition.aliases);
+
+		ActionDataRegistery<@NonNull SkillMechanic> mechanics = scanClasses("io.phanisment.urars.skill.mechanics", SkillMechanic.class);
+		MECHANICS = Collections.unmodifiableMap(mechanics.registry);
+		MECHANICS_ALIASES = Collections.unmodifiableMap(mechanics.aliases);
+
+		ActionDataRegistery<@NonNull SkillTargeter> targeters = scanClasses("io.phanisment.urars.skill.targeters", SkillTargeter.class);
+		TARGETERS = Collections.unmodifiableMap(targeters.registry);
+		TARGETERS_ALIASES = Collections.unmodifiableMap(targeters.aliases);
+	}
 }

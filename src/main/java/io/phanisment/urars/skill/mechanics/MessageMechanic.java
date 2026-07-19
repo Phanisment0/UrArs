@@ -10,7 +10,10 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import io.phanisment.urars.skill.target.IEntityTarget;
 
-@RegistryInfo(author="Phanisment", key="message")
+@RegistryInfo(
+	author = "Phanisment",
+	key = "message"
+)
 public class MessageMechanic extends SkillMechanic implements INoTarget, IEntityTarget {
 	private final String message;
 	private final boolean overlay;

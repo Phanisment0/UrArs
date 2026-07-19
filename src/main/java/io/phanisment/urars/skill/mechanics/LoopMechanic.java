@@ -1,21 +1,26 @@
 package io.phanisment.urars.skill.mechanics;
 
 import io.phanisment.urars.skill.SkillMechanic;
+import io.phanisment.urars.skill.MechanicsExecutor;
 import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.skill.target.INoTarget;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import io.phanisment.urars.skill.target.IEntityTarget;
 
 @RegistryInfo(
 	author = "Phanisment",
-	key = "discard"
+	key = "loop"
 )
-public class DiscardMechanic extends SkillMechanic implements INoTarget, IEntityTarget {
-	public DiscardMechanic(SkillLineConfig config) {
+public class LoopMechanic extends SkillMechanic implements INoTarget, IEntityTarget {
+	private final int interval;
+	private final MechanicsExecutor mechanics;
+	public LoopMechanic(SkillLineConfig config) {
 		super(config);
+
+		this.interval = config.getInt(new String[] {"interval", "i"}, 2);
+		this.mechanics = config.getMechanics("do");
 	}
 	
 	@Override
@@ -25,7 +30,6 @@ public class DiscardMechanic extends SkillMechanic implements INoTarget, IEntity
 	
 	@Override
 	public void castAtEntity(SkillContext ctx, Entity target) {
-		if (target instanceof Player) return;
-		target.discard();
+		for (int i = 0; i < interval; i++) mechanics.execute(ctx);
 	}
 }

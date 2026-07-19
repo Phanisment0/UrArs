@@ -2,34 +2,36 @@ package io.phanisment.urars.skill.config;
 
 import io.phanisment.urars.config.ConfigSection;
 import io.phanisment.urars.skill.SkillManager;
-import io.phanisment.urars.skill.SkillMechanic;
+import io.phanisment.urars.skill.MechanicsExecutor;
 import io.phanisment.urars.skill.SkillCondition;
 import java.util.List;
 import java.util.ArrayList;
 
 public class SkillConfigSection extends ConfigSection {
-	public List<SkillMechanic> getMechanics(String key) {
-		return this.getMechanics(key, new ArrayList<>());
+	public MechanicsExecutor getMechanics(String key) {
+		return this.getMechanics(key, new MechanicsExecutor());
 	}
 	
-	public List<SkillMechanic> getMechanics(String key, List<SkillMechanic> def) {
+	public MechanicsExecutor getMechanics(String key, MechanicsExecutor def) {
 		if (this.get(key) instanceof List<?> list) {
-			List<SkillMechanic> result = new ArrayList<>();
+			var result = new MechanicsExecutor();
 			for (Object value : list) {
 				if (!(value instanceof String s)) continue;
 				var line = new SkillLineConfig(s);
 				try {
-					SkillManager.getMechanic(line).ifPresent(mechanic -> result.add(mechanic));
+					var action = SkillManager.getMechanic(line);
+					if (action != null) result.add(action);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 			return result;
 		} else if (this.get(key) instanceof String value) {
-			List<SkillMechanic> result = new ArrayList<>();
+			var result = new MechanicsExecutor();
 			var line = new SkillLineConfig(value);
 			try {
-				SkillManager.getMechanic(line).ifPresent(mechanic -> result.add(mechanic));
+				var action = SkillManager.getMechanic(line);
+				if (action != null) result.add(action);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -49,7 +51,8 @@ public class SkillConfigSection extends ConfigSection {
 				if (!(value instanceof String s)) continue;
 				var line = new SkillLineConfig(s);
 				try {
-					SkillManager.getCondition(line).ifPresent(condition -> result.add(condition));
+					var action = SkillManager.getCondition(line);
+					if (action != null) result.add(action);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -59,7 +62,8 @@ public class SkillConfigSection extends ConfigSection {
 			var line = new SkillLineConfig(value);
 			List<SkillCondition> result = new ArrayList<>();
 			try {
-				SkillManager.getCondition(line).ifPresent(condition -> result.add(condition));
+				var action = SkillManager.getCondition(line);
+				if (action != null) result.add(action);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

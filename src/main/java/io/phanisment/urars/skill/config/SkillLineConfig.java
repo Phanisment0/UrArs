@@ -2,12 +2,11 @@ package io.phanisment.urars.skill.config;
 
 import io.phanisment.urars.config.LineConfig;
 import io.phanisment.urars.skill.SkillManager;
-import io.phanisment.urars.skill.SkillMechanic;
+import io.phanisment.urars.skill.MechanicsExecutor;
 import io.phanisment.urars.skill.SkillCondition;
 
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Optional;
+import java.util.List;
 import java.util.Map;
 
 public class SkillLineConfig extends LineConfig {
@@ -20,12 +19,12 @@ public class SkillLineConfig extends LineConfig {
 		super(line);
 	}
 	
-	public List<SkillMechanic> getMechanics(String key) {
-		List<SkillMechanic> list = new ArrayList<>();
+	public MechanicsExecutor getMechanics(String key) {
+		MechanicsExecutor list = new MechanicsExecutor();
 		for (LineConfig lc : this.getLineList(key)) {
 			try {
-				Optional<SkillMechanic> mechanic = SkillManager.getMechanic(lc.getAsSkillLine());
-				if (mechanic.isPresent()) list.add(mechanic.get());
+				var action = SkillManager.getMechanic(lc.getAsSkillLine());
+				if (action != null) list.add(action);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -37,8 +36,8 @@ public class SkillLineConfig extends LineConfig {
 		List<SkillCondition> list = new ArrayList<>();
 		for (LineConfig lc : this.getLineList(key)) {
 			try {
-				Optional<SkillCondition> condition = SkillManager.getCondition(lc.getAsSkillLine());
-				if (condition.isPresent()) list.add(condition.get());
+				var action = SkillManager.getCondition(lc.getAsSkillLine());
+				if (action != null) list.add(action);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

@@ -15,6 +15,7 @@ import io.phanisment.urars.skill.SkillMechanic;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.util.Location;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.IdentifierArgument;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
@@ -29,12 +30,12 @@ import static net.minecraft.commands.Commands.argument;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class UrArsCommand {
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-		dispatcher.register((LiteralArgumentBuilder<CommandSourceStack>) literal("urars")
+		dispatcher.register((LiteralArgumentBuilder<CommandSourceStack>)literal("urars")
+			.requires(Commands.hasPermission(Commands.LEVEL_ADMINS))
 			.then(literal("cast")
 				.then(argument("skill", IdentifierArgument.id())
 					.suggests(UrArsCommand::cast_suggest)
@@ -103,8 +104,13 @@ public class UrArsCommand {
 		Identifier mob_id = IdentifierArgument.getId(ctx, "mob");
 		
 		MobManager.getMob(mob_id).ifPresentOrElse(mob -> {
-			mob.spawn(new Location(source.getLevel(), pos));
-			source.sendSuccess(() -> Component.literal(String.format("Successfully spawned " + mob_id)), true);
+			try {
+				mob.spawn(new Location(source.getLevel(), pos));
+				source.sendSuccess(() -> Component.literal(String.format("Successfully spawned " + mob_id)), true);
+			} catch (Exception e) {
+				source.sendFailure(Component.literal(e.getMessage()));
+				e.printStackTrace();
+			}
 		}, () -> {
 			source.sendFailure(Component.literal("Unknown mob: " + mob_id));
 		});
@@ -126,10 +132,13 @@ public class UrArsCommand {
 	private static int executeCast(CommandSourceStack source, Collection<? extends Entity> targets, CommandContext<CommandSourceStack> ctx) {
 		Identifier skill_id = IdentifierArgument.getId(ctx, "skill");
 		
-		SkillManager.getSkill(skill_id).ifPresentOrElse(skill -> {
-			source.sendSuccess(() -> Component.literal("Casting Skill: " + skill_id + " on " + targets.size() + " target(s)"), true);
-			for (Entity target : targets) {
-				skill.cast(new SkillContext(target));
+		SkillManager.getSkillOptional(skill_id).ifPresentOrElse(skill -> {
+			try {
+				for (Entity target : targets) skill.cast(new SkillContext(target));
+				source.sendSuccess(() -> Component.literal("Casting Skill: " + skill_id + " on " + targets.size() + " target(s)"), true);
+			} catch (Exception e) {
+				source.sendFailure(Component.literal(e.getMessage()));
+				e.printStackTrace();
 			}
 		}, () -> {
 			source.sendFailure(Component.literal("Unknown skill: " + skill_id));
@@ -145,14 +154,12 @@ public class UrArsCommand {
 		String line = StringArgumentType.getString(ctx, "line");
 		try {
 			SkillLineConfig config = new SkillLineConfig(line);
-			Optional<SkillMechanic> mechanic = SkillManager.getMechanic(config);
+			SkillMechanic mechanic = SkillManager.getMechanic(config);
 			
-			if (mechanic.isPresent()) {
+			if (mechanic != null) {
 				source.sendSuccess(() -> Component.literal("Executed mechanic: " + config.getKey()), false);
-				mechanic.get().execute(new SkillContext(player));
-			} else {
-				source.sendFailure(Component.literal("Mechanic not found: " + config.getKey()));
-			}
+				mechanic.execute(new SkillContext(player));
+			} else source.sendFailure(Component.literal("Mechanic not found: " + config.getKey()));
 			return 1;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -169,14 +176,12 @@ public class UrArsCommand {
 		String line = StringArgumentType.getString(ctx, "line");
 		try {
 			SkillLineConfig config = new SkillLineConfig(line);
-			Optional<SkillCondition> condition = SkillManager.getCondition(config);
+			SkillCondition condition = SkillManager.getCondition(config);
 			
-			if (condition.isPresent()) {
-				boolean result = condition.get().execute(new SkillContext(player));
+			if (condition != null) {
+				boolean result = condition.execute(new SkillContext(player));
 				source.sendSuccess(() -> Component.literal("Condition result: " + result), false);
-			} else {
-				source.sendFailure(Component.literal("Condition not found: " + config.getKey()));
-			}
+			} else source.sendFailure(Component.literal("Condition not found: " + config.getKey()));
 			return 1;
 		} catch (Exception e) {
 			e.printStackTrace();

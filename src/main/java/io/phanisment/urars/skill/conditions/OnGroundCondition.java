@@ -5,7 +5,10 @@ import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 
-@RegistryInfo(author="Phanisment", key="onground")
+@RegistryInfo(
+	author = "Phanisment",
+	key =" onground"
+)
 public class OnGroundCondition extends SkillCondition {
 	public OnGroundCondition(SkillLineConfig config) {
 		super(config);

@@ -22,22 +22,30 @@ public abstract class SkillCondition implements ISkillAction {
 		String[] part = context.split(" ", 2);
 		String type = part[0].toLowerCase();
 		Identifier skill_id = Identifier.parse(part[1]);
-		switch (type) {
-			case "true":
+
+		if (part.length > 1) switch (type) {
+			case "true" -> {
 				return result;
-			case "false":
+			}
+			case "false" -> {
 				return !result;
-			case "cast":
-				if (part.length > 1) SkillManager.getSkill(skill_id).ifPresent(skill -> skill.cast(ctx));
+			}
+			case "cast" -> {
+				Skill s_0 = SkillManager.getSkill(skill_id);
+				if (s_0 != null) s_0.cast(ctx);
 				return result;
-			case "castinstead":
-				if (result && part.length > 1) SkillManager.getSkill(skill_id).ifPresent(skill -> skill.cast(ctx));
+			}
+			case "castinstead" -> {
+				Skill skill = SkillManager.getSkill(skill_id);
+				if (skill != null && result) skill.cast(ctx);
 				return false;
-			case "orelse":
-				if (!result && part.length > 1) SkillManager.getSkill(skill_id).ifPresent(skill -> skill.cast(ctx));
+			}
+			case "orelse" -> {
+				Skill skill = SkillManager.getSkill(skill_id);
+				if (skill != null && !result) skill.cast(ctx);
 				return false;
-			default:
-				LOGGER.warn("Unknown condition action of {}", type);
+			}
+			default -> LOGGER.warn("Unknown condition action of {}", type);
 		}
 		
 		return result;

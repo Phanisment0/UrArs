@@ -4,10 +4,16 @@ import java.util.Collection;
 
 import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.SkillTargeter;
+import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
 
+@RegistryInfo(
+	author = "Phanisment",
+	key = "entityInNear",
+	aliases = { "eir" }
+)
 public class EntityInNearTargeter extends SkillTargeter {
 	private final Double radius;
 

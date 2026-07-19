@@ -12,7 +12,7 @@ public class Skill {
 	public final SkillConfigSection config;
 	
 	private final List<SkillCondition> conditions;
-	private final List<SkillMechanic> mechanics;
+	private final MechanicsExecutor mechanics;
 	
 	public Skill(Identifier id, Resource resource, SkillConfigSection config) {
 		this.id = id;
@@ -25,6 +25,6 @@ public class Skill {
 	
 	public void cast(SkillContext ctx) {
 		if (!conditions.stream().allMatch(c -> c.execute(ctx))) return;
-		mechanics.forEach(mechanic -> mechanic.execute(ctx));
+		mechanics.execute(ctx);
 	}
 }
