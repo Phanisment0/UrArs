@@ -1,7 +1,11 @@
 package io.phanisment.urars.skill;
 
+import java.text.ParseException;
+
 import org.jspecify.annotations.Nullable;
 
+import io.phanisment.urars.lib.file_parser.parser.LineParser;
+import io.phanisment.urars.lib.file_parser.util.BufferedString;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.skill.target.IEntityTarget;
 import io.phanisment.urars.skill.target.ILocationTarget;
@@ -23,13 +27,19 @@ public class SkillMechanic implements ISkillAction {
 		
 		this.delay = config.getLong("delay", 0l);
 		
-		String context = config.getContext();
+		String context = config.context().toString();
 		if (context != null && context.startsWith("@")) {
-			var targeter_config = new SkillLineConfig(context.substring(1));
-			this.skill_targeter = SkillManager.getTargeter(targeter_config);
-			
-			String trigger = targeter_config.getContext();
-			if (trigger != null && trigger.startsWith("~")) this.trigger = trigger.substring(1);
+			var targeter_parser = new LineParser(new BufferedString(context.substring(1)));
+			try {
+				targeter_parser.parse();
+				SkillLineConfig targeter_config = new SkillLineConfig(targeter_parser.config());
+				this.skill_targeter = SkillManager.getTargeter(targeter_config);
+
+				String trigger = targeter_config.context().toString();
+				if (trigger != null && trigger.startsWith("~")) this.trigger = trigger.substring(1);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	

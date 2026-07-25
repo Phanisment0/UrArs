@@ -5,6 +5,8 @@ import net.minecraft.resources.Identifier;
 
 import static io.phanisment.urars.UrArs.LOGGER;
 
+import io.phanisment.urars.lib.file_parser.util.BufferedString;
+
 public abstract class SkillCondition implements ISkillAction {
 	private final SkillLineConfig config;
 	
@@ -16,12 +18,12 @@ public abstract class SkillCondition implements ISkillAction {
 	
 	public boolean execute(SkillContext ctx) {
 		boolean result = check(ctx);
-		String context = config.getContext();
+		BufferedString context = config.context();
 		if (context == null || context.isEmpty()) return result;
 		
-		String[] part = context.split(" ", 2);
-		String type = part[0].toLowerCase();
-		Identifier skill_id = Identifier.parse(part[1]);
+		BufferedString[] part = context.split(' ', 2);
+		String type = part[0].trim().toString().toLowerCase();
+		Identifier skill_id = Identifier.parse(part[1].toString());
 
 		if (part.length > 1) switch (type) {
 			case "true" -> {

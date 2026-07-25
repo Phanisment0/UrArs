@@ -7,6 +7,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
+import io.phanisment.urars.lib.file_parser.parser.LineParser;
+import io.phanisment.urars.lib.file_parser.util.BufferedString;
 import io.phanisment.urars.mobs.MobManager;
 import io.phanisment.urars.skill.SkillCondition;
 import io.phanisment.urars.skill.SkillContext;
@@ -153,13 +155,15 @@ public class UrArsCommand {
 		
 		String line = StringArgumentType.getString(ctx, "line");
 		try {
-			SkillLineConfig config = new SkillLineConfig(line);
+			LineParser parser = new LineParser(new BufferedString(line));
+			parser.parse();
+			SkillLineConfig config = new SkillLineConfig(parser.config());
 			SkillMechanic mechanic = SkillManager.getMechanic(config);
 			
 			if (mechanic != null) {
-				source.sendSuccess(() -> Component.literal("Executed mechanic: " + config.getKey()), false);
+				source.sendSuccess(() -> Component.literal("Executed mechanic: " + config.key()), false);
 				mechanic.execute(new SkillContext(player));
-			} else source.sendFailure(Component.literal("Mechanic not found: " + config.getKey()));
+			} else source.sendFailure(Component.literal("Mechanic not found: " + config.key()));
 			return 1;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -175,13 +179,15 @@ public class UrArsCommand {
 		
 		String line = StringArgumentType.getString(ctx, "line");
 		try {
-			SkillLineConfig config = new SkillLineConfig(line);
+			LineParser parser = new LineParser(new BufferedString(line));
+			parser.parse();
+			SkillLineConfig config = new SkillLineConfig(parser.config());
 			SkillCondition condition = SkillManager.getCondition(config);
 			
 			if (condition != null) {
 				boolean result = condition.execute(new SkillContext(player));
 				source.sendSuccess(() -> Component.literal("Condition result: " + result), false);
-			} else source.sendFailure(Component.literal("Condition not found: " + config.getKey()));
+			} else source.sendFailure(Component.literal("Condition not found: " + config.key()));
 			return 1;
 		} catch (Exception e) {
 			e.printStackTrace();

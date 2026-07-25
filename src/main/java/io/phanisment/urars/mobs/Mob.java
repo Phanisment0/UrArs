@@ -57,7 +57,9 @@ public class Mob {
 	}
 
 	public static class MobModelData {
-		private String model;
+		private final String model;
+		public EntityTracker tracker;
+
 		public MobModelData(ConfigSection config) {
 			this.model = config.getString("id");
 		}
@@ -65,7 +67,7 @@ public class Mob {
 		public void apply(Entity target) {
 			if (model == null) return;
 			LOGGER.info("Apply model " + model);
-			EntityTracker tracker = BetterModel.model(model).map(r -> r.getOrCreate(ModAdapter.adapt(target))).orElseGet(null);
+			this.tracker = BetterModel.model(model).map(r -> r.getOrCreate(ModAdapter.adapt(target))).orElseGet(null);
 		}
 	}
 }

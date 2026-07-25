@@ -1,5 +1,6 @@
 package io.phanisment.urars.skill;
 
+import io.phanisment.urars.lib.file_parser.util.BufferedString;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.util.AnnotationScanner;
@@ -75,11 +76,12 @@ public final class SkillManager {
 
 	@Nullable
 	public static SkillMechanic getMechanic(final SkillLineConfig config) {
-		return getMechanic(config.getKey()).create(config);
+		return getMechanic(config.key()).create(config);
 	}
 
+	@SuppressWarnings("unlikely-arg-type")
 	@Nullable
-	public static SkillActionFactory<SkillMechanic> getMechanic(final String alias) {
+	public static SkillActionFactory<SkillMechanic> getMechanic(final BufferedString alias) {
 		return getMechanicId(MECHANICS_ALIASES.get(alias));
 	}
 	
@@ -96,11 +98,12 @@ public final class SkillManager {
 
 	@Nullable
 	public static SkillCondition getCondition(final SkillLineConfig config) {
-		return getCondition(config.getKey()).create(config);
+		return getCondition(config.key()).create(config);
 	}
 
+	@SuppressWarnings("unlikely-arg-type")
 	@Nullable
-	public static SkillActionFactory<SkillCondition> getCondition(final String alias) {
+	public static SkillActionFactory<SkillCondition> getCondition(final BufferedString alias) {
 		return getConditionId(CONDITIONS_ALIASES.get(alias));
 	}
 
@@ -117,11 +120,11 @@ public final class SkillManager {
 
 	@Nullable
 	public static SkillTargeter getTargeter(final SkillLineConfig config) {
-		return getTargeter(config.getKey()).create(config);
+		return getTargeter(config.key()).create(config);
 	}
 
 	@Nullable
-	public static SkillActionFactory<SkillTargeter> getTargeter(String alias) {
+	public static SkillActionFactory<SkillTargeter> getTargeter(BufferedString alias) {
 		return getTargeterId(TARGETERS_ALIASES.get(alias));
 	}
 
