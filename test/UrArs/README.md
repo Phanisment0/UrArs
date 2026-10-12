@@ -1,1 +1,0 @@
-> Java 25 Gradle 9.4.1
