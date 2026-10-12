@@ -1,6 +1,7 @@
 package io.phanisment.urars;
 
 import io.phanisment.urars.config.ConfigManager;
+import io.phanisment.urars.mob.MobManager;
 import io.phanisment.urars.skill.SkillManager;
 import io.phanisment.urars.util.TickScheduler;
 import net.minecraft.server.MinecraftServer;
@@ -27,6 +28,7 @@ public class UrArs implements DedicatedServerModInitializer {
 
 	public static void reload() {
 		SkillManager.unload();
+		MobManager.unload();
 		ConfigManager.load();
 	}
 

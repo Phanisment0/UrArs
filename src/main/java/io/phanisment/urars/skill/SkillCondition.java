@@ -23,13 +23,11 @@ public abstract class SkillCondition implements ISkillAction {
 		BufferedString context = config.context();
 		if (context == null || context.isEmpty()) return result;
 
-		// strip() removes leading/trailing whitespace including \r \n \t
-		BufferedString raw = context.trim();
-		UrArsDebugger.trace("Condition context raw: '{}'", escape(context.toString()));
-		if (raw.isEmpty()) return result;
+		UrArsDebugger.trace("Condition context raw: '{}'", context.toString());
+		if (context.isEmpty()) return result;
 
-		String[] part = raw.split("\\s+", 2);
-		String type = part[0].toLowerCase(Locale.ROOT);
+		BufferedString[] part = context.split(' ', 2);
+		String type = part[0].trim().toString().toLowerCase();
 
 		switch (type) {
 			case "true" -> {
@@ -64,24 +62,19 @@ public abstract class SkillCondition implements ISkillAction {
 		return result;
 	}
 
-	private static Skill resolveSkill(String[] part, String type) {
+	private static Skill resolveSkill(BufferedString[] part, String type) {
 		if (part.length < 2) {
 			UrArsDebugger.warn("Condition action '{}' needs a skill id, but none was given", type);
 			return null;
 		}
-		String raw_id = part[1].strip().toLowerCase(Locale.ROOT);
+		String raw_id = part[1].trim().toString().toLowerCase();
 		Identifier id = Identifier.tryParse(raw_id); // null instead of throwing
 		if (id == null) {
-			UrArsDebugger.warn("Invalid skill id '{}' in condition action '{}'", escape(raw_id), type);
+			UrArsDebugger.warn("Invalid skill id '{}' in condition action '{}'", raw_id, type);
 			return null;
 		}
 		Skill skill = SkillManager.getSkill(id);
 		if (skill == null) UrArsDebugger.warn("Skill '{}' referenced by condition action '{}' was not found", id, type);
 		return skill;
-	}
-
-	/** Makes invisible characters visible in logs. */
-	private static String escape(String s) {
-		return s.replace("\r", "\\r").replace("\n", "\\n").replace("\t", "\\t");
 	}
 }

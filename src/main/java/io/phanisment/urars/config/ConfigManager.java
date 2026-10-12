@@ -5,6 +5,8 @@ import io.phanisment.urars.config.pack.PackFolderRegistry;
 import io.phanisment.urars.exception.UrArsParseException;
 import io.phanisment.urars.lib.file_parser.UrArsFileParser;
 import io.phanisment.urars.lib.file_parser.parser.Parser;
+import io.phanisment.urars.mob.Mob;
+import io.phanisment.urars.mob.MobManager;
 import io.phanisment.urars.skill.Skill;
 import io.phanisment.urars.skill.SkillManager;
 import io.phanisment.urars.skill.config.SkillConfigSection;
@@ -25,7 +27,19 @@ public final class ConfigManager {
 	}
 
 	private static void folderMobs(File folder) {
-
+		File[] files = folder.listFiles(f -> f.getName().endsWith(".urars"));
+		if (files != null) for (File file : files) try {
+			Map<String, BufferedString> raw_config = UrArsFileParser.load(file);
+			for (Map.Entry<String, BufferedString> entry : raw_config.entrySet()) {
+				var config = new SkillConfigSection(new Parser(entry.getValue()).parse());
+				String namespace = folder.getName().replaceAll(".urars", "");
+				Identifier id = Identifier.fromNamespaceAndPath(namespace, entry.getKey());
+				var mob_meta = new Mob(id, file, config);
+				MobManager.registerMob(id, mob_meta);
+			}
+		} catch (IOException | UrArsParseException e) {
+			UrArs.LOGGER.info("Filed to read a file in {}", file.getPath());
+		}
 	}
 
 	private static void folderSkills(File folder) {

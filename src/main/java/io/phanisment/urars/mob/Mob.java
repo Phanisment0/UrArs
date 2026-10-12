@@ -49,6 +49,7 @@ public class Mob {
 				if (section != null) this.entity_model = new MobModelData(section);
 			}
 		} catch (Exception e) {
+			// TODO: Make it verbose
 		}
 	}
 
