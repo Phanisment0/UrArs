@@ -29,7 +29,7 @@ public final class AnnotationScanner {
 	/**
 	 * Search all class with annotation in the targeted package.
 	 *
-	 * @param mod        Id mod that registered in {@link FabricLoader}
+	 * @param mod        Mod id that registered in {@link FabricLoader}
 	 * @param path       Package target to scan, ex: "io.phanisment.urars.util"
 	 * @param annotation Target annotation class
 	 * @param <T>        Annotation type
@@ -38,7 +38,7 @@ public final class AnnotationScanner {
 	public static <T extends Annotation> List<Class<?>> find(String mod, String path, Class<T> annotation) {
 		List<Class<?>> results = new ArrayList<>();
 		try {
-			Path jar_path = FabricLoader.getInstance().getModContainer(mod).orElseThrow(() -> new IllegalStateException("Mod not found: " + mod)).getOrigin().getPaths().get(0);
+			Path jar_path = FabricLoader.getInstance().getModContainer(mod).orElseThrow(() -> new IllegalStateException("Mod not found: " + mod)).getOrigin().getPaths().getFirst();
 			String decoded_path = URLDecoder.decode(jar_path.toString(), StandardCharsets.UTF_8);
 			
 			try (InputStream input = Files.newInputStream(Path.of(decoded_path)); JarInputStream jar_stream = new JarInputStream(input)) {

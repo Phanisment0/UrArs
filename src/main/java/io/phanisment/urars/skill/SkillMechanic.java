@@ -1,5 +1,9 @@
 package io.phanisment.urars.skill;
 
+import io.phanisment.urars.lib.file_parser.config.LineConfig;
+import io.phanisment.urars.lib.file_parser.parser.FlagParser;
+import io.phanisment.urars.lib.file_parser.parser.LineParser;
+import io.phanisment.urars.util.BufferedString;
 import org.jspecify.annotations.Nullable;
 
 import io.phanisment.urars.skill.config.SkillLineConfig;
@@ -11,47 +15,61 @@ import io.phanisment.urars.util.TickScheduler;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 
+import java.text.ParseException;
+
 public class SkillMechanic implements ISkillAction {
 	protected final SkillLineConfig config;
-	protected long delay = 0l;
+	protected long delay;
 	@Nullable
 	protected SkillTargeter skill_targeter;
 	protected String trigger = "";
 
 	public SkillMechanic(SkillLineConfig config) {
 		this.config = config;
-		
-		this.delay = config.getLong("delay", 0l);
-		
-		String context = config.getContext();
-		if (context != null && context.startsWith("@")) {
-			var targeter_config = new SkillLineConfig(context.substring(1));
-			this.skill_targeter = SkillManager.getTargeter(targeter_config);
-			
-			String trigger = targeter_config.getContext();
-			if (trigger != null && trigger.startsWith("~")) this.trigger = trigger.substring(1);
+
+		this.delay = config.getLong("delay", 0L);
+
+		try {
+			parseContext(config.context());
+		} catch (ParseException e) {
+			throw new RuntimeException(e);
 		}
 	}
-	
-	public void addDelay(long duration) {
-		this.delay += duration;
+
+	private void parseContext(@Nullable BufferedString context) throws ParseException {
+		if (context == null || context.isBlank()) return;
+		FlagParser parser = new FlagParser(context);
+		for (FlagParser.Flag flag : parser.parse()) {
+			BufferedString value = flag.text();
+			if (value.isBlank()) continue;
+			switch (flag.c()) {
+				case '@' -> initializeTargeter(value);
+				case '~' -> this.trigger = value.toString();
+			}
+		}
 	}
-	
+
+	private void initializeTargeter(BufferedString context) throws ParseException {
+		var targeter_parser = new LineParser(context);
+		targeter_parser.parse();
+		LineConfig targeter_config = targeter_parser.config();
+		this.skill_targeter = SkillManager.getTargeter(targeter_config.key()).create(new SkillLineConfig(targeter_config));
+	}
+
 	public long getDelay() {
 		return this.delay;
 	}
-	
+
 	public String getTrigger() {
 		return this.trigger;
 	}
-	
+
 	public void execute(SkillContext ctx) {
 		long total_delay = this.delay + ctx.global_delay;
-		if (total_delay > 0l) TickScheduler.wait(total_delay, () -> this.executeAtTarget(ctx));
+		if (total_delay > 0L) TickScheduler.wait(total_delay, () -> this.executeAtTarget(ctx));
 		else this.executeAtTarget(ctx);
 	}
-	
-	@SuppressWarnings("null")
+
 	private void executeAtTarget(SkillContext ctx) {
 		if (this.skill_targeter != null) {
 			for (Entity target : skill_targeter.getTarget(ctx)) {

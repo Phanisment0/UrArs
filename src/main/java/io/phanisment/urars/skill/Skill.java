@@ -1,26 +1,32 @@
 package io.phanisment.urars.skill;
 
-import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.resources.Identifier;
 import io.phanisment.urars.skill.config.SkillConfigSection;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Skill {
 	public final Identifier id;
-	public final Resource resource;
+	public final File file;
 	public final SkillConfigSection config;
+
+	private List<SkillCondition> conditions;
+	private MechanicsExecutor mechanics;
 	
-	private final List<SkillCondition> conditions;
-	private final MechanicsExecutor mechanics;
-	
-	public Skill(Identifier id, Resource resource, SkillConfigSection config) {
+	public Skill(Identifier id, File file, SkillConfigSection config) {
 		this.id = id;
-		this.resource = resource;
+		this.file = file;
 		this.config = config;
-		
-		this.conditions = config.getConditions("conditions");
-		this.mechanics = config.getMechanics("mechanics");
+
+		try {
+			this.conditions = config.getConditions("conditions");
+			this.mechanics = config.getMechanics("mechanics");
+		} catch (Exception e) {
+			this.mechanics = new MechanicsExecutor();
+			this.conditions = new ArrayList<>();
+		}
 	}
 	
 	public void cast(SkillContext ctx) {

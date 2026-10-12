@@ -7,7 +7,7 @@ import io.phanisment.urars.skill.config.SkillLineConfig;
 
 @RegistryInfo(
 	author = "Phanisment",
-	key =" onground"
+	key ="onground"
 )
 public class OnGroundCondition extends SkillCondition {
 	public OnGroundCondition(SkillLineConfig config) {

@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MechanicsExecutor extends AbstractList<SkillMechanic> {
-	private List<SkillMechanic> mechanics;
+	private final List<SkillMechanic> mechanics;
 
-	private long global_delay = 0l;
+	private long global_delay = 0L;
 
 	public MechanicsExecutor() {
 		this.mechanics = new ArrayList<>();
@@ -25,7 +25,7 @@ public class MechanicsExecutor extends AbstractList<SkillMechanic> {
 				global_delay += mechanic.getDelay();
 			}
 		}
-		context.global_delay = 0l;
+		context.global_delay = 0L;
 	}
 
 	public void execute(SkillContext context) {
@@ -34,7 +34,7 @@ public class MechanicsExecutor extends AbstractList<SkillMechanic> {
 			mechanic.execute(context);
 			global_delay += mechanic.getDelay();
 		}
-		context.global_delay = 0l;
+		context.global_delay = 0L;
 	}
 
 	@Override

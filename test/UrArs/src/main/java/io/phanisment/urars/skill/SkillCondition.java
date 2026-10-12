@@ -1,0 +1,53 @@
+package io.phanisment.urars.skill;
+
+import io.phanisment.urars.skill.config.SkillLineConfig;
+import net.minecraft.resources.Identifier;
+
+import static io.phanisment.urars.UrArs.LOGGER;
+
+public abstract class SkillCondition implements ISkillAction {
+	private final SkillLineConfig config;
+	
+	public SkillCondition(SkillLineConfig config) {
+		this.config = config;
+	}
+	
+	public abstract boolean check(SkillContext ctx);
+	
+	public boolean execute(SkillContext ctx) {
+		boolean result = check(ctx);
+		String context = config.getContext();
+		if (context == null || context.isEmpty()) return result;
+		
+		String[] part = context.split(" ", 2);
+		String type = part[0].toLowerCase();
+		Identifier skill_id = Identifier.parse(part[1]);
+
+		if (part.length > 1) switch (type) {
+			case "true" -> {
+				return result;
+			}
+			case "false" -> {
+				return !result;
+			}
+			case "cast" -> {
+				Skill s_0 = SkillManager.getSkill(skill_id);
+				if (s_0 != null) s_0.cast(ctx);
+				return result;
+			}
+			case "castinstead" -> {
+				Skill skill = SkillManager.getSkill(skill_id);
+				if (skill != null && result) skill.cast(ctx);
+				return false;
+			}
+			case "orelse" -> {
+				Skill skill = SkillManager.getSkill(skill_id);
+				if (skill != null && !result) skill.cast(ctx);
+				return false;
+			}
+			default -> LOGGER.warn("Unknown condition action of {}", type);
+		}
+		
+		return result;
+	}
+}

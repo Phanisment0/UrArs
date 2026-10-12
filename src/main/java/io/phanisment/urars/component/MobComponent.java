@@ -18,7 +18,6 @@ public class MobComponent implements CardinalComponent {
 		return id;
 	}
 
-	@SuppressWarnings("null")
 	@Override
 	public void readData(@NonNull ValueInput read) {
 		this.id = read.getStringOr(KEY_ID, null);

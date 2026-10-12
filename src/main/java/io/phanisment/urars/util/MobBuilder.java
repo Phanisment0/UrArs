@@ -1,7 +1,5 @@
 package io.phanisment.urars.util;
 
-import static io.phanisment.urars.UrArs.LOGGER;
-
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -33,10 +31,9 @@ public final class MobBuilder {
 		return new MobBuilder(id, location);
 	}
 
-	public static MobBuilder create(final Identifier id, Location location) throws IllegalArgumentException {
+	public static MobBuilder create(final Identifier id, Location location) {
 		Optional<EntityType<?>> type = BuiltInRegistries.ENTITY_TYPE.getOptional(id);
-		if (!type.isPresent()) LOGGER.error("Unknown entity type: " + id);
-		return new MobBuilder(type.get(), location);
+		return type.map(entity_type -> new MobBuilder(entity_type, location)).orElse(null);
 	}
 
 	public MobBuilder location(final Location location) {

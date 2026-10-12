@@ -2,12 +2,17 @@ package io.phanisment.urars.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
-import io.phanisment.urars.mobs.MobManager;
+import io.phanisment.urars.UrArs;
+import io.phanisment.urars.lib.file_parser.config.LineConfig;
+import io.phanisment.urars.lib.file_parser.parser.LineParser;
+import io.phanisment.urars.mob.Mob;
+import io.phanisment.urars.mob.MobManager;
+import io.phanisment.urars.skill.Skill;
+import io.phanisment.urars.skill.SkillActionFactory;
 import io.phanisment.urars.skill.SkillCondition;
 import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.SkillManager;
@@ -27,14 +32,16 @@ import net.minecraft.world.phys.Vec3;
 
 import static net.minecraft.commands.Commands.literal;
 import static net.minecraft.commands.Commands.argument;
+import static io.phanisment.urars.UrArs.LOGGER;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class UrArsCommand {
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-		dispatcher.register((LiteralArgumentBuilder<CommandSourceStack>)literal("urars")
+		dispatcher.register(literal("urars")
 			.requires(Commands.hasPermission(Commands.LEVEL_ADMINS))
 			.then(literal("cast")
 				.then(argument("skill", IdentifierArgument.id())
@@ -44,21 +51,15 @@ public class UrArsCommand {
 						.executes(UrArsCommand::castWithTargets)
 					)
 				)
-			)
-			
-			.then(literal("mechanic")
+			).then(literal("mechanic")
 				.then(argument("line", StringArgumentType.greedyString())
 					.executes(UrArsCommand::mechanic)
 				)
-			)
-			
-			.then(literal("condition")
+			).then(literal("condition")
 				.then(argument("line", StringArgumentType.greedyString())
 					.executes(UrArsCommand::condition)
 				)
-			)
-			
-			.then(literal("spawn")
+			).then(literal("spawn")
 				.then(argument("mob", IdentifierArgument.id())
 					.suggests(UrArsCommand::spawn_suggest)
 					.executes(UrArsCommand::spawn_default)
@@ -66,8 +67,13 @@ public class UrArsCommand {
 						.executes(UrArsCommand::spawn_at_pos)
 					)
 				)
-			)
+			).then(literal("reload").executes(UrArsCommand::reload))
 		);
+	}
+
+	private static int reload(CommandContext<CommandSourceStack> ctx) {
+		UrArs.reload();
+		return 1;
 	}
 
 	private static CompletableFuture<Suggestions> spawn_suggest(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
@@ -102,19 +108,22 @@ public class UrArsCommand {
 
 	private static int executeSpawn(CommandSourceStack source, Vec3 pos, CommandContext<CommandSourceStack> ctx) {
 		Identifier mob_id = IdentifierArgument.getId(ctx, "mob");
-		
-		MobManager.getMob(mob_id).ifPresentOrElse(mob -> {
-			try {
-				mob.spawn(new Location(source.getLevel(), pos));
-				source.sendSuccess(() -> Component.literal(String.format("Successfully spawned " + mob_id)), true);
-			} catch (Exception e) {
-				source.sendFailure(Component.literal(e.getMessage()));
-				e.printStackTrace();
-			}
-		}, () -> {
+		Optional<Mob> mob = MobManager.getMob(mob_id);
+
+		if (mob.isEmpty()) {
+			LOGGER.warn("Cannot spawn unknown mob '{}'. Actor: '{}'", mob_id, source.getEntity() == null ? "server/console" : source.getEntity().getName().getString());
 			source.sendFailure(Component.literal("Unknown mob: " + mob_id));
-		});
-		return 1;
+			return 0;
+		}
+
+		try {
+			mob.get().spawn(new Location(source.getLevel(), pos));
+			source.sendSuccess(() -> Component.literal("Successfully spawned " + mob_id), false);
+			return 1;
+		} catch (Exception e) {
+			logFailure(source, "spawn mob", "mob=" + mob_id + ", position=" + pos, e);
+		}
+		return 0;
 	}
 
 	private static int cast_default(CommandContext<CommandSourceStack> ctx) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
@@ -131,62 +140,101 @@ public class UrArsCommand {
 
 	private static int executeCast(CommandSourceStack source, Collection<? extends Entity> targets, CommandContext<CommandSourceStack> ctx) {
 		Identifier skill_id = IdentifierArgument.getId(ctx, "skill");
-		
-		SkillManager.getSkillOptional(skill_id).ifPresentOrElse(skill -> {
-			try {
-				for (Entity target : targets) skill.cast(new SkillContext(target));
-				source.sendSuccess(() -> Component.literal("Casting Skill: " + skill_id + " on " + targets.size() + " target(s)"), true);
-			} catch (Exception e) {
-				source.sendFailure(Component.literal(e.getMessage()));
-				e.printStackTrace();
-			}
-		}, () -> {
+		Optional<Skill> skill = SkillManager.getSkillOptional(skill_id);
+
+		if (skill.isEmpty()) {
+			LOGGER.warn("Cannot cast unknown skill '{}'", skill_id);
 			source.sendFailure(Component.literal("Unknown skill: " + skill_id));
-		});
-		return 1;
+			return 0;
+		}
+
+		int succeeded = 0, failed = 0;
+
+		for (Entity target : targets) {
+			try {
+				skill.get().cast(new SkillContext(target));
+				succeeded++;
+			} catch (Exception e) {
+				failed++;
+				LOGGER.error("Failed to cast skill '{}'. Target: '{}', UUID: {}", skill_id, target.getName().getString(), target.getUUID(), e);
+			}
+		}
+
+		if (failed == 0) {
+			final int succeeded_final = succeeded;
+			source.sendSuccess(() -> Component.literal("Casted skill " + skill_id + " on " + succeeded_final + " target(s)"), false);
+			return 1;
+		}
+
+		source.sendFailure(Component.literal("Skill " + skill_id + ": " + succeeded + " succeeded, " + failed + " failed. Check server log."));
+		return succeeded > 0 ? 1 : 0;
 	}
 
 	private static int mechanic(CommandContext<CommandSourceStack> ctx) {
 		CommandSourceStack source = ctx.getSource();
-		ServerPlayer player = source.getPlayer();
-		if (player == null) return 0;
-		
-		String line = StringArgumentType.getString(ctx, "line");
-		try {
-			SkillLineConfig config = new SkillLineConfig(line);
-			SkillMechanic mechanic = SkillManager.getMechanic(config);
-			
-			if (mechanic != null) {
-				source.sendSuccess(() -> Component.literal("Executed mechanic: " + config.getKey()), false);
-				mechanic.execute(new SkillContext(player));
-			} else source.sendFailure(Component.literal("Mechanic not found: " + config.getKey()));
-			return 1;
-		} catch (Exception e) {
-			e.printStackTrace();
-			source.sendFailure(Component.literal("Failed to execute mechanic: " + e.getMessage()));
+		ServerPlayer player = source.getEntity() instanceof ServerPlayer server_player ? server_player : null;
+
+		if (player == null) {
+			source.sendFailure(Component.literal("This command requires a player."));
 			return 0;
 		}
+
+		String line = StringArgumentType.getString(ctx, "line");
+		try {
+			LineConfig config = new LineParser(line).config();
+			SkillActionFactory<SkillMechanic> factory = SkillManager.getMechanic(config.key());
+			if (factory == null) {
+				LOGGER.warn("Unknown mechanic '{}'. Input: '{}'", config.key(), line);
+				source.sendFailure(Component.literal("Mechanic not found: " + config.key()));
+				return 0;
+			}
+
+			SkillMechanic mechanic = factory.create((SkillLineConfig)config);
+			if (mechanic == null) throw new IllegalStateException("Mechanic factory returned null: " + config.key());
+
+			mechanic.execute(new SkillContext(player));
+			source.sendSuccess(() -> Component.literal("Executed mechanic: " + config.key()), false);
+			return 1;
+		} catch (Exception e) {
+			logFailure(source, "execute mechanic", "input=" + line, e);
+		}
+		return 0;
 	}
 
 	private static int condition(CommandContext<CommandSourceStack> ctx) {
 		CommandSourceStack source = ctx.getSource();
-		ServerPlayer player = source.getPlayer();
-		if (player == null) return 0;
-		
-		String line = StringArgumentType.getString(ctx, "line");
-		try {
-			SkillLineConfig config = new SkillLineConfig(line);
-			SkillCondition condition = SkillManager.getCondition(config);
-			
-			if (condition != null) {
-				boolean result = condition.execute(new SkillContext(player));
-				source.sendSuccess(() -> Component.literal("Condition result: " + result), false);
-			} else source.sendFailure(Component.literal("Condition not found: " + config.getKey()));
-			return 1;
-		} catch (Exception e) {
-			e.printStackTrace();
-			source.sendFailure(Component.literal("Failed to execute condition: " + e.getMessage()));
+		ServerPlayer player = source.getEntity() instanceof ServerPlayer server_player ? server_player : null;
+
+		if (player == null) {
+			source.sendFailure(Component.literal("This command requires a player."));
 			return 0;
 		}
+
+		String line = StringArgumentType.getString(ctx, "line");
+		try {
+			LineConfig config = new LineParser(line).config();
+			SkillActionFactory<SkillCondition> factory = SkillManager.getCondition(config.key());
+			if (factory == null) {
+				LOGGER.warn("Unknown condition '{}'. Input: '{}'", config.key(), line);
+				source.sendFailure(Component.literal("Condition not found: " + config.key()));
+				return 0;
+			}
+
+			SkillCondition condition = factory.create((SkillLineConfig) config);
+			if (condition == null) throw new IllegalStateException("Condition factory returned null: " + config.key());
+
+			boolean result = condition.check(new SkillContext(player));
+			source.sendSuccess(() -> Component.literal("Executed condition '" + config.key() + "' with result: " + result), false);
+			return 1;
+		} catch (Exception e) {
+			logFailure(source, "execute condition", "input=" + line, e);
+		}
+		return 0;
+	}
+
+	private static void logFailure(CommandSourceStack source, String operation, String details, Exception exception) {
+		String actor = source.getEntity() == null ? "server/console" : source.getEntity().getName().getString();
+		LOGGER.error("Command '{}' failed. Actor: '{}'. Details: {}", operation, actor, details, exception);
+		source.sendFailure(Component.literal("Failed to " + operation + ". Check the server log for details."));
 	}
 }

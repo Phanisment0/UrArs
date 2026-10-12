@@ -27,6 +27,6 @@ public class EntityInNearTargeter extends SkillTargeter {
 		Entity caster = ctx.entity();
 		if (caster == null) return null;
 		AABB area = caster.getBoundingBox().inflate(radius);
-		return caster.level().getEntities(caster, area, entity -> entity.isAlive());
+		return caster.level().getEntities(caster, area, Entity::isAlive);
 	}
 }

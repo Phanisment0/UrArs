@@ -15,12 +15,16 @@ import io.phanisment.urars.skill.target.IEntityTarget;
 )
 public class LoopMechanic extends SkillMechanic implements INoTarget, IEntityTarget {
 	private final int interval;
-	private final MechanicsExecutor mechanics;
+	private MechanicsExecutor mechanics = new MechanicsExecutor();
+
 	public LoopMechanic(SkillLineConfig config) {
 		super(config);
-
 		this.interval = config.getInt(new String[] {"interval", "i"}, 2);
-		this.mechanics = config.getMechanics("do");
+		try {
+			this.mechanics = config.getMechanics("do");
+		} catch (Exception e) {
+			// Ignored
+		}
 	}
 	
 	@Override

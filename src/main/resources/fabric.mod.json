@@ -1,38 +1,31 @@
 {
-	"schemaVersion": 1,
-	"id": "urars",
-	"version": "${version}",
-	"name": "UrArs",
-	"description": "",
-	"authors": [
-		"Phanisment (Agil)"
-	],
-	"contact": {
-		"sources": "https://github.com/Phanisment0/UrArs"
-	},
-	"license": "CC0 1.0",
-	"icon": "icon.png",
-	"environment": "server",
-	"entrypoints": {
-		"server":[
-			"io.phanisment.urars.UrArs"
-		],
-		"cardinal-components-entity": [
-			"io.phanisment.urars.UrArsComponents"
-		]
-	},
-	"mixins": [
-		"urars.mixins.json"
-	],
-	"depends": {
-		"fabricloader": "*",
-		"minecraft": ">=26.1",
-		"java": ">=25",
-		"fabric-api": "*"
-	},
-	"custom": {
-		"cardinal-components": [
-			"urars:mob_components"
-		]
-	}
+  "schemaVersion": 1,
+  "id": "urars",
+  "version": "${version}",
+  "name": "UrArs",
+  "description": "",
+  "authors": [
+    "Phanisment (Agil)"
+  ],
+  "contact": {
+    "sources": "https://github.com/Phanisment0/UrArs"
+  },
+  "license": "MIT",
+  "icon": "icon.png",
+  "environment": "server",
+  "entrypoints": {
+    "server":[ "io.phanisment.urars.UrArs" ],
+    "cardinal-components-entity": [ "io.phanisment.urars.UrArsComponents" ]
+  },
+  "mixins": [ "urars.mixins.json" ],
+  "depends": {
+    "fabricloader": "*",
+    "minecraft": ">=26.1",
+    "java": ">=25"
+  },
+  "custom": {
+    "cardinal-components": [
+      "urars:mob_components"
+    ]
+  }
 }

@@ -16,7 +16,7 @@ import net.minecraft.commands.Commands;
 @Mixin(Commands.class)
 public class CommandsMixin {
 	@Inject(method = "<init>", at = @At("TAIL"))
-	public void registerCommands(final Commands.CommandSelection command_selection, final CommandBuildContext context, CallbackInfo ci) {
+	public void urars$register(final Commands.CommandSelection commandSelection, final CommandBuildContext context, CallbackInfo ci) {
 		CommandDispatcher<CommandSourceStack> dispatcher = ((Commands)(Object)this).getDispatcher();
 		
 		UrArsCommand.register(dispatcher);

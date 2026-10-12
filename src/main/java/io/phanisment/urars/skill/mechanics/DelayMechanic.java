@@ -10,12 +10,12 @@ import io.phanisment.urars.skill.config.SkillLineConfig;
 	key = "delay"
 )
 public class DelayMechanic extends SkillMechanic {
-	private Long execute_offset = 0l;
+	private Long execute_offset = 0L;
 
 	public DelayMechanic(SkillLineConfig config) {
 		super(config);
 		try {
-			this.execute_offset = Long.parseLong(config.getContext());
+			this.execute_offset = config.context().toLong();
 		} catch (NumberFormatException e) {
 			// Ignored
 		}

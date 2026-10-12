@@ -1,0 +1,41 @@
+name: alpha build
+
+on:
+  release:
+    types:
+    - prereleased
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+    - name: checkout repository
+      uses: actions/checkout@v6
+    - name: validate gradle wrapper
+      uses: gradle/actions/wrapper-validation@v6
+    - name: setup jdk
+      uses: actions/setup-java@v5
+      with:
+        java-version: '25'
+        distribution: 'microsoft'
+    - name: make gradle wrapper executable
+      run: chmod +x ./gradlew
+    - name: build with gradle wrapper
+      run: ./gradlew build -Pversion=${VERSION}
+      env:
+        VERSION: ${{ github.event.release.tag_name }}
+    - name: find correct jar
+      id: findjar
+      run: |
+        output="$(find build/libs -type f ! -name "*-dev.jar" ! -name "*-sources.jar" -printf "%f\n" | head -n1)"
+        if [ -z "$output" ]; then echo "No JAR found" >&2; exit 1; fi
+        echo "jarname=$output" >> $GITHUB_OUTPUT
+    - name: upload to github releases
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: build/libs/${{ steps.findjar.outputs.jarname }}
+        asset_name: UrArs-${{ github.event.release.tag_name }}.jar
+        asset_content_type: application/java-archive

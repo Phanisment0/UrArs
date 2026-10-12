@@ -12,7 +12,6 @@ import io.phanisment.urars.component.MobComponent;
 import net.minecraft.world.entity.Entity;
 
 public class UrArsComponents implements EntityComponentInitializer {
-	@SuppressWarnings("null")
 	public static final ComponentKey<MobComponent> MOB = ComponentRegistry.getOrCreate(of("mob_components"), MobComponent.class);
 
 	@Override

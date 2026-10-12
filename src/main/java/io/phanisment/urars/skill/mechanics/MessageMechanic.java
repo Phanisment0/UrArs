@@ -31,6 +31,9 @@ public class MessageMechanic extends SkillMechanic implements INoTarget, IEntity
 	
 	@Override
 	public void castAtEntity(SkillContext ctx, Entity target) {
-		if (target instanceof ServerPlayer player) player.sendSystemMessage(Component.literal(message), overlay);
+		if (target instanceof ServerPlayer player) {
+			if (overlay) player.sendOverlayMessage(Component.literal(message));
+			else player.sendSystemMessage(Component.literal(message));
+		}
 	}
 }
