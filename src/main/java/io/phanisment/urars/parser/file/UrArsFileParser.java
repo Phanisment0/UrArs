@@ -1,4 +1,4 @@
-package io.phanisment.urars.lib.file_parser;
+package io.phanisment.urars.parser.file;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.util.Map;
 
 import io.phanisment.urars.exception.UrArsParseException;
-import io.phanisment.urars.lib.file_parser.parser.Parser;
+import io.phanisment.urars.parser.file.parser.Parser;
 import io.phanisment.urars.util.BufferedString;
 
 public final class UrArsFileParser {

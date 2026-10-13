@@ -1,10 +1,10 @@
-package io.phanisment.urars.lib.file_parser.parser;
+package io.phanisment.urars.parser.file.parser;
 
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.phanisment.urars.lib.file_parser.config.LineConfig;
+import io.phanisment.urars.parser.file.config.LineConfig;
 import io.phanisment.urars.util.BufferedString;
 import io.phanisment.urars.util.ParserUtils;
 import io.phanisment.urars.util.UrArsDebugger;

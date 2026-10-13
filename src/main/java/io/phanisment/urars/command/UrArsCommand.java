@@ -7,7 +7,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
 import io.phanisment.urars.UrArs;
-import io.phanisment.urars.lib.file_parser.parser.LineParser;
+import io.phanisment.urars.parser.file.parser.LineParser;
 import io.phanisment.urars.mob.Mob;
 import io.phanisment.urars.mob.MobManager;
 import io.phanisment.urars.skill.Skill;

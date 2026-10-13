@@ -1,8 +1,8 @@
 package io.phanisment.urars.skill;
 
-import io.phanisment.urars.lib.file_parser.config.LineConfig;
-import io.phanisment.urars.lib.file_parser.parser.FlagParser;
-import io.phanisment.urars.lib.file_parser.parser.LineParser;
+import io.phanisment.urars.parser.file.config.LineConfig;
+import io.phanisment.urars.parser.file.parser.FlagParser;
+import io.phanisment.urars.parser.file.parser.LineParser;
 import io.phanisment.urars.util.BufferedString;
 import org.jspecify.annotations.Nullable;
 

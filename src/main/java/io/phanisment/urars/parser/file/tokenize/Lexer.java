@@ -1,4 +1,4 @@
-package io.phanisment.urars.lib.file_parser.tokenize;
+package io.phanisment.urars.parser.file.tokenize;
 
 import io.phanisment.urars.exception.UrArsParseException.SourceLocation;
 import io.phanisment.urars.util.BufferedString;

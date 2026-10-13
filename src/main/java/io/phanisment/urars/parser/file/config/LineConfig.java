@@ -1,11 +1,11 @@
-package io.phanisment.urars.lib.file_parser.config;
+package io.phanisment.urars.parser.file.config;
 
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import io.phanisment.urars.lib.file_parser.parser.LineParser;
+import io.phanisment.urars.parser.file.parser.LineParser;
 import io.phanisment.urars.util.BufferedString;
 import org.jspecify.annotations.Nullable;
 

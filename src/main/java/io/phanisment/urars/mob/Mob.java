@@ -7,7 +7,7 @@ import org.jspecify.annotations.Nullable;
 
 import io.phanisment.urars.Constant;
 import io.phanisment.urars.UrArsComponents;
-import io.phanisment.urars.lib.file_parser.config.ConfigSection;
+import io.phanisment.urars.parser.file.config.ConfigSection;
 import io.phanisment.urars.skill.MechanicsExecutor;
 import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.TriggerType;

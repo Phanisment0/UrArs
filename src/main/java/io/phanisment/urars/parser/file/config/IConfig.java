@@ -1,4 +1,4 @@
-package io.phanisment.urars.lib.file_parser.config;
+package io.phanisment.urars.parser.file.config;
 
 import java.text.ParseException;
 import java.util.List;

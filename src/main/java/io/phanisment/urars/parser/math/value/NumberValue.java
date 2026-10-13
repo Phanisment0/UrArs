@@ -1,0 +1,33 @@
+package io.phanisment.urars.parser.math.value;
+
+import java.util.List;
+
+import io.phanisment.urars.exception.InvalidMathOperationException;
+
+public class NumberValue implements IValue<Double> {
+	private final double value;
+
+	public NumberValue(double value) {
+		this.value = value;
+	}
+
+	@Override
+	public Double raw() {
+		return value;
+	}
+
+	@Override
+	public IValue<?> member(String name) throws InvalidMathOperationException {
+		throw new InvalidMathOperationException("Cannot access member '" + name + "' on number");
+	}
+
+	@Override
+	public IValue<?> invoke(List<IValue<?>> args) throws InvalidMathOperationException {
+		throw new InvalidMathOperationException("Number is not callable");
+	}
+
+	@Override
+	public String toString() {
+		return String.valueOf(value);
+	}
+}

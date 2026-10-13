@@ -1,4 +1,4 @@
-package io.phanisment.urars.lib.file_parser.parser;
+package io.phanisment.urars.parser.file.parser;
 
 import java.util.ArrayList;
 import java.util.List;

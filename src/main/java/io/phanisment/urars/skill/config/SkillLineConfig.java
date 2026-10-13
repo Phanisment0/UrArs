@@ -1,7 +1,7 @@
 package io.phanisment.urars.skill.config;
 
-import io.phanisment.urars.lib.file_parser.config.LineConfig;
-import io.phanisment.urars.lib.file_parser.parser.LineParser;
+import io.phanisment.urars.parser.file.config.LineConfig;
+import io.phanisment.urars.parser.file.parser.LineParser;
 import io.phanisment.urars.skill.SkillManager;
 import io.phanisment.urars.skill.MechanicsExecutor;
 import io.phanisment.urars.skill.SkillCondition;
