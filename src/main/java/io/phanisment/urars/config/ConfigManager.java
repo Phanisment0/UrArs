@@ -32,7 +32,7 @@ public final class ConfigManager {
 			Map<String, BufferedString> raw_config = UrArsFileParser.load(file);
 			for (Map.Entry<String, BufferedString> entry : raw_config.entrySet()) {
 				var config = new SkillConfigSection(new Parser(entry.getValue()).parse());
-				String namespace = folder.getName().replaceAll(".urars", "");
+				String namespace = file.getName().replaceAll(".urars", "");
 				Identifier id = Identifier.fromNamespaceAndPath(namespace, entry.getKey());
 				var mob_meta = new Mob(id, file, config);
 				MobManager.registerMob(id, mob_meta);

@@ -45,4 +45,5 @@ jar {
 	from("LICENSE") {
 		rename { "${it}_${project.name}"}
 	}
+	//destinationDirectory.set(file("D:\\project\\server\\26.1 - fabric\\mods")) // TODO: Dont forget to comment this
 }

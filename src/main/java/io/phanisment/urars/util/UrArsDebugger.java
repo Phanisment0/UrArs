@@ -6,7 +6,7 @@ import static io.phanisment.urars.UrArs.LOGGER;
 
 public final class UrArsDebugger {
 	// volatile: can be changed from a command thread and read from other threads
-	private static volatile Level level = Level.TRACE; // TODO: Dont forget to turn it off
+	private static volatile Level level = Level.OFF;
 
 	private UrArsDebugger() {
 	}

@@ -106,7 +106,7 @@ public class UrArsCommand {
 		UrArsDebugger.level(level);
 
 		UrArsDebugger.info("Debug level changed {} -> {} by '{}'", old, level, actor(source));
-		source.sendSuccess(() -> Component.literal("Debug level set to " + level), true);
+		source.sendSuccess(() -> Component.literal("Debug level set to " + level), false);
 		return 1;
 	}
 
@@ -129,7 +129,7 @@ public class UrArsCommand {
 		UrArsDebugger.debug("Reload requested by '{}'", actor(ctx.getSource()));
 		long start = System.nanoTime();
 		UrArs.reload();
-		UrArsDebugger.debug("Reload finished in {} ms", (System.nanoTime() - start) / 1_000_000);
+		ctx.getSource().sendSuccess(() -> Component.literal("Reload finished in " + ((System.nanoTime() - start) / 1_000_000) + " ms"), false);
 		return 1;
 	}
 
