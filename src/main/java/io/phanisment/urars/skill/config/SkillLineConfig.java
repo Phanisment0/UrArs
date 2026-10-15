@@ -1,13 +1,19 @@
 package io.phanisment.urars.skill.config;
 
+import io.phanisment.urars.UrArs;
+import io.phanisment.urars.exception.MathParserException;
 import io.phanisment.urars.parser.file.config.LineConfig;
 import io.phanisment.urars.parser.file.parser.LineParser;
-import io.phanisment.urars.skill.SkillManager;
-import io.phanisment.urars.skill.MechanicsExecutor;
-import io.phanisment.urars.skill.SkillCondition;
-import io.phanisment.urars.skill.SkillMechanic;
+import io.phanisment.urars.parser.math.ast.Node;
+import io.phanisment.urars.parser.math.ast.NumberNode;
+import io.phanisment.urars.parser.math.ast.StringNode;
+import io.phanisment.urars.parser.math.eval.EvalContext;
+import io.phanisment.urars.parser.math.parser.MathParser;
+import io.phanisment.urars.skill.*;
 import io.phanisment.urars.util.BufferedString;
 import io.phanisment.urars.util.UrArsDebugger;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -24,9 +30,40 @@ public class SkillLineConfig extends LineConfig {
 		super(key, arguments, context);
 	}
 
-	public MechanicsExecutor getMechanics(String key) throws ParseException {
+	public Node getMath(@Nullable String... keys) throws MathParserException {
+		BufferedString value = findValue(keys);
+		if (value == null) throw new MathParserException("Missing required argument: " + String.join("/", keys));
+		return new MathParser(value).parse();
+	}
+
+	public Node getNumberMath(@Nullable String... keys) throws MathParserException {
+		return getNumberMath(keys, 0);
+	}
+
+	public Node getNumberMath(@Nullable String[] keys, double def) throws MathParserException {
+		BufferedString value = findValue(keys);
+		return value == null ? new NumberNode(def) : new MathParser(value).parse();
+	}
+
+	public Node getStringMath(@Nullable String... keys) throws MathParserException {
+		return getStringMath(keys, "");
+	}
+	public Node getStringMath(@Nullable String[] keys, String def) throws MathParserException {
+		BufferedString value = findValue(keys);
+		return value == null ? new StringNode(new BufferedString(def)) : new MathParser(value).parse();
+	}
+
+	public MechanicsExecutor getMechanics(@Nullable String... keys) throws ParseException {
+		BufferedString value = findValue(keys);
+		if (value == null || value.isBlank()) return new MechanicsExecutor();
+
+		if (!isLineList(value)) {
+			Node id = new MathParser(value).parse();
+			return new MechanicsExecutor(id);
+		}
+
 		MechanicsExecutor list = new MechanicsExecutor();
-		for (LineParser line : this.getLine(key)) try {
+		for (LineParser line : this.getLine(keys)) try {
 			var config = new SkillLineConfig(line.config());
 			var factory = SkillManager.getMechanic(config.key());
 			if (factory == null) {
@@ -44,9 +81,9 @@ public class SkillLineConfig extends LineConfig {
 		return list;
 	}
 
-	public List<SkillCondition> getConditions(String key) throws ParseException {
+	public List<SkillCondition> getConditions(@Nullable String... keys) throws ParseException {
 		List<SkillCondition> list = new ArrayList<>();
-		for (LineParser line : this.getLine(key)) try {
+		for (LineParser line : this.getLine(keys)) try {
 			var config = new SkillLineConfig(line.config());
 			var factory = SkillManager.getCondition(config.key());
 			if (factory == null) {
@@ -62,5 +99,14 @@ public class SkillLineConfig extends LineConfig {
 			UrArsDebugger.error("Failed to create condition from line: " + line, e);
 		}
 		return list;
+	}
+
+	public boolean singleArgument() {
+		return map().containsKey(null);
+	}
+
+	public boolean isLineList(BufferedString value) {
+		BufferedString trimmed = value.trim();
+		return !trimmed.isEmpty() && trimmed.byteAt(0) == '[';
 	}
 }

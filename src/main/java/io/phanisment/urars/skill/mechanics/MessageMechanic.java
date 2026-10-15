@@ -1,5 +1,7 @@
 package io.phanisment.urars.skill.mechanics;
 
+import io.phanisment.urars.exception.MathParserException;
+import io.phanisment.urars.parser.math.ast.Node;
 import io.phanisment.urars.skill.SkillMechanic;
 import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
@@ -15,12 +17,17 @@ import io.phanisment.urars.skill.target.IEntityTarget;
 	key = "message"
 )
 public class MessageMechanic extends SkillMechanic implements INoTarget, IEntityTarget {
-	private final String message;
+	private final Node message;
 	private final boolean overlay;
 	
 	public MessageMechanic(SkillLineConfig config) {
 		super(config);
-		this.message = config.getString(new String[]{"text", "txt", "t", "message", "msg", "m"}, "Hi!");
+		try {
+			if (config.map().containsKey(null)) this.message = config.getStringMath(new String[]{null}, "Hi!");
+			else this.message = config.getStringMath(new String[]{"text", "txt", "t", "message", "msg", "m"}, "Hi!");
+		} catch (MathParserException e) {
+			throw new RuntimeException(e);
+		}
 		this.overlay = config.getBoolean(new String[]{"overlay", "o"}, false);
 	}
 	
@@ -32,8 +39,8 @@ public class MessageMechanic extends SkillMechanic implements INoTarget, IEntity
 	@Override
 	public void castAtEntity(SkillContext ctx, Entity target) {
 		if (target instanceof ServerPlayer player) {
-			if (overlay) player.sendOverlayMessage(Component.literal(message));
-			else player.sendSystemMessage(Component.literal(message));
+			if (overlay) player.sendOverlayMessage(Component.literal(message.evalAsString(ctx.evalContext())));
+			else player.sendSystemMessage(Component.literal(message.evalAsString(ctx.evalContext())));
 		}
 	}
 }

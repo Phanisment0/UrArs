@@ -9,8 +9,12 @@ import io.phanisment.urars.parser.math.library.MathLibraryRegistry;
 import io.phanisment.urars.parser.math.value.IValue;
 
 public class EvalContextImpl implements EvalContext {
-	private final Map<String, IValue<?>> values = new HashMap<>();
 	private final MathLibraryRegistry libraries = new MathLibraryRegistry();
+	private Map<String, IValue<?>> values = new HashMap<>();
+
+	public void put(Map<String, IValue<?>> values) {
+		this.values = values;
+	}
 
 	public void put(String name, IValue<?> value) {
 		if (libraries.contains(name)) throw new IllegalArgumentException("Cannot override library: " + name);

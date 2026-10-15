@@ -17,8 +17,10 @@ public class UrArs implements DedicatedServerModInitializer {
 	public static final String MOD_ID = "urars";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-	public static Identifier of(String path) {
-		return Identifier.fromNamespaceAndPath(MOD_ID, path);
+	public static Identifier of(String input) {
+		String name = input.strip().toLowerCase();
+		if (name.isEmpty()) return null;
+		return name.indexOf(':') >= 0 ? Identifier.tryParse(name) : Identifier.fromNamespaceAndPath(MOD_ID, name);
 	}
 
 	@Override

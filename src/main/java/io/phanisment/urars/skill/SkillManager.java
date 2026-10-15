@@ -126,13 +126,14 @@ public final class SkillManager {
 
 			RegistryInfo info = clazz.getAnnotation(RegistryInfo.class);
 
+			String author = info.author().toLowerCase();
 			String raw_id = info.key().toLowerCase();
-			Identifier id = Identifier.tryParse(raw_id);
-			if (id == null) {
+			Identifier id = Identifier.fromNamespaceAndPath(author, raw_id);
+			/*if (id == null) {
 				failed++;
 				UrArsDebugger.warn("Invalid registry key '{}' on class '{}', skipping", raw_id, clazz.getSimpleName());
 				continue;
-			}
+			}*/
 			if (registry.containsKey(id)) {
 				failed++;
 				UrArsDebugger.warn("Duplicate registry id '{}' on class '{}', skipping", id, clazz.getSimpleName());
@@ -155,6 +156,7 @@ public final class SkillManager {
 
 				registry.put(id, factory);
 				aliases.put(raw_id, id);
+				aliases.put(id.toString(), id);
 				for (String alias : info.aliases()) {
 					UrArsDebugger.trace("Alias '{}' -> '{}'", alias.toLowerCase(), id);
 					aliases.put(alias.toLowerCase(), id);

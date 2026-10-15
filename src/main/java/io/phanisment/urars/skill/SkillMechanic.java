@@ -1,8 +1,10 @@
 package io.phanisment.urars.skill;
 
+import io.phanisment.urars.exception.MathParserException;
 import io.phanisment.urars.parser.file.config.LineConfig;
 import io.phanisment.urars.parser.file.parser.FlagParser;
 import io.phanisment.urars.parser.file.parser.LineParser;
+import io.phanisment.urars.parser.math.ast.Node;
 import io.phanisment.urars.util.BufferedString;
 import org.jspecify.annotations.Nullable;
 
@@ -19,7 +21,7 @@ import java.text.ParseException;
 
 public class SkillMechanic implements ISkillAction {
 	protected final SkillLineConfig config;
-	protected long delay;
+	protected Node delay;
 	@Nullable
 	protected SkillTargeter skill_targeter;
 	protected String trigger = "";
@@ -27,7 +29,11 @@ public class SkillMechanic implements ISkillAction {
 	public SkillMechanic(SkillLineConfig config) {
 		this.config = config;
 
-		this.delay = config.getLong("delay", 0L);
+		try {
+			this.delay = config.getNumberMath(new String[]{"delay"}, 0);
+		} catch (MathParserException e) {
+			throw new RuntimeException(e);
+		}
 
 		try {
 			parseContext(config.context());
@@ -56,7 +62,7 @@ public class SkillMechanic implements ISkillAction {
 		this.skill_targeter = SkillManager.getTargeter(targeter_config.key()).create(new SkillLineConfig(targeter_config));
 	}
 
-	public long getDelay() {
+	public Node getDelay() {
 		return this.delay;
 	}
 
@@ -65,7 +71,7 @@ public class SkillMechanic implements ISkillAction {
 	}
 
 	public void execute(SkillContext ctx) {
-		long total_delay = this.delay + ctx.global_delay;
+		long total_delay = Double.valueOf(this.delay.evalAsDouble(ctx.evalContext())).longValue() + ctx.global_delay;
 		if (total_delay > 0L) TickScheduler.wait(total_delay, () -> this.executeAtTarget(ctx));
 		else this.executeAtTarget(ctx);
 	}

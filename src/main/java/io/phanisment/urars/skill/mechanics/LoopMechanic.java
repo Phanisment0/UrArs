@@ -1,5 +1,7 @@
 package io.phanisment.urars.skill.mechanics;
 
+import io.phanisment.urars.parser.math.ast.Node;
+import io.phanisment.urars.parser.math.ast.NumberNode;
 import io.phanisment.urars.skill.SkillMechanic;
 import io.phanisment.urars.skill.MechanicsExecutor;
 import io.phanisment.urars.skill.SkillContext;
@@ -14,19 +16,19 @@ import io.phanisment.urars.skill.target.IEntityTarget;
 	key = "loop"
 )
 public class LoopMechanic extends SkillMechanic implements INoTarget, IEntityTarget {
-	private final int interval;
+	private Node interval = new NumberNode(2);
 	private MechanicsExecutor mechanics = new MechanicsExecutor();
 
 	public LoopMechanic(SkillLineConfig config) {
 		super(config);
-		this.interval = config.getInt(new String[] {"interval", "i"}, 2);
 		try {
+			this.interval = config.getNumberMath(new String[] {"interval", "i"}, 2);
 			this.mechanics = config.getMechanics("do");
 		} catch (Exception e) {
 			// Ignored
 		}
 	}
-	
+
 	@Override
 	public void cast(SkillContext ctx) {
 		this.castAtEntity(ctx, ctx.entity());
@@ -34,6 +36,6 @@ public class LoopMechanic extends SkillMechanic implements INoTarget, IEntityTar
 	
 	@Override
 	public void castAtEntity(SkillContext ctx, Entity target) {
-		for (int i = 0; i < interval; i++) mechanics.execute(ctx);
+		for (int i = 0; i < interval.evalAsDouble(ctx.evalContext()); i++) mechanics.execute(ctx);
 	}
 }

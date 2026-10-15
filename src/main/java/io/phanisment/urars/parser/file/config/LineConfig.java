@@ -27,7 +27,7 @@ public class LineConfig extends ConfigSection {
 		return context;
 	}
 
-	public @Nullable BufferedString getBufferedString(String[] key) {
+	public @Nullable BufferedString getBufferedString(String... key) {
 		return getBufferedString(key,null);
 	}
 
@@ -35,7 +35,7 @@ public class LineConfig extends ConfigSection {
 		return findValue(key);
 	}
 
-	public @Nullable String getString(String[] key) {
+	public @Nullable String getString(String... key) {
 		return getString(key, null);
 	}
 
@@ -44,7 +44,7 @@ public class LineConfig extends ConfigSection {
 		return value != null ? value.toString() : def;
 	}
 
-	public @Nullable Number getNumber(String[] key) {
+	public @Nullable Number getNumber(String... key) {
 		return getNumber(key, null);
 	}
 
@@ -53,7 +53,7 @@ public class LineConfig extends ConfigSection {
 		return value != null ? value.toNumber() : def;
 	}
 
-	public long getLong(String[] key) {
+	public long getLong(String... key) {
 		return getLong(key, 0);
 	}
 
@@ -62,7 +62,7 @@ public class LineConfig extends ConfigSection {
 		return value != null ? value.toLong() : def;
 	}
 
-	public int getInt(String[] key) {
+	public int getInt(String... key) {
 		return getInt(key, 0);
 	}
 
@@ -71,7 +71,7 @@ public class LineConfig extends ConfigSection {
 		return value != null ? value.toInteger() : def;
 	}
 
-	public float getFloat(String[] key) {
+	public float getFloat(String... key) {
 		return getFloat(key, 0);
 	}
 
@@ -80,7 +80,7 @@ public class LineConfig extends ConfigSection {
 		return value != null ? value.toFloat() : def;
 	}
 
-	public double getDouble(String[] key) {
+	public double getDouble(String... key) {
 		return getDouble(key, 0);
 	}
 
@@ -89,7 +89,7 @@ public class LineConfig extends ConfigSection {
 		return value != null ? value.toDouble() : def;
 	}
 
-	public boolean getBoolean(String[] key) {
+	public boolean getBoolean(String... key) {
 		return getBoolean(key, false);
 	}
 
@@ -98,7 +98,7 @@ public class LineConfig extends ConfigSection {
 		return value != null ? value.toBoolean() : def;
 	}
 
-	public @Nullable List<BufferedString> getList(String[] key) {
+	public @Nullable List<BufferedString> getList(String... key) {
 		return getList(key, new ArrayList<>());
 	}
 
@@ -107,7 +107,7 @@ public class LineConfig extends ConfigSection {
 		return value != null ? parseList(value) : def;
 	}
 
-	public List<LineParser> getLine(String[] key) throws ParseException {
+	public List<LineParser> getLine(String... key) throws ParseException {
 		return getLine(key, new ArrayList<>());
 	}
 
@@ -125,7 +125,7 @@ public class LineConfig extends ConfigSection {
 		return list;
 	}
 
-	private BufferedString findValue(String... keys) {
+	protected BufferedString findValue(String... keys) {
 		for (String key : keys) {
 			BufferedString value = map().get(key);
 			if (value != null) return value;
