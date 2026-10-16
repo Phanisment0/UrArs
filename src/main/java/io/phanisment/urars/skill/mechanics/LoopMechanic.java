@@ -22,7 +22,7 @@ public class LoopMechanic extends SkillMechanic implements INoTarget, IEntityTar
 	public LoopMechanic(SkillLineConfig config) {
 		super(config);
 		try {
-			this.interval = config.getNumberMath(new String[] {"interval", "i"}, 2);
+			this.interval = config.getMathNumber(new String[] {"interval", "i"}, 2);
 			this.mechanics = config.getMechanics("do");
 		} catch (Exception e) {
 			// Ignored
@@ -36,6 +36,6 @@ public class LoopMechanic extends SkillMechanic implements INoTarget, IEntityTar
 	
 	@Override
 	public void castAtEntity(SkillContext ctx, Entity target) {
-		for (int i = 0; i < interval.evalAsDouble(ctx.evalContext()); i++) mechanics.execute(ctx);
+		for (int i = 0; i < interval.evalAsInt(ctx.evalContext()); i++) mechanics.execute(ctx);
 	}
 }

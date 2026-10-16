@@ -12,7 +12,8 @@ import net.minecraft.world.entity.Entity;
 
 @RegistryInfo(
 		author = "Phanisment",
-		key = "setVelocity"
+		key = "setVelocity",
+		aliases = { "velocity" }
 )
 public class SetVelocityMechanic extends SkillMechanic implements INoTarget, IEntityTarget {
 	private final Node x;
@@ -22,9 +23,9 @@ public class SetVelocityMechanic extends SkillMechanic implements INoTarget, IEn
 	public SetVelocityMechanic(SkillLineConfig config) {
 		super(config);
 		try {
-			this.x = config.getNumberMath(new String[]{"x"}, 0);
-			this.y = config.getNumberMath(new String[]{"y"}, 0);
-			this.z = config.getNumberMath(new String[]{"z"}, 0);
+			this.x = config.getMathNumber(new String[]{"x"}, 0);
+			this.y = config.getMathNumber(new String[]{"y"}, 0);
+			this.z = config.getMathNumber(new String[]{"z"}, 0);
 		} catch (MathParserException e) {
 			throw new RuntimeException(e);
 		}

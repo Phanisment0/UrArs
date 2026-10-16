@@ -18,7 +18,7 @@ public class PrintMechanic extends SkillMechanic implements INoTarget {
 	public PrintMechanic(SkillLineConfig config) {
 		super(config);
 		try {
-			this.message = config.getStringMath("message", "msg", "m");
+			this.message = config.getMathString("message", "msg", "m");
 		} catch (MathParserException e) {
 			throw new RuntimeException(e);
 		}

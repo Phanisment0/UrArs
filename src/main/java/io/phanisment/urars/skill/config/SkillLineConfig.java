@@ -36,19 +36,20 @@ public class SkillLineConfig extends LineConfig {
 		return new MathParser(value).parse();
 	}
 
-	public Node getNumberMath(@Nullable String... keys) throws MathParserException {
-		return getNumberMath(keys, 0);
+	public Node getMathNumber(@Nullable String... keys) throws MathParserException {
+		return getMathNumber(keys, 0);
 	}
 
-	public Node getNumberMath(@Nullable String[] keys, double def) throws MathParserException {
+	public Node getMathNumber(@Nullable String[] keys, double def) throws MathParserException {
 		BufferedString value = findValue(keys);
 		return value == null ? new NumberNode(def) : new MathParser(value).parse();
 	}
 
-	public Node getStringMath(@Nullable String... keys) throws MathParserException {
-		return getStringMath(keys, "");
+	public Node getMathString(@Nullable String... keys) throws MathParserException {
+		return getMathString(keys, "");
 	}
-	public Node getStringMath(@Nullable String[] keys, String def) throws MathParserException {
+
+	public Node getMathString(@Nullable String[] keys, String def) throws MathParserException {
 		BufferedString value = findValue(keys);
 		return value == null ? new StringNode(new BufferedString(def)) : new MathParser(value).parse();
 	}

@@ -1,13 +1,11 @@
 package io.phanisment.urars.skill;
 
-import java.util.Map;
-
 import io.phanisment.urars.parser.math.eval.EvalContext;
+import io.phanisment.urars.parser.math.eval.EvalContextImpl;
+import io.phanisment.urars.skill.value.EntityValue;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-
-import java.util.HashMap;
 
 public class SkillContext {
 	private final Entity entity;
@@ -22,6 +20,8 @@ public class SkillContext {
 	public SkillContext(Entity entity, EvalContext eval_context) {
 		this.entity = entity;
 		this.eval_context = eval_context;
+
+		((EvalContextImpl)this.eval_context).put("caster", new EntityValue(entity));
 	}
 
 	public boolean isPlayer() {

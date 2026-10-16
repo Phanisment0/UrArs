@@ -62,28 +62,6 @@ public final class UrArsMath {
 		return MathEval.eval(parsed, context);
 	}
 
-	public NumberValue evalAsNumber() throws InvalidMathOperationException {
-		IValue<?> result = eval();
-		if (result instanceof NumberValue number) return number;
-		throw new InvalidMathOperationException("Expected number result but got " + result.getClass().getSimpleName());
-	}
-
-	public ObjectValue evalAsObject() {
-		IValue<?> result = eval();
-		if (result instanceof ObjectValue value) return value;
-		throw new InvalidMathOperationException("Expected object result but got " + result.getClass().getSimpleName());
-	}
-
-	public double evalAsDouble() {
-		return evalAsNumber().raw();
-	}
-
-	public String evalAsString() {
-		IValue<?> result = eval();
-		if (result instanceof StringValue value) return value.raw();
-		return result.toString();
-	}
-
 	public Node node() {
 		return parsed;
 	}

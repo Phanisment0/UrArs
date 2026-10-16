@@ -290,10 +290,26 @@ public class BufferedString implements CharSequence, Comparable<BufferedString>,
 	}
 
 	public static Number toNumber(byte[] buffer, int start, int end) throws NumberFormatException {
+		if (start < 0 || end < start || end > buffer.length) throw new IndexOutOfBoundsException();
+		if (start == end) throw new NumberFormatException("Empty number");
+
+		byte last = buffer[end - 1];
+
+		// Explicit Long: 1L
+		if (last == 'l' || last == 'L') return toLong(buffer, start, end - 1);
+
+		// Explicit Double: 1.0D or 1D
+		if (last == 'd' || last == 'D') return toDouble(buffer, start, end - 1);
+
+		// Explicit Float: 1.0F or 1F
+		if (last == 'f' || last == 'F') return toFloat(buffer, start, end - 1);
+
+		// Default type inference
 		for (int i = start; i < end; i++) if (buffer[i] == '.') return toDouble(buffer, start, end);
+
 		long value = toLong(buffer, start, end);
-		if (value > Integer.MAX_VALUE || value < Integer.MIN_VALUE) return value;
-		return (int) value;
+		if (value >= Integer.MIN_VALUE && value <= Integer.MAX_VALUE) return (int)value;
+		return value;
 	}
 
 	public int toInteger() throws NumberFormatException {

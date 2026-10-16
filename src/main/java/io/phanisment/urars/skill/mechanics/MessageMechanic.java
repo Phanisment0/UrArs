@@ -23,8 +23,8 @@ public class MessageMechanic extends SkillMechanic implements INoTarget, IEntity
 	public MessageMechanic(SkillLineConfig config) {
 		super(config);
 		try {
-			if (config.map().containsKey(null)) this.message = config.getStringMath(new String[]{null}, "Hi!");
-			else this.message = config.getStringMath(new String[]{"text", "txt", "t", "message", "msg", "m"}, "Hi!");
+			if (config.singleArgument()) this.message = config.getMathString(new String[]{null}, "Hi!");
+			else this.message = config.getMathString(new String[]{"text", "txt", "t", "message", "msg", "m"}, "Hi!");
 		} catch (MathParserException e) {
 			throw new RuntimeException(e);
 		}

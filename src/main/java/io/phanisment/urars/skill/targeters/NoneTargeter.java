@@ -1,5 +1,6 @@
 package io.phanisment.urars.skill.targeters;
 
+import io.phanisment.urars.skill.EntityTargeter;
 import net.minecraft.world.entity.Entity;
 
 import io.phanisment.urars.skill.SkillContext;
@@ -13,13 +14,13 @@ import java.util.HashSet;
 	author = "Phanisment",
 	key = "none"
 )
-public class NoneTargeter extends SkillTargeter {
+public class NoneTargeter extends EntityTargeter {
 	public NoneTargeter(SkillLineConfig config) {
 		super(config);
 	}
 	
 	@Override
-	public Collection<Entity> getTarget(SkillContext ctx) {
+	public Collection<Entity> getEntities(SkillContext ctx) {
 		return new HashSet<>();
 	}
 }

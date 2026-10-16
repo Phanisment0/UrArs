@@ -27,8 +27,20 @@ public sealed interface Node permits CallNode, IdentifierNode, MemberNode, Strin
 		throw new InvalidMathOperationException("Expected object result but got " + result.getClass().getSimpleName());
 	}
 
+	default int evalAsInt(EvalContext context) {
+		return evalAsNumber(context).raw().intValue();
+	}
+
+	default long evalAsLong(EvalContext context) {
+		return evalAsNumber(context).raw().longValue();
+	}
+
 	default double evalAsDouble(EvalContext context) {
-		return evalAsNumber(context).raw();
+		return evalAsNumber(context).raw().doubleValue();
+	}
+
+	default float evalAsFloat(EvalContext context) {
+		return evalAsNumber(context).raw().floatValue();
 	}
 
 	default String evalAsString(EvalContext context) {

@@ -58,7 +58,7 @@ public class MathParser {
 		Token token = lexer.next();
 		return switch (token) {
 			case IDE -> postfix(new IdentifierNode(lexer.token()));
-			case NUM -> new NumberNode(lexer.token().toDouble());
+			case NUM -> number();
 			case STR -> new StringNode(lexer.token());
 			case ADD, MIN -> new UnaryNode(token, expression(PREC_PREFIX));
 			case L_PAR -> {
@@ -68,6 +68,15 @@ public class MathParser {
 			}
 			default -> throw new MathParserException("Unexpected token " + token, lexer.pos());
 		};
+	}
+
+	private Node number() throws MathParserException {
+		BufferedString token = lexer.token();
+		try {
+			return new NumberNode(token.toNumber());
+		} catch (NumberFormatException e) {
+			throw new MathParserException("Invalid number '" + token + "'", lexer.pos());
+		}
 	}
 
 	private Node postfix(Node node) throws MathParserException {

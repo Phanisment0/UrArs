@@ -25,8 +25,8 @@ public class DamageMechanic extends SkillMechanic implements INoTarget, IEntityT
 	public DamageMechanic(SkillLineConfig config) {
 		super(config);
 		try {
-			if (config.singleArgument()) this.amount = config.getNumberMath(new String[]{null}, 1);
-			else this.amount = config.getNumberMath(new String[]{"amount", "a"}, 1);
+			if (config.singleArgument()) this.amount = config.getMathNumber(new String[]{null}, 1);
+			else this.amount = config.getMathNumber(new String[]{"amount", "a"}, 1);
 		} catch (MathParserException e) {
 			throw new RuntimeException(e);
 		}
@@ -39,6 +39,6 @@ public class DamageMechanic extends SkillMechanic implements INoTarget, IEntityT
 	
 	@Override
 	public void castAtEntity(SkillContext ctx, Entity target) {
-		target.hurtServer((ServerLevel)target.level(), target.damageSources().mobAttack(ctx.livingEntity()), Double.valueOf(amount.evalAsDouble(ctx.evalContext())).floatValue());
+		target.hurtServer((ServerLevel)target.level(), target.damageSources().mobAttack(ctx.livingEntity()), amount.evalAsFloat(ctx.evalContext()));
 	}
 }

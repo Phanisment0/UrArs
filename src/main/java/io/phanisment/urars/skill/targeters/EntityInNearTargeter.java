@@ -2,6 +2,7 @@ package io.phanisment.urars.skill.targeters;
 
 import java.util.Collection;
 
+import io.phanisment.urars.skill.EntityTargeter;
 import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.SkillTargeter;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
@@ -14,7 +15,7 @@ import net.minecraft.world.phys.AABB;
 	key = "entityInNear",
 	aliases = { "eir" }
 )
-public class EntityInNearTargeter extends SkillTargeter {
+public class EntityInNearTargeter extends EntityTargeter {
 	private final Double radius;
 
 	public EntityInNearTargeter(SkillLineConfig config) {
@@ -23,7 +24,7 @@ public class EntityInNearTargeter extends SkillTargeter {
 	}
 
 	@Override
-	public Collection<Entity> getTarget(SkillContext ctx) {
+	public Collection<Entity> getEntities(SkillContext ctx) {
 		Entity caster = ctx.entity();
 		if (caster == null) return null;
 		AABB area = caster.getBoundingBox().inflate(radius);

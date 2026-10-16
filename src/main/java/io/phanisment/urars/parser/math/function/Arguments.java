@@ -22,7 +22,7 @@ public class Arguments {
 		return args.size();
 	}
 
-	public double number(int index, double def) {
+	public Number number(int index, double def) {
 		try {
 			return number(index);
 		} catch (IndexOutOfBoundsException | InvalidMathOperationException e) {
@@ -30,7 +30,7 @@ public class Arguments {
 		}
 	}
 
-	public double number(int index) throws InvalidMathOperationException {
+	public Number number(int index) throws InvalidMathOperationException {
 		IValue<?> val = get(index);
 		if (val instanceof NumberValue num) return num.raw();
 		throw new InvalidMathOperationException("Expect number but got " + val.getClass().getSimpleName());

@@ -25,6 +25,17 @@ public class MathLexer {
 		if (pos >= input.end) return;
 		pos++;
 	}
+	private int peekAt(int offset) {
+		int p = pos + offset;
+		if (p >= input.end) return -1;
+		return input.buffer[p] & 0xFF;
+	}
+
+	private boolean isSuffix(int c) {
+		return c == 'l' || c == 'L'
+				|| c == 'd' || c == 'D'
+				|| c == 'f' || c == 'F';
+	}
 
 	private void skipWhitespace() {
 		while (peek() != -1 && isWhitespace(peek())) skip();
@@ -137,17 +148,29 @@ public class MathLexer {
 			boolean dot = false;
 
 			while ((c = peek()) != -1) {
-				if (isDigit(c)) {
+				// digits, plus '_' separators between digits: 1_000_000
+				if (isDigit(c) || (c == '_' && isDigit(peekAt(1)))) {
 					skip();
 					continue;
 				}
-				if (c == '.' && !dot) {
+				// a '.' only belongs to the number if a digit follows: 1.5 yes, 1.abs no
+				if (c == '.' && !dot && isDigit(peekAt(1))) {
 					dot = true;
 					skip();
 					continue;
 				}
 				break;
 			}
+
+			// optional type suffix: 10L, 2.5D, 3F (only if it isn't the start of an identifier)
+			c = peek();
+			if (isSuffix(c) && !isIdentifierPart(peekAt(1))) {
+				if (dot && (c == 'l' || c == 'L')) {
+					throw new MathParserException("Long suffix cannot be used on a decimal number", pos);
+				}
+				skip();
+			}
+
 			end = pos;
 			return Token.NUM;
 		} else if (isIdentifier(c)) {

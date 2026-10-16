@@ -1,6 +1,5 @@
 package io.phanisment.urars.skill;
 
-import io.phanisment.urars.exception.MathParserException;
 import io.phanisment.urars.parser.file.config.LineConfig;
 import io.phanisment.urars.parser.file.parser.FlagParser;
 import io.phanisment.urars.parser.file.parser.LineParser;
@@ -14,7 +13,6 @@ import io.phanisment.urars.skill.target.ILocationTarget;
 import io.phanisment.urars.skill.target.INoTarget;
 import io.phanisment.urars.util.Location;
 import io.phanisment.urars.util.TickScheduler;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 
 import java.text.ParseException;
@@ -30,12 +28,7 @@ public class SkillMechanic implements ISkillAction {
 		this.config = config;
 
 		try {
-			this.delay = config.getNumberMath(new String[]{"delay"}, 0);
-		} catch (MathParserException e) {
-			throw new RuntimeException(e);
-		}
-
-		try {
+			this.delay = config.getMathNumber(new String[]{"delay"}, 0);
 			parseContext(config.context());
 		} catch (ParseException e) {
 			throw new RuntimeException(e);
@@ -62,8 +55,8 @@ public class SkillMechanic implements ISkillAction {
 		this.skill_targeter = SkillManager.getTargeter(targeter_config.key()).create(new SkillLineConfig(targeter_config));
 	}
 
-	public Node getDelay() {
-		return this.delay;
+	public long getDelay(SkillContext context) {
+		return delay.evalAsLong(context.evalContext());
 	}
 
 	public String getTrigger() {
@@ -71,18 +64,36 @@ public class SkillMechanic implements ISkillAction {
 	}
 
 	public void execute(SkillContext ctx) {
-		long total_delay = Double.valueOf(this.delay.evalAsDouble(ctx.evalContext())).longValue() + ctx.global_delay;
+		long total_delay = getDelay(ctx) + ctx.global_delay;
 		if (total_delay > 0L) TickScheduler.wait(total_delay, () -> this.executeAtTarget(ctx));
 		else this.executeAtTarget(ctx);
 	}
 
 	private void executeAtTarget(SkillContext ctx) {
-		if (this.skill_targeter != null) {
-			for (Entity target : skill_targeter.getTarget(ctx)) {
-				if (this instanceof INoTarget no_target && target == null) no_target.cast(ctx);
-				if (this instanceof IEntityTarget entity_target && target != null) entity_target.castAtEntity(ctx, target);
-				if (this instanceof ILocationTarget location_target && target != null && skill_targeter.is_location) location_target.castAtLocation(ctx, new Location((ServerLevel)target.level(), target.position()));
-			}
-		} else if (this instanceof INoTarget no_target) no_target.cast(ctx);
+		if (this.skill_targeter == null) {
+			if (this instanceof INoTarget no_target) no_target.cast(ctx);
+			return;
+		}
+
+		// 1. Location targeter + location mechanic: use locations directly.
+		if (skill_targeter.isLocation() && this instanceof ILocationTarget location_target) {
+			for (Location loc : skill_targeter.getLocations(ctx)) location_target.castAtLocation(ctx, loc);
+			return;
+		}
+
+		// 2. Entity mechanic: entities come from the targeter directly, or from a
+		//    radius query around its locations (e.g. @Forward{d=5;r=2}).
+		if (this instanceof IEntityTarget entity_target) {
+			for (Entity target : skill_targeter.getEntities(ctx)) entity_target.castAtEntity(ctx, target);
+			return;
+		}
+
+		// 3. Entity targeter + location mechanic: use entity positions.
+		if (this instanceof ILocationTarget location_target) {
+			for (Location loc : skill_targeter.getLocations(ctx)) location_target.castAtLocation(ctx, loc);
+			return;
+		}
+
+		if (this instanceof INoTarget no_target) no_target.cast(ctx);
 	}
 }

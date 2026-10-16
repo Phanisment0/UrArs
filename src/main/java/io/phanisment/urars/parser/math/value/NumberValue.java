@@ -4,15 +4,15 @@ import java.util.List;
 
 import io.phanisment.urars.exception.InvalidMathOperationException;
 
-public class NumberValue implements IValue<Double> {
-	private final double value;
+public class NumberValue implements IValue<Number> {
+	private final Number value;
 
-	public NumberValue(double value) {
+	public NumberValue(Number value) {
 		this.value = value;
 	}
 
 	@Override
-	public Double raw() {
+	public Number raw() {
 		return value;
 	}
 

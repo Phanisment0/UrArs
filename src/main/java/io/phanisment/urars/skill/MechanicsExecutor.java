@@ -44,7 +44,7 @@ public class MechanicsExecutor extends AbstractList<SkillMechanic> {
 			context.global_delay = global_delay;
 			if (event.equalsIgnoreCase(mechanic.getTrigger())) {
 				mechanic.execute(context);
-				global_delay += mechanic.getDelay();
+				global_delay += mechanic.getDelay(context);
 			}
 		}
 		context.global_delay = 0L;
@@ -65,7 +65,7 @@ public class MechanicsExecutor extends AbstractList<SkillMechanic> {
 		for (var mechanic : mechanics) {
 			context.global_delay = global_delay;
 			mechanic.execute(context);
-			global_delay += mechanic.getDelay();
+			global_delay += mechanic.getDelay(context);
 		}
 		context.global_delay = 0L;
 	}
