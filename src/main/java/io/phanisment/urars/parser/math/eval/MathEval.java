@@ -1,14 +1,9 @@
 package io.phanisment.urars.parser.math.eval;
 
 import io.phanisment.urars.exception.InvalidMathOperationException;
-import io.phanisment.urars.parser.math.ast.BinaryNode;
-import io.phanisment.urars.parser.math.ast.CallNode;
-import io.phanisment.urars.parser.math.ast.IdentifierNode;
-import io.phanisment.urars.parser.math.ast.MemberNode;
-import io.phanisment.urars.parser.math.ast.Node;
-import io.phanisment.urars.parser.math.ast.NumberNode;
-import io.phanisment.urars.parser.math.ast.StringNode;
-import io.phanisment.urars.parser.math.ast.UnaryNode;
+import io.phanisment.urars.parser.math.ast.*;
+import io.phanisment.urars.parser.math.lexer.MathLexer;
+import io.phanisment.urars.parser.math.value.BooleanValue;
 import io.phanisment.urars.parser.math.value.IValue;
 import io.phanisment.urars.parser.math.value.NumberValue;
 import io.phanisment.urars.parser.math.value.StringValue;
@@ -28,10 +23,28 @@ public class MathEval {
 		if (node instanceof CallNode call) return evalCall(call, context);
 		if (node instanceof UnaryNode unary) return evalUnary(unary, context);
 		if (node instanceof BinaryNode binary) return evalBinary(binary, context);
+		if (node instanceof BooleanNode(boolean value)) return BooleanValue.of(value);
+		if (node instanceof TernaryNode ternary) return evalTernary(ternary, context);
 		throw new IllegalArgumentException();
 	}
 
+	private static IValue<?> evalTernary(TernaryNode node, EvalContext context) {
+		return asBool(eval(node.condition(), context))
+				? eval(node.then(), context)
+				: eval(node.otherwise(), context);
+	}
+
 	private static IValue<?> evalBinary(BinaryNode node, EvalContext context) throws InvalidMathOperationException {
+		// Short-circuit operators must not evaluate the right side eagerly
+		if (node.op() == MathLexer.Token.AND) {
+			if (!asBool(eval(node.left(), context))) return BooleanValue.FALSE;
+			return BooleanValue.of(asBool(eval(node.right(), context)));
+		}
+		if (node.op() == MathLexer.Token.OR) {
+			if (asBool(eval(node.left(), context))) return BooleanValue.TRUE;
+			return BooleanValue.of(asBool(eval(node.right(), context)));
+		}
+
 		IValue<?> left = eval(node.left(), context);
 		IValue<?> right = eval(node.right(), context);
 		return switch (node.op()) {
@@ -43,17 +56,48 @@ public class MathEval {
 			case MUL -> new NumberValue(mul(asNum(left), asNum(right)));
 			case DIV -> new NumberValue(div(asNum(left), asNum(right)));
 			case MOD -> new NumberValue(mod(asNum(left), asNum(right)));
+			case EQ  -> BooleanValue.of(valueEquals(left, right));
+			case NEQ -> BooleanValue.of(!valueEquals(left, right));
+			case LT  -> BooleanValue.of(compare(left, right) < 0);
+			case LTE -> BooleanValue.of(compare(left, right) <= 0);
+			case GT  -> BooleanValue.of(compare(left, right) > 0);
+			case GTE -> BooleanValue.of(compare(left, right) >= 0);
 			default  -> throw new IllegalArgumentException();
 		};
 	}
 
 	private static IValue<?> evalUnary(UnaryNode node, EvalContext context) throws InvalidMathOperationException {
-		Number value = asNum(eval(node.value(), context));
+		IValue<?> operand = eval(node.value(), context);
 		return switch (node.op()) {
-			case ADD -> new NumberValue(value);
-			case MIN -> new NumberValue(negate(value));
+			case ADD -> new NumberValue(asNum(operand));
+			case MIN -> new NumberValue(negate(asNum(operand)));
+			case NOT -> BooleanValue.of(!asBool(operand));
 			default  -> throw new IllegalArgumentException();
 		};
+	}
+
+	private static boolean asBool(IValue<?> value) {
+		if (value instanceof BooleanValue b) return b.raw();
+		throw new InvalidMathOperationException("Expected boolean but got " + value.getClass().getSimpleName());
+	}
+
+	private static boolean valueEquals(IValue<?> a, IValue<?> b) {
+		if (a instanceof NumberValue x && b instanceof NumberValue y) return compareNum(x.raw(), y.raw()) == 0;
+		return java.util.Objects.equals(a.raw(), b.raw());
+	}
+
+	private static int compare(IValue<?> a, IValue<?> b) {
+		if (a instanceof NumberValue x && b instanceof NumberValue y) return compareNum(x.raw(), y.raw());
+		if (a instanceof StringValue x && b instanceof StringValue y) return x.raw().compareTo(y.raw());
+		throw new InvalidMathOperationException("Cannot compare " + a.getClass().getSimpleName() + " with " + b.getClass().getSimpleName());
+	}
+
+	private static int compareNum(Number a, Number b) {
+		if (rank(a, b) == DOUBLE) {
+			double x = a.doubleValue(), y = b.doubleValue();
+			return x < y ? -1 : x > y ? 1 : 0;
+		}
+		return Long.compare(a.longValue(), b.longValue());
 	}
 
 	private static int rank(Number n) {

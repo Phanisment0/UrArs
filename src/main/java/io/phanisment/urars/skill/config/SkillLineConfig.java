@@ -4,6 +4,7 @@ import io.phanisment.urars.UrArs;
 import io.phanisment.urars.exception.MathParserException;
 import io.phanisment.urars.parser.file.config.LineConfig;
 import io.phanisment.urars.parser.file.parser.LineParser;
+import io.phanisment.urars.parser.math.ast.BooleanNode;
 import io.phanisment.urars.parser.math.ast.Node;
 import io.phanisment.urars.parser.math.ast.NumberNode;
 import io.phanisment.urars.parser.math.ast.StringNode;
@@ -52,6 +53,15 @@ public class SkillLineConfig extends LineConfig {
 	public Node getMathString(@Nullable String[] keys, String def) throws MathParserException {
 		BufferedString value = findValue(keys);
 		return value == null ? new StringNode(new BufferedString(def)) : new MathParser(value).parse();
+	}
+
+	public Node getMathBoolean(@Nullable String... keys) throws MathParserException {
+		return getMathBoolean(keys, false);
+	}
+
+	public Node getMathBoolean(@Nullable String[] keys, boolean def) throws MathParserException {
+		BufferedString value = findValue(keys);
+		return value == null ? new BooleanNode(def) : new MathParser(value).parse();
 	}
 
 	public MechanicsExecutor getMechanics(@Nullable String... keys) throws ParseException {

@@ -141,6 +141,33 @@ public class MathLexer {
 				skip();
 				return Token.STR;
 			}
+			case '!' -> {
+				return peekAt(1) == '=' ? op(2, Token.NEQ) : op(1, Token.NOT);
+			}
+			case '<' -> {
+				return peekAt(1) == '=' ? op(2, Token.LTE) : op(1, Token.LT);
+			}
+			case '>' -> {
+				return peekAt(1) == '=' ? op(2, Token.GTE) : op(1, Token.GT);
+			}
+			case '=' -> {
+				if (peekAt(1) == '=') return op(2, Token.EQ);
+				throw new MathParserException("Unexpected character '=', did you mean '=='?", pos);
+			}
+			case '&' -> {
+				if (peekAt(1) == '&') return op(2, Token.AND);
+				throw new MathParserException("Unexpected character '&', did you mean '&&'?", pos);
+			}
+			case '|' -> {
+				if (peekAt(1) == '|') return op(2, Token.OR);
+				throw new MathParserException("Unexpected character '|', did you mean '||'?", pos);
+			}
+			case '?' -> {
+				return op(1, Token.QUE);
+			}
+			case ':' -> {
+				return op(1, Token.COL);
+			}
 		}
 
 		if (isDigit(c)) {
@@ -187,28 +214,28 @@ public class MathLexer {
 		return new BufferedString(input.buffer, start, end);
 	}
 
-	public static enum Token {
-		IDE(-1),
-		STR(-1),
-		NUM(-1),
-		ADD('+'),
-		MIN('-'),
-		MUL('*'),
-		DIV('/'),
-		MOD('%'),
-		DOT('.'),
-		COM(','),
-		L_PAR('('),
-		R_PAR(')'),
-		EOF(-1);
+	private Token op(int len, Token token) {
+		start = pos;
+		pos += len;
+		end = pos;
+		return token;
+	}
 
-		int alias;
-		Token(int alias) {
-			this.alias = alias;
-		}
+	public enum Token {
+		IDE, STR, NUM,
+		ADD("+"), MIN("-"), MUL("*"), DIV("/"), MOD("%"),
+		DOT("."), COM(","), L_PAR("("), R_PAR(")"),
+		EQ("=="), NEQ("!="), LT("<"), LTE("<="), GT(">"), GTE(">="),
+		AND("&&"), OR("||"), NOT("!"),
+		QUE("?"), COL(":"),
+		EOF;
+
+		private final String alias;
+		Token() { this(null); }
+		Token(String alias) { this.alias = alias; }
 
 		public String alias() {
-			return alias != -1 ? String.valueOf((char)alias) : name();
+			return alias != null ? alias : name();
 		}
 	}
 }

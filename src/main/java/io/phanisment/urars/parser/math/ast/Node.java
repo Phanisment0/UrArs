@@ -3,12 +3,9 @@ package io.phanisment.urars.parser.math.ast;
 import io.phanisment.urars.exception.InvalidMathOperationException;
 import io.phanisment.urars.parser.math.eval.EvalContext;
 import io.phanisment.urars.parser.math.eval.MathEval;
-import io.phanisment.urars.parser.math.value.IValue;
-import io.phanisment.urars.parser.math.value.NumberValue;
-import io.phanisment.urars.parser.math.value.ObjectValue;
-import io.phanisment.urars.parser.math.value.StringValue;
+import io.phanisment.urars.parser.math.value.*;
 
-public sealed interface Node permits CallNode, IdentifierNode, MemberNode, StringNode, NumberNode, BinaryNode, UnaryNode {
+public sealed interface Node permits CallNode, IdentifierNode, MemberNode, StringNode, NumberNode, BinaryNode, UnaryNode, BooleanNode, TernaryNode {
 	default IValue<?> eval(EvalContext context) {
 		// Fall back to the standard library if the user never picked one
 		if (context == null) context = EvalContext.withStandardLibrary();
@@ -19,6 +16,12 @@ public sealed interface Node permits CallNode, IdentifierNode, MemberNode, Strin
 		IValue<?> result = eval(context);
 		if (result instanceof NumberValue number) return number;
 		throw new InvalidMathOperationException("Expected number result but got " + result.getClass().getSimpleName());
+	}
+
+	default boolean evalAsBoolean(EvalContext context) {
+		IValue<?> result = eval(context);
+		if (result instanceof BooleanValue b) return b.raw();
+		throw new InvalidMathOperationException("Expected boolean result but got " + result.getClass().getSimpleName());
 	}
 
 	default ObjectValue evalAsObject(EvalContext context) {

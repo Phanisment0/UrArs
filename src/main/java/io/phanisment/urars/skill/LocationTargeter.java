@@ -15,7 +15,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public abstract class LocationTargeter extends SkillTargeter {
-	/** Radius used when an entity-only mechanic is cast at these locations. */
 	protected final Node radius;
 
 	public LocationTargeter(SkillLineConfig config) {
@@ -36,7 +35,7 @@ public abstract class LocationTargeter extends SkillTargeter {
 	public Collection<Entity> getEntities(SkillContext ctx) {
 		double r = radius.evalAsDouble(ctx.evalContext());
 		double r_sq = r * r;
-		Set<Entity> result = new LinkedHashSet<>(); // dedupe overlapping locations
+		Set<Entity> result = new LinkedHashSet<>();
 
 		for (Location loc : getLocations(ctx)) {
 			ServerLevel level = loc.level();

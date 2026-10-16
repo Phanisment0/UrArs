@@ -18,17 +18,17 @@ import io.phanisment.urars.skill.target.IEntityTarget;
 )
 public class MessageMechanic extends SkillMechanic implements INoTarget, IEntityTarget {
 	private final Node message;
-	private final boolean overlay;
+	private final Node overlay;
 	
 	public MessageMechanic(SkillLineConfig config) {
 		super(config);
 		try {
 			if (config.singleArgument()) this.message = config.getMathString(new String[]{null}, "Hi!");
 			else this.message = config.getMathString(new String[]{"text", "txt", "t", "message", "msg", "m"}, "Hi!");
+			this.overlay = config.getMathBoolean(new String[]{"overlay", "o"});
 		} catch (MathParserException e) {
 			throw new RuntimeException(e);
 		}
-		this.overlay = config.getBoolean(new String[]{"overlay", "o"}, false);
 	}
 	
 	@Override
@@ -39,7 +39,7 @@ public class MessageMechanic extends SkillMechanic implements INoTarget, IEntity
 	@Override
 	public void castAtEntity(SkillContext ctx, Entity target) {
 		if (target instanceof ServerPlayer player) {
-			if (overlay) player.sendOverlayMessage(Component.literal(message.evalAsString(ctx.evalContext())));
+			if (overlay.evalAsBoolean(ctx.evalContext())) player.sendOverlayMessage(Component.literal(message.evalAsString(ctx.evalContext())));
 			else player.sendSystemMessage(Component.literal(message.evalAsString(ctx.evalContext())));
 		}
 	}

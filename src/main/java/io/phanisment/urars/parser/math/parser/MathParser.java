@@ -4,22 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.phanisment.urars.exception.MathParserException;
-import io.phanisment.urars.parser.math.ast.BinaryNode;
-import io.phanisment.urars.parser.math.ast.CallNode;
-import io.phanisment.urars.parser.math.ast.IdentifierNode;
-import io.phanisment.urars.parser.math.ast.MemberNode;
-import io.phanisment.urars.parser.math.ast.Node;
-import io.phanisment.urars.parser.math.ast.NumberNode;
-import io.phanisment.urars.parser.math.ast.StringNode;
-import io.phanisment.urars.parser.math.ast.UnaryNode;
+import io.phanisment.urars.parser.math.ast.*;
 import io.phanisment.urars.parser.math.lexer.MathLexer;
 import io.phanisment.urars.parser.math.lexer.MathLexer.Token;
 import io.phanisment.urars.util.BufferedString;
 
 public class MathParser {
+	private static final int PREC_TERNARY = 1;
+	private static final int PREC_OR      = 2;
+	private static final int PREC_AND     = 3;
+	private static final int PREC_EQ      = 4;
+	private static final int PREC_CMP     = 5;
 	private static final int PREC_ADD     = 10;
-	private static final int PREC_MUL    = 20;
-	private static final int PREC_PREFIX = 30;
+	private static final int PREC_MUL     = 20;
+	private static final int PREC_PREFIX  = 30;
 
 	private final MathLexer lexer;
 
@@ -48,19 +46,29 @@ public class MathParser {
 
 	private int binding(Token token) {
 		return switch (token) {
-			case ADD, MIN      -> PREC_ADD;
-			case MUL, DIV, MOD -> PREC_MUL;
-			default             -> -1;
+			case QUE                 -> PREC_TERNARY;
+			case OR                  -> PREC_OR;
+			case AND                 -> PREC_AND;
+			case EQ, NEQ             -> PREC_EQ;
+			case LT, LTE, GT, GTE    -> PREC_CMP;
+			case ADD, MIN            -> PREC_ADD;
+			case MUL, DIV, MOD       -> PREC_MUL;
+			default                  -> -1;
 		};
 	}
 
 	private Node prefix() throws MathParserException {
 		Token token = lexer.next();
 		return switch (token) {
-			case IDE -> postfix(new IdentifierNode(lexer.token()));
+			case IDE -> {
+				BufferedString name = lexer.token();
+				if (name.isTrue())  yield new BooleanNode(true);
+				if (name.isFalse()) yield new BooleanNode(false);
+				yield postfix(new IdentifierNode(name));
+			}
 			case NUM -> number();
 			case STR -> new StringNode(lexer.token());
-			case ADD, MIN -> new UnaryNode(token, expression(PREC_PREFIX));
+			case ADD, MIN, NOT -> new UnaryNode(token, expression(PREC_PREFIX));
 			case L_PAR -> {
 				Node node = expression(0);
 				expect(Token.R_PAR);
@@ -113,6 +121,14 @@ public class MathParser {
 			if (bp < limit) break;
 
 			lexer.next();
+
+			if (operator == Token.QUE) {
+				Node then = expression(0);
+				expect(Token.COL);
+				Node otherwise = expression(PREC_TERNARY); // right-assoc: a ? b : c ? d : e
+				left = new TernaryNode(left, then, otherwise);
+				continue;
+			}
 
 			Node right = expression(bp + 1);
 			left = new BinaryNode(left, operator, right);
