@@ -40,12 +40,12 @@ public final class Lexer {
 	}
 
 	/**
-	 * Return true if the given character is treated as sytax token.
+	 * Return true if the given character is treated as syntax token.
 	 * 
 	 * @param c char input
-	 * @return false if not sytax token
+	 * @return false if not syntax token
 	 */
-	public static boolean isSytax(int c) {
+	public static boolean isSyntax(int c) {
 		return c == '{'
 				|| c == '}'
 				|| c == '='
@@ -61,17 +61,14 @@ public final class Lexer {
 
 	/**
 	 * Consumes and return the next byte
-	 * 
-	 * @return the next byte, or -1 if EOF is reached.
 	 */
-	private byte skip() {
-		if (pos >= length) return -1;
+	private void skip() {
+		if (pos >= length) return;
 		byte c = buffer[pos++];
 		if (c == '\n') {
 			line++;
 			column = 1;
 		} else column++;
-		return c;
 	}
 
 	/**
@@ -149,7 +146,7 @@ public final class Lexer {
 
 		start = pos;
 		byte current;
-		while ((current = peek()) != -1 && !isSytax(current) && !ParserUtils.isWhitespace(current)) pos++;
+		while ((current = peek()) != -1 && !isSyntax(current) && !ParserUtils.isWhitespace(current)) pos++;
 		end = pos;
 		return Token.TEXT;
 	}
@@ -189,8 +186,7 @@ public final class Lexer {
 
 	/**
 	 * Parse inside the slice/buffered string
-	 * 
-	 * @param new_buffer
+	 *
 	 */
 	public void reset(BufferedString new_buffer) {
 		this.buffer = new_buffer.buffer();
@@ -217,7 +213,7 @@ public final class Lexer {
 		/** '=' */
 		EQUAL,
 
-		/** Any non-sytax text. */
+		/** Any non-syntax text. */
 		TEXT,
 
 		/** End of File. */

@@ -1,8 +1,8 @@
 package io.phanisment.urars.skill;
 
 import io.phanisment.urars.exception.MathParserException;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -38,7 +38,7 @@ public abstract class LocationTargeter extends SkillTargeter {
 		Set<Entity> result = new LinkedHashSet<>();
 
 		for (Location loc : getLocations(ctx)) {
-			ServerLevel level = loc.level();
+			Level level = loc.level();
 			Vec3 pos = loc.pos();
 			AABB box = new AABB(pos, pos).inflate(r);
 			result.addAll(level.getEntities(

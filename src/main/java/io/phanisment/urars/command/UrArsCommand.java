@@ -8,8 +8,10 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
 import io.phanisment.urars.UrArs;
 import io.phanisment.urars.parser.file.parser.LineParser;
-import io.phanisment.urars.mob.Mob;
+import io.phanisment.urars.mob.MobMeta;
 import io.phanisment.urars.mob.MobManager;
+import io.phanisment.urars.reload.ReloadResult;
+import io.phanisment.urars.reload.UrArsReload;
 import io.phanisment.urars.skill.Skill;
 import io.phanisment.urars.skill.SkillActionFactory;
 import io.phanisment.urars.skill.SkillCondition;
@@ -34,10 +36,7 @@ import static net.minecraft.commands.Commands.literal;
 import static net.minecraft.commands.Commands.argument;
 import static io.phanisment.urars.UrArs.LOGGER;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class UrArsCommand {
@@ -128,7 +127,13 @@ public class UrArsCommand {
 	private static int reload(CommandContext<CommandSourceStack> ctx) {
 		UrArsDebugger.debug("Reload requested by '{}'", actor(ctx.getSource()));
 		long start = System.nanoTime();
-		UrArs.reload();
+
+		List<ReloadResult> results = UrArsReload.reloadAll();
+		for (ReloadResult result : results) {
+			if (result.result()) ctx.getSource().sendSuccess(() -> Component.literal("[UrArs] " + result.message()), false);
+			else ctx.getSource().sendSuccess(() -> Component.literal("(ERROR) [UrArs] " + result.message()).withColor(0), false);
+		}
+
 		ctx.getSource().sendSuccess(() -> Component.literal("Reload finished in " + ((System.nanoTime() - start) / 1_000_000) + " ms"), false);
 		return 1;
 	}
@@ -176,7 +181,7 @@ public class UrArsCommand {
 	private static int executeSpawn(CommandSourceStack source, Vec3 pos, CommandContext<CommandSourceStack> ctx) {
 		Identifier mob_id = IdentifierArgument.getId(ctx, "mob");
 		UrArsDebugger.debug("Spawn requested: mob='{}', pos={}, actor='{}'", mob_id, pos, actor(source));
-		Optional<Mob> mob = MobManager.getMob(mob_id);
+		Optional<MobMeta> mob = MobManager.getMobOptional(mob_id);
 
 		if (mob.isEmpty()) {
 			LOGGER.warn("Cannot spawn unknown mob '{}'. Actor: '{}'", mob_id, actor(source));

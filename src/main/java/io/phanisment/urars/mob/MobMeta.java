@@ -2,7 +2,10 @@
 package io.phanisment.urars.mob;
 
 import java.io.File;
+import java.text.ParseException;
 
+import io.phanisment.urars.mob.ai.MobAi;
+import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.Nullable;
 
 import io.phanisment.urars.Constant;
@@ -16,26 +19,43 @@ import io.phanisment.urars.util.Location;
 import io.phanisment.urars.util.MobBuilder;
 import io.phanisment.urars.util.UrArsDebugger;
 
-import kr.toxicity.model.api.BetterModel;
-import kr.toxicity.model.api.mod.platform.ModAdapter;
-
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 
-public class Mob {
+public class MobMeta {
 	private final Identifier id;
 	private final Identifier type;
 	private final MechanicsExecutor mechanics;
 
 	@Nullable
-	private final MobModelData entity_model;
+	private final String name;
+	private boolean silent;
+	private boolean invulnerable;
+	private boolean no_gravity;
 
-	public Mob(final Identifier id, final File file, final SkillConfigSection config) {
+	@Nullable
+	private final MobModelData entity_model;
+	@Nullable
+	private final MobAi ai;
+
+	public MobMeta(final Identifier id, final File file, final SkillConfigSection config) {
 		this.id = id;
 		this.type = parseType(id, config.getString("type", "minecraft:zombie"));
 		this.mechanics = loadMechanics(id, config);
-		this.entity_model = loadModel(id, config);
+		this.ai = loadAi(id, config);
 
+		this.name = config.getString("name", null);
+
+		try {
+			ConfigSection settings = config.getSection("settings");
+			this.silent = settings.getBoolean("silent", false);
+			this.invulnerable = settings.getBoolean("invulnerable", false);
+			this.no_gravity = settings.getBoolean("no-gravity", false);
+		} catch (ParseException e) {
+			UrArsDebugger.error("Failed to parse section 'settings' in file " + file.getPath() + "'", e);
+		}
+
+		this.entity_model = loadModel(id, config);
 		UrArsDebugger.debug("Loaded mob '{}': type='{}', model={}", id, type, entity_model != null);
 	}
 
@@ -44,6 +64,15 @@ public class Mob {
 		Identifier type = Identifier.tryParse(cleaned);
 		if (type == null) throw new IllegalArgumentException("Invalid entity type '" + raw_type.replace("\r", "\\r").replace("\n", "\\n") + "' for mob '" + id + "'");
 		return type;
+	}
+
+	private static MobAi loadAi(Identifier id, SkillConfigSection config) {
+		try {
+			return new MobAi(config);
+		} catch (Exception e) {
+			UrArsDebugger.error("Failed to load AI for mob '" + id + "'", e);
+			return null;
+		}
 	}
 
 	private static MechanicsExecutor loadMechanics(final Identifier id, final SkillConfigSection config) {
@@ -93,25 +122,18 @@ public class Mob {
 	private void beforeSpawn(final Entity entity) {
 		UrArsDebugger.trace("Preparing mob '{}' before spawn: entity={}", id, entity.getUUID());
 		UrArsComponents.MOB.get(entity).id(id.toString());
-		mechanics.execute(TriggerType.ON_PRE_SPAWN, new SkillContext(entity));
+
+		if (name != null) entity.setCustomName(Component.literal(name));
+
+		entity.setSilent(silent);
+		entity.setInvulnerable(invulnerable);
+		entity.setNoGravity(no_gravity);
+
+		if (mechanics != null) mechanics.execute(TriggerType.ON_PRE_SPAWN, new SkillContext(entity));
+		applyAi(entity);
 	}
 
-	public static class MobModelData {
-		@Nullable
-		private final String model;
-
-		public MobModelData(final ConfigSection config) {
-			this.model = config.getString("id").strip();
-		}
-
-		public void apply(final Entity target) {
-			if (model == null || model.isBlank()) {
-				UrArsDebugger.trace("Skipping empty model for entity '{}'", target.getUUID());
-				return;
-			}
-
-			UrArsDebugger.debug("Applying model '{}' to entity '{}'", model, target.getUUID());
-			BetterModel.model(model).ifPresentOrElse(resource -> resource.getOrCreate(ModAdapter.adapt(target)), () -> UrArsDebugger.warn("Cannot apply model '{}': model was not found", model));
-		}
+	public void applyAi(Entity entity) {
+		if (ai != null && !ai.isEmpty()) ai.apply(entity);
 	}
 }

@@ -9,6 +9,7 @@ public class Pack {
 	private final String name;
 	private final File dir;
 	private final Map<String, PackLoader> registry;
+	private PackMeta meta;
 
 	public Pack(String name, File dir, Map<String, PackLoader> registry) {
 		this(PackType.PACK, name, dir, registry);
@@ -19,6 +20,7 @@ public class Pack {
 		this.name = Objects.requireNonNull(name, "name");
 		this.dir = Objects.requireNonNull(dir, "dir");
 		this.registry = Objects.requireNonNull(registry, "registry");
+		this.meta = PackMeta.defaults(name);
 	}
 
 	public PackType type() {
@@ -37,11 +39,16 @@ public class Pack {
 		return new File(dir, name);
 	}
 
+	public PackMeta meta() {
+		return meta;
+	}
+
 	public boolean isGlobal() {
 		return type == PackType.GLOBAL;
 	}
 
 	public void load() {
+		if (!isGlobal()) meta = PackMeta.load(name, dir);
 		for (var entry : registry.entrySet()) {
 			File folder = folder(entry.getKey());
 			if (!folder.exists() && !folder.mkdirs()) throw new IllegalStateException("Could not create folder: " + folder.getAbsolutePath());

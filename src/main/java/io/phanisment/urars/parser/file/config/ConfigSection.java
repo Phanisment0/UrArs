@@ -97,7 +97,7 @@ public class ConfigSection implements IConfig {
 	public boolean getBoolean(String key, boolean def) {
 		BufferedString value = map.get(key);
 		if (value == null) return def;
-		return value.toBoolean();
+		return value.trim().toBoolean();
 	}
 
 	@Override

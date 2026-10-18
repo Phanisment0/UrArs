@@ -11,6 +11,8 @@ import io.phanisment.urars.skill.target.INoTarget;
 import net.minecraft.world.entity.Entity;
 import io.phanisment.urars.skill.target.IEntityTarget;
 
+import static io.phanisment.urars.util.ActionUtils.aliases;
+
 @RegistryInfo(
 	author = "Phanisment",
 	key = "loop"
@@ -22,7 +24,7 @@ public class LoopMechanic extends SkillMechanic implements INoTarget, IEntityTar
 	public LoopMechanic(SkillLineConfig config) {
 		super(config);
 		try {
-			this.interval = config.getMathNumber(new String[] {"interval", "i"}, 2);
+			this.interval = config.getMathNumber(aliases("interval", "i"), 2);
 			this.mechanics = config.getMechanics("do");
 		} catch (Exception e) {
 			// Ignored

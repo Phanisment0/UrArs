@@ -4,16 +4,19 @@ import io.phanisment.urars.config.pack.Pack;
 import io.phanisment.urars.config.pack.PackFolderRegistry;
 import io.phanisment.urars.config.pack.PackLoader;
 import io.phanisment.urars.exception.UrArsParseException;
-import io.phanisment.urars.mob.Mob;
+import io.phanisment.urars.mob.MobMeta;
 import io.phanisment.urars.mob.MobManager;
 import io.phanisment.urars.parser.file.UrArsFileParser;
 import io.phanisment.urars.parser.file.parser.Parser;
+import io.phanisment.urars.reload.ReloadResult;
+import io.phanisment.urars.reload.Reloadable;
 import io.phanisment.urars.skill.Skill;
 import io.phanisment.urars.skill.SkillManager;
 import io.phanisment.urars.skill.config.SkillConfigSection;
 import io.phanisment.urars.util.BufferedString;
 import io.phanisment.urars.util.UrArsDebugger;
 import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,28 +25,31 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-public final class ConfigManager {
+public final class ConfigManager implements Reloadable {
 	public static final PackFolderRegistry PACK_FOLDER_REGISTRY = new PackFolderRegistry();
 	private static final String FILE_SUFFIX = ".urars";
 
-	private ConfigManager() {
+	private static int failed_files;
+
+	static {
+		PACK_FOLDER_REGISTRY.register("skills", folderLoader("skills", Skill::new, SkillManager::registerSkill));
+		PACK_FOLDER_REGISTRY.register("mobs", folderLoader("mobs", MobMeta::new, MobManager::registerMob));
 	}
 
-	public static void load() {
-		PACK_FOLDER_REGISTRY.register("skills", folderLoader("skills", Skill::new, SkillManager::registerSkill));
-		PACK_FOLDER_REGISTRY.register("mobs", folderLoader("mobs", Mob::new, MobManager::registerMob));
+	@Override
+	public @Nullable ReloadResult load() {
+		failed_files = 0;
 		new UrArsPackConfig(new File("config/urars"), PACK_FOLDER_REGISTRY).load();
+		return failed_files == 0 ? ReloadResult.success("Loaded packs") : ReloadResult.failed("Failed to read " + failed_files + " file(s), check the log");
 	}
+
+
 
 	@FunctionalInterface
 	private interface EntryFactory<T> {
 		T create(Identifier id, File file, SkillConfigSection config);
 	}
 
-	/**
-	 * Creates a loader that reads every .urars file in {@code <pack>/<folder>}, turns each
-	 * top-level entry into a T, and registers it under {@code <pack name>:<entry key>}.
-	 */
 	private static <T> PackLoader folderLoader(String folder, EntryFactory<T> factory, BiConsumer<Identifier, T> register) {
 		return pack -> {
 			File[] files = pack.folder(folder).listFiles(f -> f.isFile() && f.getName().endsWith(FILE_SUFFIX));
@@ -63,6 +69,7 @@ public final class ConfigManager {
 				register.accept(id, factory.create(id, file, config));
 			}
 		} catch (IOException | UrArsParseException e) {
+			failed_files++;
 			UrArsDebugger.warn("Failed to read file {}", file.getPath(), e);
 		}
 	}

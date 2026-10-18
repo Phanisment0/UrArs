@@ -12,6 +12,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import io.phanisment.urars.skill.target.IEntityTarget;
 
+import static io.phanisment.urars.util.ActionUtils.*;
+
 @RegistryInfo(
 	author = "Phanisment",
 	key = "message"
@@ -23,9 +25,9 @@ public class MessageMechanic extends SkillMechanic implements INoTarget, IEntity
 	public MessageMechanic(SkillLineConfig config) {
 		super(config);
 		try {
-			if (config.singleArgument()) this.message = config.getMathString(new String[]{null}, "Hi!");
-			else this.message = config.getMathString(new String[]{"text", "txt", "t", "message", "msg", "m"}, "Hi!");
-			this.overlay = config.getMathBoolean(new String[]{"overlay", "o"});
+			if (config.singleArgument()) this.message = config.getMathString(aliasNull(), "Hi!");
+			else this.message = config.getMathString(aliases("text", "txt", "t", "message", "msg", "m"), "Hi!");
+			this.overlay = config.getMathBoolean(aliases("overlay", "o"));
 		} catch (MathParserException e) {
 			throw new RuntimeException(e);
 		}

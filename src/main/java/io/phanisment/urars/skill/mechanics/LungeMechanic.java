@@ -13,6 +13,8 @@ import io.phanisment.urars.util.Location;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
+import static io.phanisment.urars.util.ActionUtils.*;
+
 @RegistryInfo(
 		author = "Phanisment",
 		key = "lunge"
@@ -28,12 +30,12 @@ public class LungeMechanic extends SkillMechanic implements INoTarget, IEntityTa
 	public LungeMechanic(SkillLineConfig config) {
 		super(config);
 		try {
-			this.velocity     = config.getMathNumber(new String[]{"velocity", "v"}, 1);
-			this.y_boost      = config.getMathNumber(new String[]{"yboost", "y"}, 0.2);
-			this.scale        = config.getMathNumber(new String[]{"scale", "s"}, 0);
-			this.min_distance = config.getMathNumber(new String[]{"mindistance", "min"}, 1);
-			this.max_distance = config.getMathNumber(new String[]{"maxdistance", "max"}, 32);
-			this.max_speed    = config.getMathNumber(new String[]{"maxspeed"}, 4);
+			this.velocity     = config.getMathNumber(aliases("velocity", "v"), 1);
+			this.y_boost      = config.getMathNumber(aliases("yboost", "y"), 0.2);
+			this.scale        = config.getMathNumber(aliases("scale", "s"), 0);
+			this.min_distance = config.getMathNumber(aliases("mindistance", "min"), 1);
+			this.max_distance = config.getMathNumber(aliases("maxdistance", "max"), 32);
+			this.max_speed    = config.getMathNumber(aliases("maxspeed"), 4);
 		} catch (MathParserException e) {
 			throw new RuntimeException(e);
 		}

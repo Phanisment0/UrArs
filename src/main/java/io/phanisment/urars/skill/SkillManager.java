@@ -1,5 +1,7 @@
 package io.phanisment.urars.skill;
 
+import io.phanisment.urars.reload.ReloadResult;
+import io.phanisment.urars.reload.Reloadable;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.util.AnnotationScanner;
@@ -19,25 +21,30 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.minecraft.server.level.ServerPlayer;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
  * Class for managing skill registration, class registration and get the registered.
  */
-public final class SkillManager {
-	private static final ActionDataRegistery<@NonNull SkillCondition> CONDITIONS = scanClasses("io.phanisment.urars.skill.conditions", SkillCondition.class);
-	private static final ActionDataRegistery<@NonNull SkillMechanic>  MECHANICS = scanClasses("io.phanisment.urars.skill.mechanics", SkillMechanic.class);
-	private static final ActionDataRegistery<@NonNull SkillTargeter>  TARGETERS = scanClasses("io.phanisment.urars.skill.targeters", SkillTargeter.class);
+public final class SkillManager implements Reloadable {
+	private static final ActionDataRegistry<@NonNull SkillCondition> CONDITIONS = scanClasses("io.phanisment.urars.skill.conditions", SkillCondition.class);
+	private static final ActionDataRegistry<@NonNull SkillMechanic> MECHANICS = scanClasses("io.phanisment.urars.skill.mechanics", SkillMechanic.class);
+	private static final ActionDataRegistry<@NonNull SkillTargeter> TARGETERS = scanClasses("io.phanisment.urars.skill.targeters", SkillTargeter.class);
 
-	private static final Map<Identifier, Skill> SKILLS = new ConcurrentHashMap<>();
+	private static final Map<Identifier, Skill> SKILLS = new HashMap<>();
 
-	private SkillManager() {
+	@Override
+	public ReloadResult load() {
+		return ReloadResult.success("Loaded " + SKILLS.size() + " skill(s)");
 	}
 
-	public static void unload() {
-		UrArsDebugger.debug("Unloading {} skill(s)", SKILLS.size());
+	@Override
+	public ReloadResult unload() {
+		var msg = ReloadResult.success("Unloading " + SKILLS.size() + " skill(s)");
 		SKILLS.clear();
+		return msg;
 	}
 
 
@@ -77,7 +84,7 @@ public final class SkillManager {
 		return MECHANICS.get(alias);
 	}
 
-	public static ActionDataRegistery<SkillMechanic> getMechanics() {
+	public static ActionDataRegistry<SkillMechanic> getMechanics() {
 		return MECHANICS;
 	}
 
@@ -91,7 +98,7 @@ public final class SkillManager {
 		return CONDITIONS.get(alias);
 	}
 
-	public static ActionDataRegistery<SkillCondition> getConditions() {
+	public static ActionDataRegistry<SkillCondition> getConditions() {
 		return CONDITIONS;
 	}
 
@@ -105,11 +112,11 @@ public final class SkillManager {
 		return  TARGETERS.get(alias);
 	}
 
-	public static ActionDataRegistery<SkillTargeter> getTargeters() {
+	public static ActionDataRegistry<SkillTargeter> getTargeters() {
 		return TARGETERS;
 	}
 
-	public static <T extends ISkillAction> ActionDataRegistery<T> scanClasses(final String path, final Class<T> base_class) {
+	public static <T extends ISkillAction> ActionDataRegistry<T> scanClasses(final String path, final Class<T> base_class) {
 		Map<Identifier, SkillActionFactory<T>> registry = new HashMap<>();
 		Map<String, Identifier> aliases = new HashMap<>();
 		var lookup = MethodHandles.lookup();
@@ -128,7 +135,11 @@ public final class SkillManager {
 
 			String author = info.author().toLowerCase();
 			String raw_id = info.key().toLowerCase();
+			String namespace = info.namespace().toLowerCase();
+
 			Identifier id = Identifier.fromNamespaceAndPath(author, raw_id);
+			if (!namespace.isBlank()) id = Identifier.fromNamespaceAndPath(namespace, raw_id);
+
 			/*if (id == null) {
 				failed++;
 				UrArsDebugger.warn("Invalid registry key '{}' on class '{}', skipping", raw_id, clazz.getSimpleName());
@@ -172,6 +183,6 @@ public final class SkillManager {
 		long ms = (System.nanoTime() - start) / 1_000_000;
 		UrArsDebugger.info("Scanned '{}': {} registered, {} failed, {} aliases ({} ms)", path, registry.size(), failed, aliases.size(), ms);
 
-		return new ActionDataRegistery<T>(registry, aliases);
+		return new ActionDataRegistry<T>(registry, aliases);
 	}
 }

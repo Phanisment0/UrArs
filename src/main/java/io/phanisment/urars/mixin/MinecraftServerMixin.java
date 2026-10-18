@@ -10,7 +10,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(MinecraftServer.class)
 public class MinecraftServerMixin {
 	@Inject(method = "tickServer", at = @At("TAIL"))
-	public void urars$tickServer(CallbackInfo ci) {
+	private void urars$tickServer(CallbackInfo ci) {
 		UrArs.tick((MinecraftServer)(Object)this);
+	}
+
+	@Inject(method = "runServer", at = @At("TAIL"))
+	private void urars$startServer(CallbackInfo ci) {
+		UrArs.start((MinecraftServer)(Object)this);
+	}
+
+	@Inject(method = "stopServer", at = @At("TAIL"))
+	private void urars$stopServer(CallbackInfo ci) {
+		UrArs.stop((MinecraftServer)(Object)this);
 	}
 }

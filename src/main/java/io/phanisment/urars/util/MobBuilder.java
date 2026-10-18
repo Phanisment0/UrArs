@@ -60,7 +60,7 @@ public final class MobBuilder {
 		if (entity instanceof Mob mob) {
 			mob.yHeadRot = mob.getYRot();
 			mob.yBodyRot = mob.getYRot();
-			mob.finalizeSpawn(location.level(), location.level().getCurrentDifficultyAt(mob.blockPosition()), reason, null);
+			mob.finalizeSpawn(location.serverLevel(), location.serverLevel().getCurrentDifficultyAt(mob.blockPosition()), reason, null);
 		}
 
 		if (before_spawn != null) this.before_spawn.accept(entity);

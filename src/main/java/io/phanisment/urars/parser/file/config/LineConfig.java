@@ -95,7 +95,7 @@ public class LineConfig extends ConfigSection {
 
 	public boolean getBoolean(String[] key, boolean def) {
 		BufferedString value = findValue(key);
-		return value != null ? value.toBoolean() : def;
+		return value != null ? value.trim().toBoolean() : def;
 	}
 
 	public @Nullable List<BufferedString> getList(String... key) {

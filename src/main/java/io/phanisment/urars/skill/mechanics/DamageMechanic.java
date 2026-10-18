@@ -8,12 +8,10 @@ import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.skill.target.IEntityTarget;
 import io.phanisment.urars.skill.target.INoTarget;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.DamageTypeTags;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
+
+import static io.phanisment.urars.util.ActionUtils.aliases;
 
 @RegistryInfo(
 	author = "Phanisment",
@@ -26,7 +24,7 @@ public class DamageMechanic extends SkillMechanic implements INoTarget, IEntityT
 		super(config);
 		try {
 			if (config.singleArgument()) this.amount = config.getMathNumber(new String[]{null}, 1);
-			else this.amount = config.getMathNumber(new String[]{"amount", "a"}, 1);
+			else this.amount = config.getMathNumber(aliases("amount", "a"), 1);
 		} catch (MathParserException e) {
 			throw new RuntimeException(e);
 		}

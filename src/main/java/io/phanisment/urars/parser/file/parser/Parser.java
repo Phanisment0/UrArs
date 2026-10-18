@@ -70,7 +70,7 @@ public class Parser {
 	}
 
 	/**
-	 * TEXT ... isSytax()
+	 * TEXT ... isSyntax()
 	 */
 	private BufferedString parseKey() throws UrArsParseException {
 		int start = lexer.start;
@@ -87,11 +87,16 @@ public class Parser {
 	 */
 	private BufferedString parseField() {
 		int start = lexer.end;
+		int last = start;
 		while (true) {
 			Token token = lexer.next();
-			if (token == Token.EOF) return new BufferedString(lexer.buffer, start, lexer.end);
-			if (isSytax(token) || token == Token.NEW_LINE) return new BufferedString(lexer.buffer, start, lexer.start);
+			if (token == Token.TEXT) {
+				last = lexer.end;
+				continue;
+			}
+			if (token == Token.EOF || token == Token.NEW_LINE || isSytax(token)) break;
 		}
+		return new BufferedString(lexer.buffer, start, last).trimStart();
 	}
 
 	/**

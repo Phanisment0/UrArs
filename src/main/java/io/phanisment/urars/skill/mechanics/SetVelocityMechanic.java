@@ -10,6 +10,8 @@ import io.phanisment.urars.skill.target.IEntityTarget;
 import io.phanisment.urars.skill.target.INoTarget;
 import net.minecraft.world.entity.Entity;
 
+import static io.phanisment.urars.util.ActionUtils.aliases;
+
 @RegistryInfo(
 		author = "Phanisment",
 		key = "setVelocity",
@@ -23,9 +25,9 @@ public class SetVelocityMechanic extends SkillMechanic implements INoTarget, IEn
 	public SetVelocityMechanic(SkillLineConfig config) {
 		super(config);
 		try {
-			this.x = config.getMathNumber(new String[]{"x"}, 0);
-			this.y = config.getMathNumber(new String[]{"y"}, 0);
-			this.z = config.getMathNumber(new String[]{"z"}, 0);
+			this.x = config.getMathNumber(aliases("velocityX", "vx", "x"), 0);
+			this.y = config.getMathNumber(aliases("velocityY", "vy", "y"), 0);
+			this.z = config.getMathNumber(aliases("velocityZ", "vz", "z"), 0);
 		} catch (MathParserException e) {
 			throw new RuntimeException(e);
 		}
