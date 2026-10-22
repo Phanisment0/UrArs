@@ -1,9 +1,10 @@
 package io.phanisment.urars.mob.targets;
 
+import io.phanisment.urars.mob.IGoalCondition;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
-import io.phanisment.urars.util.GoalUtils;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 
 @RegistryInfo(
@@ -11,8 +12,13 @@ import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 		namespace = "minecraft",
 		key = "hurtByTarget"
 )
-public class UrArsHurtByTargetGoal extends HurtByTargetGoal {
+public class UrArsHurtByTargetGoal extends HurtByTargetGoal implements IGoalCondition {
 	public UrArsHurtByTargetGoal(Mob mob, SkillLineConfig c) {
-		super(GoalUtils.pathfinder(mob, "hurt_by_target"));
+		super((PathfinderMob)mob);
+	}
+
+	@Override
+	public boolean isPass(Mob mob) {
+		return mob instanceof PathfinderMob;
 	}
 }

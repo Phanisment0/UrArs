@@ -114,17 +114,10 @@ public class LineConfig extends ConfigSection {
 	public List<LineParser> getLine(String[] key, List<LineParser> def) throws ParseException {
 		List<BufferedString> value = getList(key);
 		if (value == null) return def;
-
-		List<LineParser> list = new ArrayList<>();
-		for (BufferedString line : value) {
-			if (line.isBlank()) continue;
-			var parser = new LineParser(line);
-			parser.parse();
-			list.add(parser);
-		}
-		return list;
+		return convertToLineParser(value);
 	}
 
+	/* -- Utility method --*/
 	protected BufferedString findValue(String... keys) {
 		for (String key : keys) {
 			BufferedString value = map().get(key);

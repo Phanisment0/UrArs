@@ -174,6 +174,18 @@ public class BufferedString implements CharSequence, Comparable<BufferedString>,
 		return true;
 	}
 
+	public BufferedString unescape() {
+		if (!contains((byte)'\\')) return this;
+		byte[] out = new byte[length()];
+		int n = 0;
+		for (int i = start; i < end; i++) {
+			byte b = buffer[i];
+			if (b == '\\' && i + 1 < end) b = buffer[++i];
+			out[n++] = b;
+		}
+		return new BufferedString(out, 0, n);
+	}
+
 	public BufferedString trim() {
 		int start = this.start;
 		int end = this.end;

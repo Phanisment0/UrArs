@@ -1,10 +1,11 @@
-
 package io.phanisment.urars.mob;
 
 import java.io.File;
 import java.text.ParseException;
+import java.util.Locale;
 
 import io.phanisment.urars.mob.ai.MobAi;
+import io.phanisment.urars.util.BufferedString;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.Nullable;
 
@@ -26,47 +27,50 @@ public class MobMeta {
 	private final Identifier id;
 	private final Identifier type;
 	private final MechanicsExecutor mechanics;
+	private final Settings settings;
 
-	@Nullable
-	private final String name;
-	private boolean silent;
-	private boolean invulnerable;
-	private boolean no_gravity;
-
-	@Nullable
-	private final MobModelData entity_model;
-	@Nullable
-	private final MobAi ai;
+	private final @Nullable String name;
+	private final @Nullable MobModelData entity_model;
+	private final @Nullable MobAi ai;
 
 	public MobMeta(final Identifier id, final File file, final SkillConfigSection config) {
 		this.id = id;
-		this.type = parseType(id, config.getString("type", "minecraft:zombie"));
-		this.mechanics = loadMechanics(id, config);
-		this.ai = loadAi(id, config);
 
+		this.type = parseType(config.getBufferedString("type", new BufferedString("minecraft:zombie")));
 		this.name = config.getString("name", null);
 
-		try {
-			ConfigSection settings = config.getSection("settings");
-			this.silent = settings.getBoolean("silent", false);
-			this.invulnerable = settings.getBoolean("invulnerable", false);
-			this.no_gravity = settings.getBoolean("no-gravity", false);
-		} catch (ParseException e) {
-			UrArsDebugger.error("Failed to parse section 'settings' in file " + file.getPath() + "'", e);
-		}
-
+		this.mechanics = loadMechanics(id, config);
+		this.ai = loadAi(id, config);
+		this.settings = loadSettings(file, config);
 		this.entity_model = loadModel(id, config);
-		UrArsDebugger.debug("Loaded mob '{}': type='{}', model={}", id, type, entity_model != null);
+
+		UrArsDebugger.debug("Loaded mob '{}': type='{}', model={}, mechanic(s)={}", id, type, entity_model != null, mechanics.size());
 	}
 
-	private static Identifier parseType(final Identifier id, final String raw_type) {
-		String cleaned = raw_type.strip().toLowerCase();
-		Identifier type = Identifier.tryParse(cleaned);
-		if (type == null) throw new IllegalArgumentException("Invalid entity type '" + raw_type.replace("\r", "\\r").replace("\n", "\\n") + "' for mob '" + id + "'");
+	private Identifier parseType(final BufferedString raw_type) {
+		String input = raw_type.toString();
+		Identifier type = Identifier.tryParse(input);
+		if (type == null) throw new IllegalArgumentException("Invalid entity type '" + input + "' for mob '" + id + "'");
 		return type;
 	}
 
-	private static MobAi loadAi(Identifier id, SkillConfigSection config) {
+	private static Settings loadSettings(final File file, final SkillConfigSection config) {
+		try {
+			ConfigSection section = config.getSection("settings");
+			if (section == null) return Settings.DEFAULT;
+			return new Settings(
+					section.getBoolean("silent", false),
+					section.getBoolean("invulnerable", false),
+					section.getBoolean("no-gravity", false)
+			);
+		} catch (ParseException e) {
+			UrArsDebugger.error("Failed to parse section 'settings' in file '" + file.getPath() + "'", e);
+			return Settings.DEFAULT;
+		}
+	}
+
+	@Nullable
+	private static MobAi loadAi(final Identifier id, final SkillConfigSection config) {
 		try {
 			return new MobAi(config);
 		} catch (Exception e) {
@@ -100,14 +104,12 @@ public class MobMeta {
 		UrArsDebugger.debug("Spawning mob '{}': type='{}', position={}", id, type, loc.pos());
 
 		MobBuilder builder = MobBuilder.create(type, loc);
-
 		if (builder == null) {
 			UrArsDebugger.warn("Cannot spawn mob '{}': entity type '{}' is not registered", id, type);
 			return false;
 		}
 
 		Entity entity = builder.beforeSpawn(this::beforeSpawn).spawn();
-
 		if (entity == null) {
 			UrArsDebugger.warn("Cannot spawn mob '{}': failed to create entity of type '{}'", id, type);
 			return false;
@@ -124,16 +126,23 @@ public class MobMeta {
 		UrArsComponents.MOB.get(entity).id(id.toString());
 
 		if (name != null) entity.setCustomName(Component.literal(name));
+		settings.apply(entity);
 
-		entity.setSilent(silent);
-		entity.setInvulnerable(invulnerable);
-		entity.setNoGravity(no_gravity);
-
-		if (mechanics != null) mechanics.execute(TriggerType.ON_PRE_SPAWN, new SkillContext(entity));
+		mechanics.execute(TriggerType.ON_PRE_SPAWN, new SkillContext(entity));
 		applyAi(entity);
 	}
 
-	public void applyAi(Entity entity) {
+	public void applyAi(final Entity entity) {
 		if (ai != null && !ai.isEmpty()) ai.apply(entity);
+	}
+
+	private record Settings(boolean silent, boolean invulnerable, boolean no_gravity) {
+		static final Settings DEFAULT = new Settings(false, false, false);
+
+		void apply(Entity entity) {
+			entity.setSilent(silent);
+			entity.setInvulnerable(invulnerable);
+			entity.setNoGravity(no_gravity);
+		}
 	}
 }

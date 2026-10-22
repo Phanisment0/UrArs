@@ -7,13 +7,9 @@ import kr.toxicity.model.api.mod.platform.ModAdapter;
 import net.minecraft.world.entity.Entity;
 import org.jspecify.annotations.Nullable;
 
-public class MobModelData {
-	@Nullable
-	private String model;
-
+public record MobModelData(@Nullable String model) {
 	public MobModelData(final ConfigSection config) {
-		String model_name = config.getString("id", null);
-		if (model_name != null) this.model = model_name.strip();
+		this(config.getString("id"));
 	}
 
 	public void apply(final Entity target) {

@@ -1,5 +1,6 @@
 package io.phanisment.urars.mob.goals;
 
+import io.phanisment.urars.mob.IGoalCondition;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import net.minecraft.world.entity.Mob;
@@ -12,13 +13,13 @@ import static io.phanisment.urars.util.ActionUtils.aliases;
 		namespace = "minecraft",
 		key = "fleeSun"
 )
-public class UrArsFleeSunGoal extends FleeSunGoal {
+public class UrArsFleeSunGoal extends FleeSunGoal  implements IGoalCondition {
 	public UrArsFleeSunGoal(Mob mob, SkillLineConfig config) {
-		super(asPathfinder(mob), config.getDouble(aliases("speed", "s"), 0));
+		super((PathfinderMob)mob, config.getDouble(aliases("speed", "s"), 0));
 	}
 
-	private static PathfinderMob asPathfinder(Mob mob) {
-		if (mob instanceof PathfinderMob p) return p;
-		throw new IllegalArgumentException("flee_sun requires a PathfinderMob, got " + mob.getType());
+	@Override
+	public boolean isPass(Mob mob) {
+		return mob instanceof PathfinderMob;
 	}
 }

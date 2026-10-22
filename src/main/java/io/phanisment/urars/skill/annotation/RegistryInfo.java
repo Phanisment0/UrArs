@@ -8,10 +8,10 @@ import java.lang.annotation.ElementType;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface RegistryInfo {
-	String key() default "";
-	String[] aliases() default {};
-	String author() default ""; // Will be used as namespace if namespace is empty
+	String author(); // Will be used as namespace if namespace is empty
+	String key();
 	String namespace() default "";
+	String[] aliases() default {};
 
 	// --- Unnecessary info, used only for code documentation --- //
 	String description() default "";

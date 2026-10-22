@@ -16,6 +16,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 
@@ -27,7 +28,7 @@ public final class TargeterUtils {
 
 		if (server.isSameThread()) return findTarget(entity, level, range);
 		try {
-			return server.submit(() -> findTarget(entity, level, range)).get();
+			return server.submit(() -> Objects.requireNonNull(findTarget(entity, level, range))).get();
 		} catch (InterruptedException | ExecutionException e) {
 			UrArsDebugger.warn("Somehow its error", e);
 			return null;
@@ -45,7 +46,7 @@ public final class TargeterUtils {
 			VoxelShape shape = state.getCollisionShape(lvl, pos);
 			return shape.isEmpty() ? null : shape.clip(eye, far_end, pos);
 		}, lvl -> null);
-		Vec3 end = block_hit != null ? block_hit.getLocation() : far_end;
+		Vec3 end = block_hit.getLocation();
 		AABB search = entity.getBoundingBox().expandTowards(end.subtract(eye)).inflate(1);
 		Predicate<Entity> filter = e -> e instanceof Entity && e != entity && !e.isSpectator() && e.isPickable() && !(e instanceof Player p);
 		EntityHitResult hit = ProjectileUtil.getEntityHitResult(entity, eye, end, search, filter, eye.distanceTo(end));

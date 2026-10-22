@@ -18,9 +18,7 @@ public class LineParser {
 	private String key;
 	private final Map<String, BufferedString> arguments = new HashMap<>();
 	private BufferedString context;
-
-	private int pos;
-	private int start, end = 0;
+	private int pos, start, end;
 
 	public LineParser(String line) {
 		this(new BufferedString(line));
@@ -51,12 +49,7 @@ public class LineParser {
 		parse(true);
 	}
 
-	public void parse(boolean include_context) throws ParseException {
-		doParse(include_context);
-		UrArsDebugger.trace("Parsed line -> key='{}', args={}, context='{}'", key, arguments, context);
-	}
-
-	private void doParse(boolean include_context) throws ParseException {
+	private void parse(boolean include_context) throws ParseException {
 		skipWhitespace();
 		if (peek() == -1) return;
 
@@ -90,9 +83,7 @@ public class LineParser {
 		if (include_context) {
 			skipWhitespace();
 			if (pos < line.end) {
-				// Start from `pos` (after the whitespace), not `end`, and trim the tail
-				// so stray \r \n \t from the source never leak into the context.
-				BufferedString ctx = new BufferedString(line.buffer, pos, line.end).trim();
+				BufferedString ctx = new BufferedString(line.buffer, pos, line.end);
 				if (!ctx.isEmpty()) context = ctx;
 			}
 		}
@@ -102,7 +93,7 @@ public class LineParser {
 		int depth = 0;
 		int current = start;
 		for (int i = start; i < end; i++) {
-			int c = line.buffer[i] & 0xFF;
+			byte c = line.buffer[i];
 			if (c == '{' || c == '[') depth++;
 			else if (c == '}' || c == ']') depth--;
 			else if (c == ';' && depth == 0) {
@@ -117,17 +108,17 @@ public class LineParser {
 		if (start >= end) return;
 
 		int equals_index = -1;
-		for (int i = start; i < end; i++) if ((line.buffer[i] & 0xFF) == '=') {
+		for (int i = start; i < end; i++) if ((line.buffer[i]) == '=') {
 			equals_index = i;
 			break;
 		}
 
 		if (equals_index != -1) {
-			var key = new BufferedString(line.buffer, start, equals_index).trim();
-			var value = new BufferedString(line.buffer, equals_index + 1, end).trim();
+			var key = new BufferedString(line.buffer, start, equals_index);
+			var value = new BufferedString(line.buffer, equals_index + 1, end);
 			arguments.put(key.toString(), value);
 		} else {
-			var value = new BufferedString(line.buffer, start, end).trim();
+			var value = new BufferedString(line.buffer, start, end);
 			arguments.put(null, value);
 		}
 	}

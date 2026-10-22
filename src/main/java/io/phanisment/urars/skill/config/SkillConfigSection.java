@@ -6,57 +6,49 @@ import io.phanisment.urars.skill.MechanicsExecutor;
 import io.phanisment.urars.skill.SkillCondition;
 import io.phanisment.urars.skill.SkillManager;
 import io.phanisment.urars.skill.SkillMechanic;
+import io.phanisment.urars.util.ActionUtils;
 import io.phanisment.urars.util.BufferedString;
-
-import static io.phanisment.urars.UrArs.LOGGER;
+import io.phanisment.urars.util.UrArsDebugger;
+import org.jspecify.annotations.Nullable;
 
 import java.text.ParseException;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class SkillConfigSection extends ConfigSection {
+
 	public SkillConfigSection(Map<String, BufferedString> map) {
 		super(map);
 	}
 
 	public MechanicsExecutor getMechanics(String key) throws ParseException {
-		return this.getMechanics(key, new MechanicsExecutor());
+		return getMechanics(key, new MechanicsExecutor());
 	}
 
 	public MechanicsExecutor getMechanics(String key, MechanicsExecutor def) throws ParseException {
-		List<LineParser> list = this.getLine(key);
-		if (list == null || list.isEmpty()) return def;
+		List<LineParser> lines = getLine(key);
+		if (lines == null || lines.isEmpty()) return def;
 
-		var mechanics = new MechanicsExecutor();
-
-		for (LineParser line : list) try {
-			var config = new SkillLineConfig(line.config());
-			SkillMechanic action = SkillManager.getMechanic(config.key()).create(config);
-			mechanics.add(action);
-		} catch (Exception e) {
-			LOGGER.warn("Failed to create mechanic", e);
-		}
-		return mechanics;
+		MechanicsExecutor executor = new MechanicsExecutor();
+		executor.addAll(ActionUtils.createAll(lines, "mechanic", config -> {
+			var factory = SkillManager.getMechanic(config.key());
+			return factory == null ? null : factory.create(config);
+		}));
+		return executor;
 	}
 
 	public List<SkillCondition> getConditions(String key) throws ParseException {
-		return this.getConditions(key, new ArrayList<>());
+		return getConditions(key, new ArrayList<>());
 	}
 
 	public List<SkillCondition> getConditions(String key, List<SkillCondition> def) throws ParseException {
-		List<LineParser> list = this.getLine(key);
-		if (list == null || list.isEmpty()) return def;
+		List<LineParser> lines = getLine(key);
+		if (lines == null || lines.isEmpty()) return def;
 
-		List<SkillCondition> conditions = new ArrayList<>();
-
-		for (LineParser line : list) try {
-			var config = new SkillLineConfig(line.config());
-			SkillCondition action = SkillManager.getCondition(config.key()).create(config);
-			conditions.add(action);
-		} catch (Exception e) {
-			LOGGER.warn("Failed to create condition", e);
-		}
-		return conditions;
+		return ActionUtils.createAll(lines, "condition", config -> {
+			var factory = SkillManager.getCondition(config.key());
+			return factory == null ? null : factory.create(config);
+		});
 	}
 }

@@ -1,5 +1,6 @@
 package io.phanisment.urars.skill;
 
+import io.phanisment.urars.util.UrArsDebugger;
 import net.minecraft.resources.Identifier;
 import io.phanisment.urars.skill.config.SkillConfigSection;
 
@@ -12,20 +13,25 @@ public class Skill {
 	public final File file;
 	public final SkillConfigSection config;
 
-	private List<SkillCondition> conditions;
-	private MechanicsExecutor mechanics;
-	
+	private final List<SkillCondition> conditions;
+	private final MechanicsExecutor mechanics;
+
 	public Skill(Identifier id, File file, SkillConfigSection config) {
 		this.id = id;
 		this.file = file;
 		this.config = config;
 
+		this.conditions = load(id, "conditions", () -> config.getConditions("conditions"), new ArrayList<>());
+		this.mechanics = load(id, "mechanics", () -> config.getMechanics("mechanics"), new MechanicsExecutor());
+		UrArsDebugger.debug("Skill '{}': {} condition(s), {} mechanic(s)", id, conditions.size(), mechanics.size());
+	}
+
+	private static <V> V load(Identifier id, String what, java.util.concurrent.Callable<V> loader, V fallback) {
 		try {
-			this.conditions = config.getConditions("conditions");
-			this.mechanics = config.getMechanics("mechanics");
+			return loader.call();
 		} catch (Exception e) {
-			this.mechanics = new MechanicsExecutor();
-			this.conditions = new ArrayList<>();
+			UrArsDebugger.error("Failed to load " + what + " for skill '" + id + "'", e);
+			return fallback;
 		}
 	}
 	

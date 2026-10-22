@@ -180,7 +180,6 @@ public class UrArsCommand {
 
 	private static int executeSpawn(CommandSourceStack source, Vec3 pos, CommandContext<CommandSourceStack> ctx) {
 		Identifier mob_id = IdentifierArgument.getId(ctx, "mob");
-		UrArsDebugger.debug("Spawn requested: mob='{}', pos={}, actor='{}'", mob_id, pos, actor(source));
 		Optional<MobMeta> mob = MobManager.getMobOptional(mob_id);
 
 		if (mob.isEmpty()) {

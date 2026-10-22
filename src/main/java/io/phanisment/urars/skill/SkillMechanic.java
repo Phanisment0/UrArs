@@ -20,9 +20,8 @@ import java.text.ParseException;
 public class SkillMechanic implements ISkillAction {
 	protected final SkillLineConfig config;
 	protected Node delay;
-	@Nullable
-	protected SkillTargeter skill_targeter;
-	protected String trigger = "";
+	protected @Nullable SkillTargeter skill_targeter;
+	protected @Nullable String trigger;
 
 	public SkillMechanic(SkillLineConfig config) {
 		this.config = config;
@@ -43,7 +42,7 @@ public class SkillMechanic implements ISkillAction {
 			if (value.isBlank()) continue;
 			switch (flag.c()) {
 				case '@' -> initializeTargeter(value);
-				case '~' -> this.trigger = value.toString();
+				case '~' -> this.trigger = value.trimEnd().toString();
 			}
 		}
 	}
@@ -75,20 +74,16 @@ public class SkillMechanic implements ISkillAction {
 			return;
 		}
 
-		// 1. Location targeter + location mechanic: use locations directly.
 		if (skill_targeter.isLocation() && this instanceof ILocationTarget location_target) {
 			for (Location loc : skill_targeter.getLocations(ctx)) location_target.castAtLocation(ctx, loc);
 			return;
 		}
 
-		// 2. Entity mechanic: entities come from the targeter directly, or from a
-		//    radius query around its locations (e.g. @Forward{d=5;r=2}).
 		if (this instanceof IEntityTarget entity_target) {
 			for (Entity target : skill_targeter.getEntities(ctx)) entity_target.castAtEntity(ctx, target);
 			return;
 		}
 
-		// 3. Entity targeter + location mechanic: use entity positions.
 		if (this instanceof ILocationTarget location_target) {
 			for (Location loc : skill_targeter.getLocations(ctx)) location_target.castAtLocation(ctx, loc);
 			return;

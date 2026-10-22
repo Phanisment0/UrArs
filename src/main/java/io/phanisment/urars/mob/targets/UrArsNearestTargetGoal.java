@@ -1,11 +1,13 @@
 package io.phanisment.urars.mob.targets;
 
+import io.phanisment.urars.mob.IGoalCondition;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.util.EntityTypeUtils;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 
@@ -19,12 +21,12 @@ import static io.phanisment.urars.util.ActionUtils.aliases;
 		key = "nearestTarget",
 		aliases = {"nearest"}
 )
-public class UrArsNearestTargetGoal extends NearestAttackableTargetGoal<LivingEntity> {
+public class UrArsNearestTargetGoal extends NearestAttackableTargetGoal<LivingEntity> implements IGoalCondition {
 	public UrArsNearestTargetGoal(Mob mob, SkillLineConfig c) {
 		super(mob, LivingEntity.class,
 				c.getInt(aliases("interval", "i"), 10),
-				c.getBoolean(aliases("must_see", "see"), true),
-				c.getBoolean(aliases("must_reach", "reach"), false),
+				c.getBoolean(aliases("mustSee", "see"), true),
+				c.getBoolean(aliases("mustReach", "reach"), false),
 				filter(c));
 	}
 

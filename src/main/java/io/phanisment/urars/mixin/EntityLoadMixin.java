@@ -20,7 +20,6 @@ public class EntityLoadMixin {
 		if (entity instanceof Player) return;
 		if (!(entity instanceof Mob)) return;
 		MobComponent comp = UrArsComponents.MOB.get(entity);
-		if (comp == null) return;
 		String id = comp.id();
 		if (id == null || id.isEmpty()) return;
 

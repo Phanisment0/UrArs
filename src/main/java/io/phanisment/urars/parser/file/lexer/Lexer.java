@@ -1,4 +1,4 @@
-package io.phanisment.urars.parser.file.tokenize;
+package io.phanisment.urars.parser.file.lexer;
 
 import io.phanisment.urars.exception.UrArsParseException.SourceLocation;
 import io.phanisment.urars.util.BufferedString;
@@ -49,7 +49,7 @@ public final class Lexer {
 		return c == '{'
 				|| c == '}'
 				|| c == '='
-				|| c == '#';
+				|| c == '$';
 	}
 
 	/**
@@ -136,7 +136,7 @@ public final class Lexer {
 				end = pos;
 				return Token.NEW_LINE;
 			}
-			case '#' -> {
+			case '$' -> {
 				// Skip for new line
 				byte current;
 				while ((current = peek()) != -1 && !ParserUtils.isNewLine(current)) pos++;
@@ -146,7 +146,15 @@ public final class Lexer {
 
 		start = pos;
 		byte current;
-		while ((current = peek()) != -1 && !isSyntax(current) && !ParserUtils.isWhitespace(current)) pos++;
+		while ((current = peek()) != -1) {
+			if (current == '\\') {
+				skip();
+				if (peek() != -1) skip();
+				continue;
+			}
+			if (isSyntax(current) || ParserUtils.isWhitespace(current)) break;
+			pos++;
+		}
 		end = pos;
 		return Token.TEXT;
 	}

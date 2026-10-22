@@ -8,20 +8,18 @@ import org.jspecify.annotations.Nullable;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class MechanicsExecutor extends AbstractList<SkillMechanic> {
-	private final List<SkillMechanic> mechanics;
-	private final Node skill_id;
-
-	private long global_delay = 0L;
+	private final List<SkillMechanic> mechanics = new ArrayList<>();
+	private final @Nullable Node skill;
 
 	public MechanicsExecutor() {
 		this(null);
 	}
 
-	public MechanicsExecutor(Node skill_id) {
-		this.skill_id = skill_id;
-		mechanics = new ArrayList<>();
+	public MechanicsExecutor(@Nullable Node skill) {
+		this.skill = skill;
 	}
 
 	public void execute(TriggerType event, SkillContext context) {
@@ -29,45 +27,46 @@ public class MechanicsExecutor extends AbstractList<SkillMechanic> {
 	}
 
 	public void execute(String event, SkillContext context) {
-		if (skill_id != null) {
-			String parsed = skill_id.evalAsString(context.evalContext());
-			Skill skill_meta = SkillManager.getSkill(UrArs.of(parsed));
-			if (skill_meta == null) {
-				UrArsDebugger.warn("Unknown skill of '{}'", parsed);
-				return;
-			}
-			skill_meta.cast(context);
-			return;
-		}
-
-		for (var mechanic : mechanics) {
-			context.global_delay = global_delay;
-			if (event.equalsIgnoreCase(mechanic.getTrigger())) {
-				mechanic.execute(context);
-				global_delay += mechanic.getDelay(context);
-			}
-		}
-		context.global_delay = 0L;
+		UrArsDebugger.trace("Executing trigger '{}'", event);
+		run(context, event);
 	}
 
 	public void execute(SkillContext context) {
-		if (skill_id != null) {
-			String parsed = skill_id.evalAsString(context.evalContext());
-			Skill skill_meta = SkillManager.getSkill(UrArs.of(parsed));
-			if (skill_meta == null) {
-				UrArsDebugger.warn("Unknown skill of '{}'", parsed);
-				return;
-			}
-			skill_meta.cast(context);
+		run(context, null);
+	}
+
+	private void run(SkillContext context, @Nullable String event) {
+		if (skill != null) {
+			castSkill(context);
 			return;
 		}
 
-		for (var mechanic : mechanics) {
-			context.global_delay = global_delay;
-			mechanic.execute(context);
-			global_delay += mechanic.getDelay(context);
+		long delay = 0L;
+		try {
+			for (SkillMechanic mechanic : mechanics) {
+				if (event != null && (mechanic.getTrigger() == null || !event.equalsIgnoreCase(mechanic.getTrigger()))) {
+					UrArsDebugger.trace("Skipped '{}': trigger '{}' on event '{}'", mechanic.getClass().getSimpleName(), mechanic.getTrigger(), event);
+					continue;
+				}
+
+				context.global_delay = delay;
+				mechanic.execute(context);
+				delay += mechanic.getDelay(context);
+			}
+		} finally {
+			context.global_delay = 0L;
 		}
-		context.global_delay = 0L;
+	}
+
+	private void castSkill(SkillContext context) {
+		assert skill != null;
+		String parsed = skill.evalAsString(context.evalContext());
+		Skill skill = SkillManager.getSkill(UrArs.of(parsed));
+		if (skill == null) {
+			UrArsDebugger.warn("Unknown skill of '{}'", parsed);
+			return;
+		}
+		skill.cast(context);
 	}
 
 	@Override
@@ -86,12 +85,15 @@ public class MechanicsExecutor extends AbstractList<SkillMechanic> {
 	}
 
 	@Override
-	public boolean add(SkillMechanic mechanic) {
-		return mechanics.add(mechanic);
+	public void add(int index, SkillMechanic mechanic) {
+		mechanics.add(index, mechanic);
+		modCount++;
 	}
 
 	@Override
 	public SkillMechanic remove(int index) {
-		return mechanics.remove(index);
+		SkillMechanic removed = mechanics.remove(index);
+		modCount++;
+		return removed;
 	}
 }

@@ -16,7 +16,7 @@ import io.phanisment.urars.skill.config.SkillConfigSection;
 import io.phanisment.urars.util.BufferedString;
 import io.phanisment.urars.util.UrArsDebugger;
 import net.minecraft.resources.Identifier;
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +37,7 @@ public final class ConfigManager implements Reloadable {
 	}
 
 	@Override
-	public @Nullable ReloadResult load() {
+	public @NonNull ReloadResult load() {
 		failed_files = 0;
 		new UrArsPackConfig(new File("config/urars"), PACK_FOLDER_REGISTRY).load();
 		return failed_files == 0 ? ReloadResult.success("Loaded packs") : ReloadResult.failed("Failed to read " + failed_files + " file(s), check the log");

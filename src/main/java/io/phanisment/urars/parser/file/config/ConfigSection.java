@@ -165,15 +165,7 @@ public class ConfigSection implements IConfig {
 	public List<LineParser> getLine(String key, List<LineParser> def) throws ParseException {
 		List<BufferedString> value = getList(key);
 		if (value == null) return def;
-
-		List<LineParser> list = new ArrayList<>();
-		for (BufferedString line : value) {
-			if (line.isBlank()) continue;
-			var parser = new LineParser(line);
-			parser.parse();
-			list.add(parser);
-		}
-		return list;
+		return convertToLineParser(value);
 	}
 
 	public Map<String, BufferedString> getMapSection(String key) throws ParseException {
@@ -193,5 +185,18 @@ public class ConfigSection implements IConfig {
 	@Override
 	public String toString() {
 		return map.toString();
+	}
+
+
+	/* -- Utility method --*/
+	protected List<LineParser> convertToLineParser(List<BufferedString> value) throws ParseException {
+		List<LineParser> list = new ArrayList<>();
+		for (BufferedString line : value) {
+			if (line.isBlank()) continue;
+			var parser = new LineParser(line);
+			parser.parse();
+			list.add(parser);
+		}
+		return list;
 	}
 }

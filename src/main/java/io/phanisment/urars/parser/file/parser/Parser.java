@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.phanisment.urars.exception.UrArsParseException;
-import io.phanisment.urars.parser.file.tokenize.Lexer;
-import io.phanisment.urars.parser.file.tokenize.Lexer.Token;
+import io.phanisment.urars.parser.file.lexer.Lexer;
+import io.phanisment.urars.parser.file.lexer.Lexer.Token;
 import io.phanisment.urars.util.BufferedString;
 
 public class Parser {
@@ -86,17 +86,18 @@ public class Parser {
 	 * TEXT EQUAL TEXT
 	 */
 	private BufferedString parseField() {
-		int start = lexer.end;
-		int last = start;
+		int start = -1, last = lexer.end;
 		while (true) {
 			Token token = lexer.next();
 			if (token == Token.TEXT) {
+				if (start == -1) start = lexer.start;
 				last = lexer.end;
 				continue;
 			}
 			if (token == Token.EOF || token == Token.NEW_LINE || isSytax(token)) break;
 		}
-		return new BufferedString(lexer.buffer, start, last).trimStart();
+		if (start == -1) start = last;
+		return new BufferedString(lexer.buffer, start, last);
 	}
 
 	/**

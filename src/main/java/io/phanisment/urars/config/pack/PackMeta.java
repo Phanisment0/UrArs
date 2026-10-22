@@ -54,12 +54,12 @@ public record PackMeta(String name, String version, String author, String descri
 
 	private static String template(PackMeta meta) {
 		return """
-				# urars generated pack metadata
+				$ urars generated pack metadata
 				
-				# This parser is really simple and (hopefully) fast.
-				# The structure is: key ( `=` | `{` ) value [ `}` ]
-				# When you use `=` only a single-line value is allowed.
-				# When you use `{}` the value can span multiple lines.
+				$ This parser is really simple and (hopefully) fast.
+				$ The structure is: key ( `=` | `{` ) value [ `}` ]
+				$ When you use `=` only a single-line value is allowed.
+				$ When you use `{}` the value can span multiple lines.
 
 				name = %s
 				version = %s

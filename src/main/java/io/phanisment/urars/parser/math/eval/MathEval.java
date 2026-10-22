@@ -35,7 +35,6 @@ public class MathEval {
 	}
 
 	private static IValue<?> evalBinary(BinaryNode node, EvalContext context) throws InvalidMathOperationException {
-		// Short-circuit operators must not evaluate the right side eagerly
 		if (node.op() == MathLexer.Token.AND) {
 			if (!asBool(eval(node.left(), context))) return BooleanValue.FALSE;
 			return BooleanValue.of(asBool(eval(node.right(), context)));
@@ -77,7 +76,7 @@ public class MathEval {
 	}
 
 	private static boolean asBool(IValue<?> value) {
-		if (value instanceof BooleanValue b) return b.raw();
+		if (value instanceof BooleanValue(Boolean raw)) return raw;
 		throw new InvalidMathOperationException("Expected boolean but got " + value.getClass().getSimpleName());
 	}
 
@@ -95,7 +94,7 @@ public class MathEval {
 	private static int compareNum(Number a, Number b) {
 		if (rank(a, b) == DOUBLE) {
 			double x = a.doubleValue(), y = b.doubleValue();
-			return x < y ? -1 : x > y ? 1 : 0;
+			return Double.compare(x, y);
 		}
 		return Long.compare(a.longValue(), b.longValue());
 	}
@@ -103,7 +102,7 @@ public class MathEval {
 	private static int rank(Number n) {
 		if (n instanceof Double || n instanceof Float) return DOUBLE;
 		if (n instanceof Long) return LONG;
-		return INT; // Integer, Short, Byte
+		return INT;
 	}
 
 	private static int rank(Number a, Number b) {

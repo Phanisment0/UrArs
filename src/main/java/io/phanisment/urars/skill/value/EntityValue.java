@@ -11,16 +11,16 @@ public class EntityValue extends ObjectValue {
 	public EntityValue(Entity entity) {
 		super(entity);
 
-		member("x", new FunctionValue(args -> new NumberValue(entity.getX())));
-		member("y", new FunctionValue(args -> new NumberValue(entity.getY())));
-		member("z", new FunctionValue(args -> new NumberValue(entity.getZ())));
+		member("x", new NumberValue(entity.getX()));
+		member("y", new NumberValue(entity.getY()));
+		member("z", new NumberValue(entity.getZ()));
 
-		member("name", new FunctionValue(args -> new StringValue(entity.getName().getString())));
-		member("height", new FunctionValue(args -> new NumberValue(entity.getBbHeight())));
+		member("name", new StringValue(entity.getName().getString()));
+		member("type", new StringValue(entity.getType().toShortString()));
 
 		if (entity instanceof LivingEntity living) {
-			member("health", new FunctionValue(args -> new NumberValue(living.getHealth())));
-			member("maxHealth", new FunctionValue(args -> new NumberValue(living.getMaxHealth())));
+			member("hp", new NumberValue(living.getHealth()));
+			member("max_hp", new NumberValue(living.getMaxHealth()));
 		}
 	}
 }

@@ -5,9 +5,7 @@ import java.util.function.Supplier;
 import static io.phanisment.urars.UrArs.LOGGER;
 
 public final class UrArsDebugger {
-	private static final String prefix = "[UrArs]";
-
-	// volatile: can be changed from a command thread and read from other threads
+	private static final String prefix = "[UrArs] ";
 	private static volatile Level level = Level.OFF;
 
 	private UrArsDebugger() {
@@ -30,24 +28,24 @@ public final class UrArsDebugger {
 	}
 
 	public static void info(String msg, Object... args) {
-		if (isEnabled(Level.INFO)) LOGGER.info(prefix + " [DEBUG] " + msg, args);
+		if (isEnabled(Level.INFO)) LOGGER.info(prefix + "[DEBUG] " + msg, args);
 	}
 
 	public static void debug(String msg, Object... args) {
-		if (isEnabled(Level.DEBUG)) LOGGER.info(prefix + " [DEBUG/D] " + msg, args);
+		if (isEnabled(Level.DEBUG)) LOGGER.info(prefix + "[DEBUG/D] " + msg, args);
 	}
 
 	public static void trace(String msg, Object... args) {
-		if (isEnabled(Level.TRACE)) LOGGER.info(prefix + " DEBUG/T] " + msg, args);
+		if (isEnabled(Level.TRACE)) LOGGER.info(prefix + "[DEBUG/T] " + msg, args);
 	}
 
 	/** Lazy variant: the message is only built if the level is enabled. */
 	public static void debug(Supplier<String> msg) {
-		if (isEnabled(Level.DEBUG)) LOGGER.info(prefix + " [DEBUG/D] {}", msg.get());
+		if (isEnabled(Level.DEBUG)) LOGGER.info(prefix + "[DEBUG/D] {}", msg.get());
 	}
 
 	public static void trace(Supplier<String> msg) {
-		if (isEnabled(Level.TRACE)) LOGGER.info(prefix + " [DEBUG/T] {}", msg.get());
+		if (isEnabled(Level.TRACE)) LOGGER.info(prefix + "[DEBUG/T] {}", msg.get());
 	}
 
 	/** Warnings and errors are always logged, regardless of debug level. */
@@ -61,7 +59,7 @@ public final class UrArsDebugger {
 
 	/** Logs the exception with full stack trace, only when debugging is on. */
 	public static void exception(String context, Throwable t) {
-		if (isEnabled(Level.DEBUG)) LOGGER.error(prefix + " [DEBUG/EX] " + context, t);
+		if (isEnabled(Level.DEBUG)) LOGGER.error(prefix + "[DEBUG/EX] " + context, t);
 	}
 
 	/** Measures how long a task takes (shown at DEBUG level). */

@@ -14,6 +14,10 @@ public class Arguments {
 		this.args = args;
 	}
 
+	public List<IValue<?>> get() {
+		return args;
+	}
+
 	public IValue<?> get(int index) throws InvalidMathOperationException {
 		return args.get(index);
 	}

@@ -8,7 +8,8 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 @RegistryInfo(
 		author = "Phanisment",
 		namespace = "minecraft",
-		key = "randomLook"
+		key = "randomLook",
+		aliases = {"lookAround"}
 )
 public class UrArsRandomLookGoal extends RandomLookAroundGoal {
 	public UrArsRandomLookGoal(Mob mob, SkillLineConfig c) {

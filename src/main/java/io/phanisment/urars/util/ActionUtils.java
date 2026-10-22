@@ -1,17 +1,42 @@
 package io.phanisment.urars.util;
 
-import net.minecraft.client.gui.font.providers.FreeTypeUtil;
+import io.phanisment.urars.parser.file.parser.LineParser;
+import io.phanisment.urars.skill.config.SkillLineConfig;
+import org.jspecify.annotations.Nullable;
 
-public interface ActionUtils {
-	static String[] aliases(String... alias) {
+import java.util.ArrayList;
+import java.util.List;
+
+public final class ActionUtils {
+	public static String[] aliases(String... alias) {
 		return alias;
 	}
 
-	static String[] aliasNull() {
+	public static String[] aliasNull() {
 		return new String[]{null};
 	}
 
-	static boolean optionalBoolean(Boolean input) {
-		return input != null ? input : false;
+	public static <T> List<T> createAll(List<LineParser> lines, String kind, LineFactory<T> factory) {
+		List<T> result = new ArrayList<>(lines.size());
+		for (LineParser line : lines) {
+			try {
+				var config = new SkillLineConfig(line.config());
+				T created = factory.create(config);
+				if (created == null) {
+					UrArsDebugger.warn("Unknown {} '{}' in line: {}", kind, config.key(), line);
+					continue;
+				}
+				result.add(created);
+				UrArsDebugger.trace("Created {} '{}'", kind, config.key());
+			} catch (Exception e) {
+				UrArsDebugger.error("Failed to create " + kind + " from line: " + line, e);
+			}
+		}
+		return result;
+	}
+
+	@FunctionalInterface
+	public interface LineFactory<T> {
+		@Nullable T create(SkillLineConfig config) throws Exception;
 	}
 }

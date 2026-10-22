@@ -33,14 +33,23 @@ public class FlagParser {
 	public List<Flag> parse() {
 		List<Flag> result = new ArrayList<>();
 		skipWhitespace();
-		if (peek() == -1) return new ArrayList<>();
+		if (peek() == -1) return result;
 
 		while (pos < input.end) {
 			byte prefix = next();
 			if (peek() == -1) break;
 
 			int start = pos;
-			while (pos < input.end && !isPrefix(peek()) && !ParserUtils.isNewLine(peek())) next();
+			int depth = 0;
+			while (pos < input.end) {
+				byte c = peek();
+
+				if (c == '{') depth++;
+				else if (c == '}') if (depth > 0) depth--;
+				else if (depth == 0 && (isPrefix(c) || ParserUtils.isNewLine(c))) break;
+
+				next();
+			}
 			int end = pos;
 
 			result.add(new Flag(prefix, new BufferedString(input.buffer, start, end)));

@@ -18,7 +18,6 @@ public class CommandsMixin {
 	@Inject(method = "<init>", at = @At("TAIL"))
 	public void urars$register(final Commands.CommandSelection commandSelection, final CommandBuildContext context, CallbackInfo ci) {
 		CommandDispatcher<CommandSourceStack> dispatcher = ((Commands)(Object)this).getDispatcher();
-		
 		UrArsCommand.register(dispatcher);
 	}
 }
