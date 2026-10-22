@@ -1,7 +1,10 @@
 package io.phanisment.urars.skill.mechanics;
 
+import io.phanisment.urars.UrArs;
 import io.phanisment.urars.exception.MathParserException;
+import io.phanisment.urars.parser.math.ast.BooleanNode;
 import io.phanisment.urars.parser.math.ast.Node;
+import io.phanisment.urars.parser.math.ast.StringNode;
 import io.phanisment.urars.skill.SkillMechanic;
 import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
@@ -19,8 +22,8 @@ import static io.phanisment.urars.util.ActionUtils.*;
 	key = "message"
 )
 public class MessageMechanic extends SkillMechanic implements INoTarget, IEntityTarget {
-	private final Node message;
-	private final Node overlay;
+	protected Node message = new StringNode("Hi!");
+	protected Node overlay = new BooleanNode(false);
 	
 	public MessageMechanic(SkillLineConfig config) {
 		super(config);
@@ -29,7 +32,7 @@ public class MessageMechanic extends SkillMechanic implements INoTarget, IEntity
 			else this.message = config.getMathString(aliases("text", "txt", "t", "message", "msg", "m"), "Hi!");
 			this.overlay = config.getMathBoolean(aliases("overlay", "o"));
 		} catch (MathParserException e) {
-			throw new RuntimeException(e);
+			UrArs.LOGGER.error("Failed to parse arguments", e);
 		}
 	}
 	

@@ -58,7 +58,7 @@ public class SkillMechanic implements ISkillAction {
 		return delay.evalAsLong(context.evalContext());
 	}
 
-	public String getTrigger() {
+	public @Nullable String getTrigger() {
 		return this.trigger;
 	}
 

@@ -7,6 +7,7 @@ import io.phanisment.urars.skill.config.SkillConfigSection;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 public class Skill {
 	public final Identifier id;
@@ -26,7 +27,7 @@ public class Skill {
 		UrArsDebugger.debug("Skill '{}': {} condition(s), {} mechanic(s)", id, conditions.size(), mechanics.size());
 	}
 
-	private static <V> V load(Identifier id, String what, java.util.concurrent.Callable<V> loader, V fallback) {
+	private static <V> V load(Identifier id, String what, Callable<V> loader, V fallback) {
 		try {
 			return loader.call();
 		} catch (Exception e) {

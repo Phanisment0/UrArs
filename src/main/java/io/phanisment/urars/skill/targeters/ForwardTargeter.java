@@ -14,6 +14,8 @@ import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.util.Location;
 
+import static io.phanisment.urars.util.ActionUtils.aliases;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -22,16 +24,18 @@ import java.util.List;
 		key = "forward"
 )
 public class ForwardTargeter extends LocationTargeter {
-	private final Node distance;
-	private final Node y_offset;
-	private final boolean stop_at_block;
+	protected final Node distance;
+	protected final Node y_offset;
+	protected final Node stop_at_block;
+	protected final Node lock_pitch;
 
 	public ForwardTargeter(SkillLineConfig config) {
 		super(config);
 		try {
-			this.distance = config.getMathNumber(new String[]{"distance", "d"}, 5);
-			this.y_offset = config.getMathNumber(new String[]{"yOffset", "y"}, 0);
-			this.stop_at_block = config.getBoolean(new String[]{"stopAtBlock", "sab"}, true);
+			this.distance = config.getMathNumber(aliases("distance", "d"), 5);
+			this.y_offset = config.getMathNumber(aliases("yOffset", "y"), 0);
+			this.stop_at_block = config.getMathBoolean(aliases("stopAtBlock", "sab"), true);
+			this.lock_pitch = config.getMathBoolean(aliases("lockPitch", "lp"), false);
 		} catch (MathParserException e) {
 			throw new RuntimeException(e);
 		}
@@ -46,9 +50,10 @@ public class ForwardTargeter extends LocationTargeter {
 		double y = y_offset.evalAsDouble(ctx.evalContext());
 
 		Vec3 from = caster.getEyePosition();
-		Vec3 to = from.add(caster.getLookAngle().scale(dist));
+		Vec3 direction = lock_pitch.evalAsBoolean(ctx.evalContext()) ? Vec3.directionFromRotation(0.0F, caster.getYRot()) : caster.getLookAngle();
+		Vec3 to = from.add(direction.scale(dist));
 
-		if (stop_at_block) {
+		if (stop_at_block.evalAsBoolean(ctx.evalContext())) {
 			HitResult hit = level.clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, caster));
 			if (hit.getType() != HitResult.Type.MISS) to = hit.getLocation();
 		}

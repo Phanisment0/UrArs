@@ -3,6 +3,7 @@ package io.phanisment.urars.mob;
 import java.io.File;
 import java.text.ParseException;
 import java.util.Locale;
+import java.util.Objects;
 
 import io.phanisment.urars.mob.ai.MobAi;
 import io.phanisment.urars.util.BufferedString;
@@ -47,6 +48,10 @@ public class MobMeta {
 		UrArsDebugger.debug("Loaded mob '{}': type='{}', model={}, mechanic(s)={}", id, type, entity_model != null, mechanics.size());
 	}
 
+	public MechanicsExecutor mechanics() {
+		return mechanics;
+	}
+
 	private Identifier parseType(final BufferedString raw_type) {
 		String input = raw_type.toString();
 		Identifier type = Identifier.tryParse(input);
@@ -57,15 +62,14 @@ public class MobMeta {
 	private static Settings loadSettings(final File file, final SkillConfigSection config) {
 		try {
 			ConfigSection section = config.getSection("settings");
-			if (section == null) return Settings.DEFAULT;
-			return new Settings(
-					section.getBoolean("silent", false),
-					section.getBoolean("invulnerable", false),
-					section.getBoolean("no-gravity", false)
-			);
+			if (section == null) return new Settings();
+			return new Settings()
+					.silent(section.getBoolean("silent", false))
+					.invulnerable(section.getBoolean("invulnerable", false))
+					.no_gravity(section.getBoolean("no-gravity", false));
 		} catch (ParseException e) {
 			UrArsDebugger.error("Failed to parse section 'settings' in file '" + file.getPath() + "'", e);
-			return Settings.DEFAULT;
+			return new Settings();
 		}
 	}
 
@@ -125,10 +129,13 @@ public class MobMeta {
 		UrArsDebugger.trace("Preparing mob '{}' before spawn: entity={}", id, entity.getUUID());
 		UrArsComponents.MOB.get(entity).id(id.toString());
 
+		apply(entity);
+		mechanics.execute(TriggerType.ON_PRE_SPAWN, new SkillContext(entity));
+	}
+
+	public void apply(final Entity entity) {
 		if (name != null) entity.setCustomName(Component.literal(name));
 		settings.apply(entity);
-
-		mechanics.execute(TriggerType.ON_PRE_SPAWN, new SkillContext(entity));
 		applyAi(entity);
 	}
 
@@ -136,10 +143,27 @@ public class MobMeta {
 		if (ai != null && !ai.isEmpty()) ai.apply(entity);
 	}
 
-	private record Settings(boolean silent, boolean invulnerable, boolean no_gravity) {
-		static final Settings DEFAULT = new Settings(false, false, false);
+	private static final class Settings {
+		private boolean silent = false;
+		private boolean invulnerable = false;
+		private boolean no_gravity = false;
 
-		void apply(Entity entity) {
+		public Settings silent(boolean value) {
+			silent = value;
+			return this;
+		}
+
+		public Settings invulnerable(boolean value) {
+			invulnerable = value;
+			return this;
+		}
+
+		public Settings no_gravity(boolean value) {
+			no_gravity = value;
+			return this;
+		}
+
+		public void apply(Entity entity) {
 			entity.setSilent(silent);
 			entity.setInvulnerable(invulnerable);
 			entity.setNoGravity(no_gravity);

@@ -175,12 +175,11 @@ public class MathLexer {
 			boolean dot = false;
 
 			while ((c = peek()) != -1) {
-				// digits, plus '_' separators between digits: 1_000_000
 				if (isDigit(c) || (c == '_' && isDigit(peekAt(1)))) {
 					skip();
 					continue;
 				}
-				// a '.' only belongs to the number if a digit follows: 1.5 yes, 1.abs no
+
 				if (c == '.' && !dot && isDigit(peekAt(1))) {
 					dot = true;
 					skip();
@@ -189,7 +188,6 @@ public class MathLexer {
 				break;
 			}
 
-			// optional type suffix: 10L, 2.5D, 3F (only if it isn't the start of an identifier)
 			c = peek();
 			if (isSuffix(c) && !isIdentifierPart(peekAt(1))) {
 				if (dot && (c == 'l' || c == 'L')) {
@@ -210,7 +208,7 @@ public class MathLexer {
 		throw new MathParserException("Unexpected character '" + (char)c + "'", pos);
 	}
 
-	public BufferedString token() {
+	public BufferedString slice() {
 		return new BufferedString(input.buffer, start, end);
 	}
 
@@ -231,8 +229,13 @@ public class MathLexer {
 		EOF;
 
 		private final String alias;
-		Token() { this(null); }
-		Token(String alias) { this.alias = alias; }
+		Token() {
+			this(null);
+		}
+
+		Token(String alias) {
+			this.alias = alias;
+		}
 
 		public String alias() {
 			return alias != null ? alias : name();

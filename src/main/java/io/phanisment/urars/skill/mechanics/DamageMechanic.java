@@ -13,6 +13,9 @@ import net.minecraft.world.entity.Entity;
 
 import static io.phanisment.urars.util.ActionUtils.aliases;
 
+/**
+ * TODO: Improve damage mechanic, like add argument no knockback etc that has in MythicMobs.
+ */
 @RegistryInfo(
 	author = "Phanisment",
 	key = "damage"

@@ -4,6 +4,8 @@ import io.phanisment.urars.UrArsComponents;
 import io.phanisment.urars.component.MobComponent;
 import io.phanisment.urars.mob.MobManager;
 import io.phanisment.urars.mob.MobMeta;
+import io.phanisment.urars.skill.SkillContext;
+import io.phanisment.urars.skill.TriggerType;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
@@ -24,6 +26,8 @@ public class EntityLoadMixin {
 		if (id == null || id.isEmpty()) return;
 
 		MobMeta mob = MobManager.getMob(Identifier.tryParse(id));
-		if (mob != null) mob.applyAi(entity);
+		if (mob == null) return;
+		mob.apply(entity);
+		mob.mechanics().execute(TriggerType.ON_LOAD, new SkillContext(entity));
 	}
 }

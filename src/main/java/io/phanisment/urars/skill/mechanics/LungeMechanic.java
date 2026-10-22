@@ -20,12 +20,12 @@ import static io.phanisment.urars.util.ActionUtils.*;
 		key = "lunge"
 )
 public class LungeMechanic extends SkillMechanic implements INoTarget, IEntityTarget, ILocationTarget {
-	private final Node velocity;      // base speed
-	private final Node y_boost;       // extra upward velocity
-	private final Node scale;         // 1 = multiply speed by distance
-	private final Node min_distance;  // closer than this: don't lunge
-	private final Node max_distance;  // farther than this: don't lunge (also the range for no-target)
-	private final Node max_speed;     // clamp on final speed
+	protected final Node velocity;     // base speed
+	protected final Node y_boost;      // extra upward velocity
+	protected final Node scale;        // 1 = multiply speed by distance
+	protected final Node min_distance; // closer than this: don't lunge
+	protected final Node max_distance; // farther than this: don't lunge (also the range for no-target)
+	protected final Node max_speed;    // clamp on final speed
 
 	public LungeMechanic(SkillLineConfig config) {
 		super(config);

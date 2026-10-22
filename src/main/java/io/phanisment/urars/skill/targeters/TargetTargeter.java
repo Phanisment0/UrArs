@@ -2,14 +2,14 @@ package io.phanisment.urars.skill.targeters;
 
 import io.phanisment.urars.exception.MathParserException;
 import io.phanisment.urars.parser.math.ast.Node;
-import io.phanisment.urars.parser.math.ast.NumberNode;
 import io.phanisment.urars.skill.EntityTargeter;
 import io.phanisment.urars.skill.SkillContext;
-import io.phanisment.urars.skill.SkillTargeter;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
-import io.phanisment.urars.util.Location;
 import io.phanisment.urars.util.TargeterUtils;
+
+import static io.phanisment.urars.util.ActionUtils.aliases;
+
 import net.minecraft.world.entity.Entity;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public class TargetTargeter extends EntityTargeter {
 	public TargetTargeter(SkillLineConfig config) {
 		super(config);
 		try {
-			this.range = config.getMathNumber(new String[]{"range", "r"}, 16);
+			this.range = config.getMathNumber(aliases("range", "r"), 16);
 		} catch (MathParserException e) {
 			throw new RuntimeException(e);
 		}

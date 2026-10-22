@@ -7,6 +7,7 @@ import io.phanisment.urars.util.Location;
 
 import java.util.Collection;
 
+// TODO: Add argument target condition, need some change in SkillMechanic.
 public abstract class SkillTargeter implements ISkillAction {
 	protected final SkillLineConfig config;
 

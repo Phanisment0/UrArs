@@ -1,5 +1,6 @@
 package io.phanisment.urars.skill.mechanics;
 
+import io.phanisment.urars.UrArs;
 import io.phanisment.urars.parser.math.ast.Node;
 import io.phanisment.urars.parser.math.ast.NumberNode;
 import io.phanisment.urars.skill.SkillMechanic;
@@ -18,8 +19,8 @@ import static io.phanisment.urars.util.ActionUtils.aliases;
 	key = "loop"
 )
 public class LoopMechanic extends SkillMechanic implements INoTarget, IEntityTarget {
-	private Node interval = new NumberNode(2);
-	private MechanicsExecutor mechanics = new MechanicsExecutor();
+	protected Node interval = new NumberNode(2);
+	protected MechanicsExecutor mechanics = new MechanicsExecutor();
 
 	public LoopMechanic(SkillLineConfig config) {
 		super(config);
@@ -27,7 +28,7 @@ public class LoopMechanic extends SkillMechanic implements INoTarget, IEntityTar
 			this.interval = config.getMathNumber(aliases("interval", "i"), 2);
 			this.mechanics = config.getMechanics("do");
 		} catch (Exception e) {
-			// Ignored
+			UrArs.LOGGER.error("Failed to parse arguments", e);
 		}
 	}
 

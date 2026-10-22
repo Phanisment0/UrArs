@@ -3,14 +3,12 @@
   "id": "urars",
   "version": "${version}",
   "name": "UrArs",
-  "description": "",
-  "authors": [
-    "Phanisment (Agil)"
-  ],
+  "description": "I cant think the idea for description, Help :(",
+  "authors": [ "Phanisment (Agil)" ],
   "contact": {
     "sources": "https://github.com/Phanisment0/UrArs"
   },
-  "license": "MIT",
+  "license": "CCO-1.0",
   "icon": "icon.png",
   "environment": "server",
   "entrypoints": {

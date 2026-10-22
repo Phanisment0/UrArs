@@ -163,7 +163,7 @@ public final class Lexer {
 	 * Simple utility method for getting the current slice/byte array location
 	 * @return the slice/buffered string
 	 */
-	public BufferedString token() {
+	public BufferedString slice() {
 		return new BufferedString(buffer, start, end);
 	}
 
@@ -207,7 +207,7 @@ public final class Lexer {
 	/**
 	 * Token types produced by lexer
 	 */
-	public static enum Token {
+	public enum Token {
 
 		/** '{' */
 		L_BRACKET,

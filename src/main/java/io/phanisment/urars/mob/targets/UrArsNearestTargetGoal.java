@@ -3,11 +3,11 @@ package io.phanisment.urars.mob.targets;
 import io.phanisment.urars.mob.IGoalCondition;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
+import io.phanisment.urars.util.BufferedString;
 import io.phanisment.urars.util.EntityTypeUtils;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 
@@ -31,7 +31,7 @@ public class UrArsNearestTargetGoal extends NearestAttackableTargetGoal<LivingEn
 	}
 
 	private static TargetingConditions.Selector filter(SkillLineConfig c) {
-		Predicate<Entity> matcher = EntityTypeUtils.matcher(c.getString(aliases("target", "t"), "player"));
+		Predicate<Entity> matcher = EntityTypeUtils.matcher(c.getBufferedString(aliases("target", "t"), new BufferedString("player")));
 		return (entity, level) -> matcher.test(entity);
 	}
 }

@@ -61,13 +61,13 @@ public class MathParser {
 		Token token = lexer.next();
 		return switch (token) {
 			case IDE -> {
-				BufferedString name = lexer.token();
+				BufferedString name = lexer.slice();
 				if (name.isTrue())  yield new BooleanNode(true);
 				if (name.isFalse()) yield new BooleanNode(false);
 				yield postfix(new IdentifierNode(name));
 			}
 			case NUM -> number();
-			case STR -> new StringNode(lexer.token());
+			case STR -> new StringNode(lexer.slice());
 			case ADD, MIN, NOT -> new UnaryNode(token, expression(PREC_PREFIX));
 			case L_PAR -> {
 				Node node = expression(0);
@@ -79,7 +79,7 @@ public class MathParser {
 	}
 
 	private Node number() throws MathParserException {
-		BufferedString token = lexer.token();
+		BufferedString token = lexer.slice();
 		try {
 			return new NumberNode(token.toNumber());
 		} catch (NumberFormatException e) {
@@ -92,7 +92,7 @@ public class MathParser {
 			case DOT -> {
 				lexer.next();
 				expect(Token.IDE);
-				node = new MemberNode(node, lexer.token());
+				node = new MemberNode(node, lexer.slice());
 			}
 			case L_PAR -> node = function(node);
 			default -> {
