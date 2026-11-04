@@ -1,6 +1,5 @@
 package io.phanisment.urars.skill;
 
-import io.phanisment.urars.exception.MathParserException;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -19,11 +18,7 @@ public abstract class LocationTargeter extends SkillTargeter {
 
 	public LocationTargeter(SkillLineConfig config) {
 		super(config);
-		try {
-			this.radius = config.getMathNumber(new String[]{"radius", "r"}, 1);
-		} catch (MathParserException e) {
-			throw new RuntimeException(e);
-		}
+		this.radius = config.getMathNumber(new String[]{"radius", "r"}, 1);
 	}
 
 	@Override
@@ -41,11 +36,7 @@ public abstract class LocationTargeter extends SkillTargeter {
 			Level level = loc.level();
 			Vec3 pos = loc.pos();
 			AABB box = new AABB(pos, pos).inflate(r);
-			result.addAll(level.getEntities(
-					(Entity)null,
-					box,
-					e -> e != ctx.entity() && e.distanceToSqr(pos) <= r_sq
-			));
+			result.addAll(level.getEntities((Entity)null, box, e -> e != ctx.entity() && e.distanceToSqr(pos) <= r_sq));
 		}
 		return result;
 	}

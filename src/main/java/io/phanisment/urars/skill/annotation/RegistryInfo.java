@@ -12,8 +12,9 @@ public @interface RegistryInfo {
 	String key();
 	String namespace() default "";
 	String[] aliases() default {};
+	String[] mods() default {};
 
-	// --- Unnecessary info, used only for code documentation --- //
+	// Unnecessary info, used only for code documentation
 	String description() default "";
 	String version() default "";
 	boolean empty_args() default false; // ex: key{<value>}

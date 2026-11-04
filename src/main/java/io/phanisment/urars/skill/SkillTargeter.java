@@ -6,13 +6,19 @@ import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.util.Location;
 
 import java.util.Collection;
+import java.util.List;
 
-// TODO: Add argument target condition, need some change in SkillMechanic.
 public abstract class SkillTargeter implements ISkillAction {
 	protected final SkillLineConfig config;
+	protected List<SkillCondition> target_conditions;
 
 	public SkillTargeter(SkillLineConfig config) {
 		this.config = config;
+		this.target_conditions = config.getConditions("targetConditions", "conditions");
+	}
+
+	public boolean conditionIsPass(SkillContext ctx) {
+		return target_conditions.stream().allMatch(c -> c.execute(ctx));
 	}
 
 	/** True if this targeter natively produces locations (not entities). */

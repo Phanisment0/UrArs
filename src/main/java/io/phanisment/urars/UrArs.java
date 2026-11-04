@@ -6,7 +6,7 @@ import io.phanisment.urars.mob.MobManager;
 import io.phanisment.urars.reload.ReloadResult;
 import io.phanisment.urars.reload.UrArsReload;
 import io.phanisment.urars.skill.SkillManager;
-import io.phanisment.urars.util.TickScheduler;
+import io.phanisment.urars.util.UrArsScheduler;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.minecraft.resources.Identifier;
 
+import java.nio.file.Path;
 import java.util.List;
 
 public class UrArs implements DedicatedServerModInitializer {
@@ -37,7 +38,7 @@ public class UrArs implements DedicatedServerModInitializer {
 		List<ReloadResult> results = UrArsReload.reloadAll();
 		for (ReloadResult result : results) {
 			if (result.result()) LOGGER.info("[UrArs] {}", result.message());
-			else LOGGER.error("(ERROR) [UrArs] {}", result.message());
+			else LOGGER.error("[UrArs/ERROR] {}", result.message());
 		}
 		LOGGER.info("[UrArs] Reload finished in {} ms", (System.nanoTime() - start) / 1_000_000 );
 	}
@@ -50,6 +51,6 @@ public class UrArs implements DedicatedServerModInitializer {
 	}
 
 	public static void tick(MinecraftServer server) {
-		TickScheduler.init();
+		UrArsScheduler.init();
 	}
 }

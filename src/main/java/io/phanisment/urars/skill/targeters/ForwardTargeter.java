@@ -1,6 +1,5 @@
 package io.phanisment.urars.skill.targeters;
 
-import io.phanisment.urars.exception.MathParserException;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -31,14 +30,10 @@ public class ForwardTargeter extends LocationTargeter {
 
 	public ForwardTargeter(SkillLineConfig config) {
 		super(config);
-		try {
-			this.distance = config.getMathNumber(aliases("distance", "d"), 5);
-			this.y_offset = config.getMathNumber(aliases("yOffset", "y"), 0);
-			this.stop_at_block = config.getMathBoolean(aliases("stopAtBlock", "sab"), true);
-			this.lock_pitch = config.getMathBoolean(aliases("lockPitch", "lp"), false);
-		} catch (MathParserException e) {
-			throw new RuntimeException(e);
-		}
+		this.distance = config.getMathNumber(aliases("distance", "d"), 5);
+		this.y_offset = config.getMathNumber(aliases("yOffset", "y"), 0);
+		this.stop_at_block = config.getMathBoolean(aliases("stopAtBlock", "sab"), true);
+		this.lock_pitch = config.getMathBoolean(aliases("lockPitch", "lp"), false);
 	}
 
 	@Override

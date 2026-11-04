@@ -1,5 +1,6 @@
 package io.phanisment.urars.skill;
 
+import io.phanisment.urars.UrArs;
 import io.phanisment.urars.parser.file.config.LineConfig;
 import io.phanisment.urars.parser.file.parser.FlagParser;
 import io.phanisment.urars.parser.file.parser.LineParser;
@@ -12,7 +13,7 @@ import io.phanisment.urars.skill.target.IEntityTarget;
 import io.phanisment.urars.skill.target.ILocationTarget;
 import io.phanisment.urars.skill.target.INoTarget;
 import io.phanisment.urars.util.Location;
-import io.phanisment.urars.util.TickScheduler;
+import io.phanisment.urars.util.UrArsScheduler;
 import net.minecraft.world.entity.Entity;
 
 import java.text.ParseException;
@@ -26,11 +27,12 @@ public class SkillMechanic implements ISkillAction {
 	public SkillMechanic(SkillLineConfig config) {
 		this.config = config;
 
+		this.delay = config.getMathNumber(new String[]{"delay"}, 0);
+
 		try {
-			this.delay = config.getMathNumber(new String[]{"delay"}, 0);
 			parseContext(config.context());
 		} catch (ParseException e) {
-			throw new RuntimeException(e);
+			UrArs.LOGGER.error("Failed to parse mechanic flags", e);
 		}
 	}
 
@@ -51,7 +53,8 @@ public class SkillMechanic implements ISkillAction {
 		var targeter_parser = new LineParser(context);
 		targeter_parser.parse();
 		LineConfig targeter_config = targeter_parser.config();
-		this.skill_targeter = SkillManager.getTargeter(targeter_config.key()).create(new SkillLineConfig(targeter_config));
+		var factory = SkillManager.getTargeter(targeter_config.key());
+		this.skill_targeter = factory == null ? null : factory.create(new SkillLineConfig(targeter_config));
 	}
 
 	public long getDelay(SkillContext context) {
@@ -64,7 +67,7 @@ public class SkillMechanic implements ISkillAction {
 
 	public void execute(SkillContext ctx) {
 		long total_delay = getDelay(ctx) + ctx.global_delay;
-		if (total_delay > 0L) TickScheduler.wait(total_delay, () -> this.executeAtTarget(ctx));
+		if (total_delay > 0L) UrArsScheduler.wait(total_delay, () -> this.executeAtTarget(ctx));
 		else this.executeAtTarget(ctx);
 	}
 
@@ -75,20 +78,29 @@ public class SkillMechanic implements ISkillAction {
 		}
 
 		if (skill_targeter.isLocation() && this instanceof ILocationTarget location_target) {
-			for (Location loc : skill_targeter.getLocations(ctx)) location_target.castAtLocation(ctx, loc);
+			for (Location loc : skill_targeter.getLocations(ctx)) {
+				if (!skill_targeter.conditionIsPass(ctx)) continue;
+				location_target.castAtLocation(ctx, loc);
+			}
 			return;
 		}
 
-		if (this instanceof IEntityTarget entity_target) {
-			for (Entity target : skill_targeter.getEntities(ctx)) entity_target.castAtEntity(ctx, target);
-			return;
+		switch (this) {
+			case IEntityTarget entity_target -> {
+				for (Entity target : skill_targeter.getEntities(ctx)) {
+					if (!skill_targeter.conditionIsPass(ctx)) continue;
+					entity_target.castAtEntity(ctx, target);
+				}
+			}
+			case ILocationTarget location_target -> {
+				for (Location loc : skill_targeter.getLocations(ctx)) {
+					if (!skill_targeter.conditionIsPass(ctx)) continue;
+					location_target.castAtLocation(ctx, loc);
+				}
+			}
+			case INoTarget no_target when skill_targeter.conditionIsPass(ctx) -> no_target.cast(ctx);
+			default -> {
+			}
 		}
-
-		if (this instanceof ILocationTarget location_target) {
-			for (Location loc : skill_targeter.getLocations(ctx)) location_target.castAtLocation(ctx, loc);
-			return;
-		}
-
-		if (this instanceof INoTarget no_target) no_target.cast(ctx);
 	}
 }

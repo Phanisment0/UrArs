@@ -1,13 +1,11 @@
 package io.phanisment.urars.parser.math.library.standard;
 
-import io.phanisment.urars.exception.InvalidMathOperationException;
 import io.phanisment.urars.parser.math.function.FunctionValue;
 import io.phanisment.urars.parser.math.library.IMathLibrary;
 import io.phanisment.urars.parser.math.value.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public final class StandardLibrary implements IMathLibrary {
 
@@ -29,7 +27,7 @@ public final class StandardLibrary implements IMathLibrary {
 		value.member("map", new FunctionValue(args -> new MapValue(new HashMap<>())));
 	}
 
-	private static boolean truthy(IValue<?> value) {
+	/*private static boolean truthy(IValue<?> value) {
 		return value instanceof BooleanValue(Boolean raw) && raw;
-	}
+	}*/
 }

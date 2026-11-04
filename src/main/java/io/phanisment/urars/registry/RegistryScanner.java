@@ -3,6 +3,8 @@ package io.phanisment.urars.registry;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.util.AnnotationScanner;
 import io.phanisment.urars.util.UrArsDebugger;
+import net.fabricmc.loader.api.FabricLoader;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.invoke.CallSite;
 import java.lang.invoke.LambdaMetafactory;
@@ -25,11 +27,19 @@ public final class RegistryScanner {
 
 		long start = System.nanoTime();
 		int failed = 0;
+		int skipped = 0;
 		UrArsDebugger.debug("Scanning package '{}' for {}", path, base_class.getSimpleName());
 
 		for (Class<?> clazz : AnnotationScanner.find(MOD_ID, path, RegistryInfo.class)) {
 			if (!base_class.isAssignableFrom(clazz)) {
 				UrArsDebugger.trace("Skipped '{}': not a {}", clazz.getName(), base_class.getSimpleName());
+				continue;
+			}
+
+			String missing = findMissingMod(clazz);
+			if (missing != null) {
+				skipped++;
+				UrArsDebugger.debug("Skipped '{}': required mod '{}' is not loaded", clazz.getSimpleName(), missing);
 				continue;
 			}
 
@@ -44,8 +54,15 @@ public final class RegistryScanner {
 		}
 
 		long ms = (System.nanoTime() - start) / 1_000_000;
-		UrArsDebugger.info("Scanned '{}': {} registered, {} failed, {} aliases ({} ms)", path, registry.size(), failed, registry.aliasSize(), ms);
+		UrArsDebugger.info("Scanned '{}': {} registered, {} failed, {} skipped, {} aliases ({} ms)", path, registry.size(), failed, skipped, registry.aliasSize(), ms);
 		return registry;
+	}
+
+	private static @Nullable String findMissingMod(Class<?> clazz) {
+		RegistryInfo info = clazz.getAnnotation(RegistryInfo.class);
+		if (info == null) return null;
+		for (String mod : info.mods()) if (!FabricLoader.getInstance().isModLoaded(mod)) return mod;
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -61,7 +78,7 @@ public final class RegistryScanner {
 				constructor,
 				MethodType.methodType(clazz, params)                // real signature
 		);
-		return (F) site.getTarget().invoke();
+		return (F)site.getTarget().invoke();
 	}
 
 	private static Method findFactoryMethod(Class<?> factory_type) {

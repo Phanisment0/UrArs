@@ -1,17 +1,12 @@
 package io.phanisment.urars.parser.math;
 
-import io.phanisment.urars.exception.InvalidMathOperationException;
 import io.phanisment.urars.exception.MathParserException;
 import io.phanisment.urars.parser.math.ast.Node;
 import io.phanisment.urars.parser.math.eval.EvalContext;
-import io.phanisment.urars.parser.math.eval.EvalContextImpl;
 import io.phanisment.urars.parser.math.eval.MathEval;
 import io.phanisment.urars.parser.math.library.IMathLibrary;
 import io.phanisment.urars.parser.math.parser.MathParser;
 import io.phanisment.urars.parser.math.value.IValue;
-import io.phanisment.urars.parser.math.value.NumberValue;
-import io.phanisment.urars.parser.math.value.ObjectValue;
-import io.phanisment.urars.parser.math.value.StringValue;
 import io.phanisment.urars.util.BufferedString;
 
 import java.util.Map;
@@ -46,12 +41,12 @@ public final class UrArsMath {
 	}
 
 	public UrArsMath setVar(String name, IValue<?> value) {
-		((EvalContextImpl)context).put(name, value);
+		context.put(name, value);
 		return this;
 	}
 
 	public UrArsMath setVars(Map<String, IValue<?>> values) {
-		((EvalContextImpl)context).put(values);
+		context.put(values);
 		return this;
 	}
 

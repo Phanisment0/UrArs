@@ -11,8 +11,8 @@ import java.util.Collection;
 import java.util.HashSet;
 
 @RegistryInfo(
-	author = "Phanisment",
-	key = "self"
+		author = "Phanisment",
+		key = "self"
 )
 public class SelfTargeter extends EntityTargeter {
 	public SelfTargeter(SkillLineConfig config) {

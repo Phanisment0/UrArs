@@ -2,8 +2,7 @@ package io.phanisment.urars.mob;
 
 import java.io.File;
 import java.text.ParseException;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.function.Consumer;
 
 import io.phanisment.urars.mob.ai.MobAi;
 import io.phanisment.urars.util.BufferedString;
@@ -51,7 +50,6 @@ public class MobMeta {
 	public MechanicsExecutor mechanics() {
 		return mechanics;
 	}
-
 	private Identifier parseType(final BufferedString raw_type) {
 		String input = raw_type.toString();
 		Identifier type = Identifier.tryParse(input);
@@ -104,30 +102,40 @@ public class MobMeta {
 		}
 	}
 
-	public boolean spawn(final Location loc) {
+	public @Nullable Entity spawn(final Location loc) {
+		return spawn(loc, null);
+	}
+
+	public @Nullable Entity spawnWithOwner(final Entity owner, final Location loc) {
+		return spawn(loc, entity -> UrArsComponents.MOB.get(entity).owner(owner.getUUID()));
+	}
+
+	public @Nullable Entity spawn(final Location loc, final @Nullable Consumer<Entity> pre_spawn) {
 		UrArsDebugger.debug("Spawning mob '{}': type='{}', position={}", id, type, loc.pos());
 
 		MobBuilder builder = MobBuilder.create(type, loc);
 		if (builder == null) {
 			UrArsDebugger.warn("Cannot spawn mob '{}': entity type '{}' is not registered", id, type);
-			return false;
+			return null;
 		}
 
-		Entity entity = builder.beforeSpawn(this::beforeSpawn).spawn();
+		Entity entity = builder.beforeSpawn(e -> beforeSpawn(e, pre_spawn)).spawn();
 		if (entity == null) {
 			UrArsDebugger.warn("Cannot spawn mob '{}': failed to create entity of type '{}'", id, type);
-			return false;
+			return null;
 		}
 
 		if (entity_model != null) entity_model.apply(entity);
 		mechanics.execute(TriggerType.ON_SPAWN, new SkillContext(entity));
 		UrArsDebugger.debug("Spawned mob '{}': entity='{}', uuid={}", id, entity.getType(), entity.getUUID());
-		return true;
+		return entity;
 	}
 
-	private void beforeSpawn(final Entity entity) {
+	private void beforeSpawn(final Entity entity, final @Nullable Consumer<Entity> extra) {
 		UrArsDebugger.trace("Preparing mob '{}' before spawn: entity={}", id, entity.getUUID());
 		UrArsComponents.MOB.get(entity).id(id.toString());
+
+		if (extra != null) extra.accept(entity);
 
 		apply(entity);
 		mechanics.execute(TriggerType.ON_PRE_SPAWN, new SkillContext(entity));
@@ -136,10 +144,6 @@ public class MobMeta {
 	public void apply(final Entity entity) {
 		if (name != null) entity.setCustomName(Component.literal(name));
 		settings.apply(entity);
-		applyAi(entity);
-	}
-
-	public void applyAi(final Entity entity) {
 		if (ai != null && !ai.isEmpty()) ai.apply(entity);
 	}
 

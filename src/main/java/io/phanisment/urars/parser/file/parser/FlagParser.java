@@ -16,14 +16,14 @@ public class FlagParser {
 		this.pos = input.start;
 	}
 
-	private byte next() {
+	private int next() {
 		if (pos >= input.end) return -1;
-		return input.buffer[pos++];
+		return input.buffer[pos++] & 0xFF;
 	}
 
-	private byte peek() {
+	private int peek() {
 		if (pos >= input.end) return -1;
-		return input.buffer[pos];
+		return input.buffer[pos] & 0xFF;
 	}
 
 	private void skipWhitespace() {
@@ -36,17 +36,21 @@ public class FlagParser {
 		if (peek() == -1) return result;
 
 		while (pos < input.end) {
-			byte prefix = next();
+			int prefix = next();
 			if (peek() == -1) break;
 
 			int start = pos;
 			int depth = 0;
 			while (pos < input.end) {
-				byte c = peek();
+				int c = peek();
 
-				if (c == '{') depth++;
-				else if (c == '}') if (depth > 0) depth--;
-				else if (depth == 0 && (isPrefix(c) || ParserUtils.isNewLine(c))) break;
+				if (c == '{') {
+					depth++;
+				} else if (c == '}') {
+					if (depth > 0) depth--;
+				} else if (depth == 0 && (isPrefix(c) || ParserUtils.isNewLine(c))) {
+					break;
+				}
 
 				next();
 			}
@@ -57,12 +61,12 @@ public class FlagParser {
 		return result;
 	}
 
-	public boolean isPrefix(byte c) {
+	public boolean isPrefix(int c) {
 		return c == '@'
 				|| c == '~';
 	}
 
-	public static record Flag(byte c, BufferedString text) {
+	public static record Flag(int c, BufferedString text) {
 		@Override
 		public @NonNull String toString() {
 			return "[" + ((char)c) + "] " + text.toString();

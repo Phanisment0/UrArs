@@ -1,7 +1,5 @@
 package io.phanisment.urars.skill.mechanics;
 
-import io.phanisment.urars.UrArs;
-import io.phanisment.urars.exception.MathParserException;
 import io.phanisment.urars.parser.math.ast.Node;
 import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.SkillMechanic;
@@ -9,20 +7,19 @@ import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.skill.target.INoTarget;
 
+import static io.phanisment.urars.util.ActionUtils.aliasNull;
+
 @RegistryInfo(
 		author = "Phanisment",
 		key = "print"
 )
 public class PrintMechanic extends SkillMechanic implements INoTarget {
-	protected Node message;
+	protected final Node message;
 	
 	public PrintMechanic(SkillLineConfig config) {
 		super(config);
-		try {
-			this.message = config.getMathString("message", "msg", "m");
-		} catch (MathParserException e) {
-			UrArs.LOGGER.error("Failed to parse arguments", e);
-		}
+		if (config.singleArgument()) message = config.getMathString(aliasNull());
+		else message = config.getMathString("message", "msg", "m");
 	}
 	
 	@Override

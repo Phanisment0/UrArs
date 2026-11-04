@@ -6,8 +6,8 @@ import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 
 @RegistryInfo(
-	author = "Phanisment",
-	key = "raining"
+		author = "Phanisment",
+		key = "raining"
 )
 public class RainingCondition extends SkillCondition {
 	public RainingCondition(SkillLineConfig config) {

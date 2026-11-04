@@ -16,8 +16,8 @@ import java.util.HashSet;
 import java.util.List;
 
 @RegistryInfo(
-	author = "Phanisment",
-	key = "selfLocation"
+		author = "Phanisment",
+		key = "selfLocation"
 )
 public class SelfLocationTargeter extends LocationTargeter {
 	public SelfLocationTargeter(SkillLineConfig config) {

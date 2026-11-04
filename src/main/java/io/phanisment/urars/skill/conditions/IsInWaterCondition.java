@@ -6,8 +6,9 @@ import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 
 @RegistryInfo(
-	author = "Phanisment",
-	key = "isInWater"
+		author = "Phanisment",
+		key = "isInWater",
+		aliases = { "InWater" }
 )
 public class IsInWaterCondition extends SkillCondition {
 	public IsInWaterCondition(SkillLineConfig config) {

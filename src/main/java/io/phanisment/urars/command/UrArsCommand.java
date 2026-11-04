@@ -53,10 +53,12 @@ public class UrArsCommand {
 						)
 				).then(literal("mechanic")
 						.then(argument("line", StringArgumentType.greedyString())
+								.suggests(UrArsCommand::mechanic_suggest)
 								.executes(UrArsCommand::mechanic)
 						)
 				).then(literal("condition")
 						.then(argument("line", StringArgumentType.greedyString())
+								.suggests(UrArsCommand::condition_suggest)
 								.executes(UrArsCommand::condition)
 						)
 				).then(literal("spawn")
@@ -148,7 +150,6 @@ public class UrArsCommand {
 				count++;
 			}
 		}
-		UrArsDebugger.trace("Spawn suggestions for '{}': {} match(es)", remaining, count);
 		return builder.buildFuture();
 	}
 
@@ -162,7 +163,6 @@ public class UrArsCommand {
 				count++;
 			}
 		}
-		UrArsDebugger.trace("Cast suggestions for '{}': {} match(es)", remaining, count);
 		return builder.buildFuture();
 	}
 
@@ -248,6 +248,12 @@ public class UrArsCommand {
 		return succeeded > 0 ? 1 : 0;
 	}
 
+	private static CompletableFuture<Suggestions> mechanic_suggest(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
+		String remaining = builder.getRemaining().toLowerCase(Locale.ROOT);
+		for (String key : SkillManager.getMechanics().aliasesEntries().keySet()) if (key.startsWith(remaining)) builder.suggest(key);
+		return builder.buildFuture();
+	}
+
 	private static int mechanic(CommandContext<CommandSourceStack> ctx) {
 		CommandSourceStack source = ctx.getSource();
 		ServerPlayer player = source.getEntity() instanceof ServerPlayer server_player ? server_player : null;
@@ -285,6 +291,12 @@ public class UrArsCommand {
 		return 0;
 	}
 
+	private static CompletableFuture<Suggestions> condition_suggest(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
+		String remaining = builder.getRemaining().toLowerCase(Locale.ROOT);
+		for (String key : SkillManager.getConditions().aliasesEntries().keySet()) if (key.startsWith(remaining)) builder.suggest(key);
+		return builder.buildFuture();
+	}
+
 	private static int condition(CommandContext<CommandSourceStack> ctx) {
 		CommandSourceStack source = ctx.getSource();
 		ServerPlayer player = source.getEntity() instanceof ServerPlayer server_player ? server_player : null;
@@ -312,7 +324,7 @@ public class UrArsCommand {
 			SkillCondition condition = factory.create(config);
 			if (condition == null) throw new IllegalStateException("Condition factory returned null: " + config.key());
 
-			boolean result = condition.check(new SkillContext(player));
+			boolean result = condition.execute(new SkillContext(player));
 			UrArsDebugger.debug("Condition '{}' -> {}", config.key(), result);
 			source.sendSuccess(() -> Component.literal("Executed condition '" + config.key() + "' with result: " + result), false);
 			return 1;

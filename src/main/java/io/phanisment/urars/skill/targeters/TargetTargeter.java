@@ -1,6 +1,5 @@
 package io.phanisment.urars.skill.targeters;
 
-import io.phanisment.urars.exception.MathParserException;
 import io.phanisment.urars.parser.math.ast.Node;
 import io.phanisment.urars.skill.EntityTargeter;
 import io.phanisment.urars.skill.SkillContext;
@@ -25,11 +24,7 @@ public class TargetTargeter extends EntityTargeter {
 
 	public TargetTargeter(SkillLineConfig config) {
 		super(config);
-		try {
-			this.range = config.getMathNumber(aliases("range", "r"), 16);
-		} catch (MathParserException e) {
-			throw new RuntimeException(e);
-		}
+		this.range = config.getMathNumber(aliases("range", "r"), 16);
 	}
 
 	@Override

@@ -44,7 +44,11 @@ public abstract class AnnotatedRegistry<T, F> {
 	}
 
 	public Map<Identifier, F> entries() {
-		return Collections.unmodifiableMap(registry);
+		return registry;
+	}
+
+	public Map<String, Identifier> aliasesEntries() {
+		return aliases;
 	}
 
 	public boolean register(Class<? extends T> clazz, F factory) {
