@@ -1,6 +1,6 @@
 package io.phanisment.urars.mixin;
 
-import io.phanisment.urars.skill.aura.AuraManager;
+import io.phanisment.urars.skill.template.aura.AuraManager;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;

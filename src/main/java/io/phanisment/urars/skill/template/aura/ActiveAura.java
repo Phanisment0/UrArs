@@ -1,4 +1,4 @@
-package io.phanisment.urars.skill.aura;
+package io.phanisment.urars.skill.template.aura;
 
 import io.phanisment.urars.skill.SkillContext;
 import net.minecraft.world.entity.Entity;

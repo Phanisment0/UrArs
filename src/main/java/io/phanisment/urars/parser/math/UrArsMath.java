@@ -22,11 +22,15 @@ public final class UrArsMath {
 		this.context = context;
 	}
 
+	public static UrArsMath withNoLibrary() {
+		return new UrArsMath(EvalContext.empty());
+	}
+
 	public static UrArsMath withLibraries(IMathLibrary... libraries) {
 		return new UrArsMath(EvalContext.withLibraries(libraries));
 	}
 
-	public UrArsMath withStandardLibrary() {
+	public static UrArsMath withStandardLibrary() {
 		return new UrArsMath(EvalContext.withStandardLibrary());
 	}
 

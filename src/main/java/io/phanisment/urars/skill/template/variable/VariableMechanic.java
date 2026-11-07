@@ -1,4 +1,4 @@
-package io.phanisment.urars.skill.variable;
+package io.phanisment.urars.skill.template.variable;
 
 import io.phanisment.urars.parser.math.ast.Node;
 import io.phanisment.urars.skill.SkillMechanic;

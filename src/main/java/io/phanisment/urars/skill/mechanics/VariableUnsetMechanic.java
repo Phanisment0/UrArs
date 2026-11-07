@@ -4,7 +4,7 @@ import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.skill.target.IEntityTarget;
-import io.phanisment.urars.skill.variable.VariableMechanic;
+import io.phanisment.urars.skill.template.variable.VariableMechanic;
 import net.minecraft.world.entity.Entity;
 
 

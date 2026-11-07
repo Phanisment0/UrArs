@@ -3,7 +3,7 @@ package io.phanisment.urars.skill.conditions;
 import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
-import io.phanisment.urars.skill.variable.VariableCondition;
+import io.phanisment.urars.skill.template.variable.VariableCondition;
 
 @RegistryInfo(
 		author = "Phanisment",

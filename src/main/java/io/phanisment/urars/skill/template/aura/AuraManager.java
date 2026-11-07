@@ -1,4 +1,4 @@
-package io.phanisment.urars.skill.aura;
+package io.phanisment.urars.skill.template.aura;
 
 import io.phanisment.urars.parser.math.value.NumberValue;
 import io.phanisment.urars.parser.math.value.StringValue;

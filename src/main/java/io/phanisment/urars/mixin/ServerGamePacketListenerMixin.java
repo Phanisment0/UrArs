@@ -1,6 +1,6 @@
 package io.phanisment.urars.mixin;
 
-import io.phanisment.urars.skill.aura.AuraManager;
+import io.phanisment.urars.skill.template.aura.AuraManager;
 import net.minecraft.network.DisconnectionDetails;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;

@@ -4,7 +4,7 @@ import io.phanisment.urars.parser.math.ast.Node;
 import io.phanisment.urars.skill.SkillCondition;
 import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
-import io.phanisment.urars.skill.aura.AuraManager;
+import io.phanisment.urars.skill.template.aura.AuraManager;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 
 @RegistryInfo(

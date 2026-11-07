@@ -1,4 +1,4 @@
-package io.phanisment.urars.skill.aura;
+package io.phanisment.urars.skill.template.aura;
 
 import io.phanisment.urars.parser.math.ast.Node;
 import io.phanisment.urars.skill.MechanicsExecutor;

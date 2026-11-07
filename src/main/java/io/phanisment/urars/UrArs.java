@@ -1,12 +1,12 @@
 package io.phanisment.urars;
 
+import io.phanisment.urars.compatibility.bettermodel.BetterModelCompatibility;
 import io.phanisment.urars.config.ConfigManager;
 import io.phanisment.urars.config.UrArsConfig;
 import io.phanisment.urars.mob.MobManager;
 import io.phanisment.urars.reload.ReloadResult;
 import io.phanisment.urars.reload.UrArsReload;
 import io.phanisment.urars.skill.SkillManager;
-import io.phanisment.urars.skill.aura.AuraManager;
 import io.phanisment.urars.util.UrArsScheduler;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.minecraft.resources.Identifier;
 
-import java.nio.file.Path;
 import java.util.List;
 
 public class UrArs implements DedicatedServerModInitializer {
@@ -42,6 +41,8 @@ public class UrArs implements DedicatedServerModInitializer {
 			else LOGGER.error("[UrArs/ERROR] {}", result.message());
 		}
 		LOGGER.info("[UrArs] Reload finished in {} ms", (System.nanoTime() - start) / 1_000_000 );
+
+		if (Constant.BETTER_MODEL_LOADED) BetterModelCompatibility.init();
 	}
 
 	public static void start(MinecraftServer server) {

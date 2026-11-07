@@ -1,4 +1,4 @@
-package io.phanisment.urars.skill.damage;
+package io.phanisment.urars.skill.template;
 
 import io.phanisment.urars.parser.math.ast.Node;
 import io.phanisment.urars.skill.SkillContext;

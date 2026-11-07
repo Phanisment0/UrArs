@@ -4,7 +4,7 @@ import io.phanisment.urars.parser.math.ast.Node;
 import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
-import io.phanisment.urars.skill.damage.DamagingMechanic;
+import io.phanisment.urars.skill.template.DamagingMechanic;
 import net.minecraft.world.entity.Entity;
 
 import static io.phanisment.urars.util.ActionUtils.aliases;
