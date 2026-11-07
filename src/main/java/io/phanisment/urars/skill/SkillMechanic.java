@@ -5,6 +5,7 @@ import io.phanisment.urars.parser.file.config.LineConfig;
 import io.phanisment.urars.parser.file.parser.FlagParser;
 import io.phanisment.urars.parser.file.parser.LineParser;
 import io.phanisment.urars.parser.math.ast.Node;
+import io.phanisment.urars.skill.value.EntityValue;
 import io.phanisment.urars.util.BufferedString;
 import org.jspecify.annotations.Nullable;
 
@@ -89,6 +90,7 @@ public class SkillMechanic implements ISkillAction {
 			case IEntityTarget entity_target -> {
 				for (Entity target : skill_targeter.getEntities(ctx)) {
 					if (!skill_targeter.conditionIsPass(ctx)) continue;
+					ctx.setVar("target", new EntityValue(target));
 					entity_target.castAtEntity(ctx, target);
 				}
 			}

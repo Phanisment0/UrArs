@@ -22,6 +22,7 @@ public abstract class Aura extends SkillMechanic implements IEntityTarget {
 	protected final Node name;
 	protected final Node duration;
 	protected final Node interval;
+	protected final Node sync_tick;
 
 	protected final MechanicsExecutor on_start;
 	protected final MechanicsExecutor on_tick;
@@ -38,6 +39,7 @@ public abstract class Aura extends SkillMechanic implements IEntityTarget {
 		name = config.getMathString(aliases("name", "n", "aura", "a"), default_name);
 		duration = config.getMathNumber(aliases("duration", "d"), 400); // < 0 = infinite
 		interval = config.getMathNumber(aliases("interval", "i"), 1);
+		sync_tick = config.getMathBoolean(aliases("syncTick", "st"), true);
 
 		on_start = config.getMechanics("onStart", "os");
 		on_tick = config.getMechanics("onTick", "ot");

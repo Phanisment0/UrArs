@@ -21,6 +21,7 @@ public final class ActiveAura {
 		this.owner = owner;
 		this.context = context;
 		this.target = target;
+		this.remaining = remaining;
 	}
 
 	public String name() {

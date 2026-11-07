@@ -6,6 +6,7 @@ import io.phanisment.urars.mob.MobManager;
 import io.phanisment.urars.reload.ReloadResult;
 import io.phanisment.urars.reload.UrArsReload;
 import io.phanisment.urars.skill.SkillManager;
+import io.phanisment.urars.skill.aura.AuraManager;
 import io.phanisment.urars.util.UrArsScheduler;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;

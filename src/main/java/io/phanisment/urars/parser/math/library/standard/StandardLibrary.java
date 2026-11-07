@@ -24,7 +24,7 @@ public final class StandardLibrary implements IMathLibrary {
 		}));*/
 
 		value.member("list", new FunctionValue(args -> new ListValue(new ArrayList<>(args.get()))));
-		value.member("map", new FunctionValue(args -> new MapValue(new HashMap<>())));
+		value.member("map", new FunctionValue(_ -> new MapValue(new HashMap<>())));
 	}
 
 	/*private static boolean truthy(IValue<?> value) {

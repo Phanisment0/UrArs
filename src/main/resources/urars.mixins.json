@@ -5,8 +5,10 @@
   "mixins": [
     "CommandsMixin",
     "EntityLoadMixin",
+    "LivingEntityMixin",
     "MinecraftServerMixin",
-    "MobAccessor"
+    "MobAccessor",
+    "ServerGamePacketListenerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
