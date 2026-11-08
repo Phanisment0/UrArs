@@ -5,7 +5,6 @@ import io.phanisment.urars.UrArs;
 import io.phanisment.urars.exception.MathParserException;
 import io.phanisment.urars.parser.math.UrArsMath;
 import io.phanisment.urars.parser.math.value.IValue;
-import io.phanisment.urars.parser.math.value.NumberValue;
 import io.phanisment.urars.parser.math.value.StringValue;
 import io.phanisment.urars.skill.Skill;
 import io.phanisment.urars.skill.SkillContext;
@@ -53,7 +52,7 @@ public final class BetterModelCompatibility {
 							IValue<?> result = UrArsMath.withStandardLibrary().parse(value).eval();
 							ctx.setVar(key, result);
 						} catch (MathParserException e) {
-							ctx.setVar(key, new StringValue(value)); // Save catch, because this run on animation
+							ctx.setVar(key, new StringValue(value)); // Safe catch, because this run on animation
 						}
 					});
 

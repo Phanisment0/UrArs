@@ -13,7 +13,7 @@ public final class Unchecked {
 	public static <T> T parse(ParseSupplier<T> supplier) {
 		try {
 			return supplier.get();
-		} catch (ParseException | UnsupportedOperationException e) { // also covers MathParserException if it extends ParseException
+		} catch (ParseException | UnsupportedOperationException e) {
 			throw new SkillParseException(e);
 		}
 	}
