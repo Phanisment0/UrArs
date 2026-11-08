@@ -19,7 +19,8 @@ import static io.phanisment.urars.util.ActionUtils.*;
 
 @RegistryInfo(
 		author = "Phanisment",
-		key = "particleMath"
+		key = "particleMath",
+		namespace = "fx"
 )
 public class ParticleMathMechanic extends AbstractParticleMechanic {
 	private static final int MAX_POINTS = 4096;

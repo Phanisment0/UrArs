@@ -13,7 +13,8 @@ import static io.phanisment.urars.util.ActionUtils.*;
 
 @RegistryInfo(
 		author = "Phanisment",
-		key = "particleHelix"
+		key = "particleHelix",
+		namespace = "fx"
 )
 public class ParticleHelixMechanic extends AbstractShapeMechanic {
 	protected final Node radius;

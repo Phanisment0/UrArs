@@ -27,6 +27,7 @@ import static io.phanisment.urars.util.ActionUtils.*;
  */
 public abstract class AbstractShapeMechanic extends AbstractParticleMechanic {
 	protected static final int MAX_POINTS = 4096;
+	protected static final double GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
 
 	protected final Node zoom;
 	protected final Node rot_x;
@@ -50,7 +51,7 @@ public abstract class AbstractShapeMechanic extends AbstractParticleMechanic {
 	protected abstract List<Vec3> shape(Cast cast);
 
 	@Override
-	protected final void emit(Cast cast) {
+	protected final void emit(AbstractParticleMechanic.Cast cast) {
 		var eval = cast.eval();
 
 		List<Vec3> base = shape(cast);

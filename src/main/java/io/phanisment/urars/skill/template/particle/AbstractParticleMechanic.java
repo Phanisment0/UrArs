@@ -9,7 +9,6 @@ import io.phanisment.urars.skill.target.IEntityTarget;
 import io.phanisment.urars.skill.target.ILocationTarget;
 import io.phanisment.urars.skill.target.INoTarget;
 import io.phanisment.urars.util.Location;
-import io.phanisment.urars.util.ParticleSpec;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;

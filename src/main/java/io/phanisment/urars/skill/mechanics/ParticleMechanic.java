@@ -6,7 +6,8 @@ import io.phanisment.urars.skill.template.particle.AbstractParticleMechanic;
 
 @RegistryInfo(
 		author = "Phanisment",
-		key = "particle"
+		key = "particle",
+		namespace = "fx"
 )
 public class ParticleMechanic extends AbstractParticleMechanic {
 

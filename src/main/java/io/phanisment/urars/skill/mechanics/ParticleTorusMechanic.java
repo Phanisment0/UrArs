@@ -13,7 +13,8 @@ import static io.phanisment.urars.util.ActionUtils.*;
 
 @RegistryInfo(
 		author = "Phanisment",
-		key = "particleTorus"
+		key = "particleTorus",
+		namespace = "fx"
 )
 public class ParticleTorusMechanic extends AbstractShapeMechanic {
 	protected final Node radius;     // distance from center to the tube's center

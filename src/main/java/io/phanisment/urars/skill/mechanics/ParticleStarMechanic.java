@@ -14,7 +14,8 @@ import static io.phanisment.urars.util.ActionUtils.*;
 
 @RegistryInfo(
 		author = "Phanisment",
-		key = "particleStar"
+		key = "particleStar",
+		namespace = "fx"
 )
 public class ParticleStarMechanic extends AbstractShapeMechanic {
 	protected final Node radius; // outer radius

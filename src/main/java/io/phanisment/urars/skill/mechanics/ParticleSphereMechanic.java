@@ -13,11 +13,10 @@ import static io.phanisment.urars.util.ActionUtils.*;
 
 @RegistryInfo(
 		author = "Phanisment",
-		key = "particleSphere"
+		key = "particleSphere",
+		namespace = "fx"
 )
 public class ParticleSphereMechanic extends AbstractShapeMechanic {
-	private static final double GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
-
 	protected final Node radius;
 	protected final Node points; // total points on the surface
 

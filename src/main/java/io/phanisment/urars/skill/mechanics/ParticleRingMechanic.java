@@ -13,7 +13,8 @@ import static io.phanisment.urars.util.ActionUtils.*;
 
 @RegistryInfo(
 		author = "Phanisment",
-		key = "particleRing"
+		key = "particleRing",
+		namespace = "fx"
 )
 public class ParticleRingMechanic extends AbstractShapeMechanic {
 	protected final Node radius;

@@ -13,7 +13,8 @@ import static io.phanisment.urars.util.ActionUtils.*;
 
 @RegistryInfo(
 		author = "Phanisment",
-		key = "particleLine"
+		key = "particleLine",
+		namespace = "fx"
 )
 public class ParticleLineMechanic extends AbstractShapeMechanic {
 	protected final Node length;

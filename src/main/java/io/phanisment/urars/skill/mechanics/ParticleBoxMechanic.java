@@ -14,7 +14,8 @@ import static io.phanisment.urars.util.ActionUtils.*;
 
 @RegistryInfo(
 		author = "Phanisment",
-		key = "particleBox"
+		key = "particleBox",
+		namespace = "fx"
 )
 public class ParticleBoxMechanic extends AbstractShapeMechanic {
 	private static final int[][] EDGES = {
