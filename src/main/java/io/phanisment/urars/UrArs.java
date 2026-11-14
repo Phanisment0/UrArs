@@ -3,6 +3,7 @@ package io.phanisment.urars;
 import io.phanisment.urars.compatibility.bettermodel.BetterModelCompatibility;
 import io.phanisment.urars.config.ConfigManager;
 import io.phanisment.urars.config.UrArsConfig;
+import io.phanisment.urars.item.ItemManager;
 import io.phanisment.urars.mob.MobManager;
 import io.phanisment.urars.reload.ReloadResult;
 import io.phanisment.urars.reload.UrArsReload;
@@ -32,6 +33,7 @@ public class UrArs implements DedicatedServerModInitializer {
 		new UrArsConfig().register();
 		new ConfigManager().register();
 		new SkillManager().register();
+		new ItemManager().register();
 		new MobManager().register();
 
 		long start = System.nanoTime();

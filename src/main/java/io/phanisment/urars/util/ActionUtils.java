@@ -1,6 +1,6 @@
 package io.phanisment.urars.util;
 
-import io.phanisment.urars.parser.file.parser.LineParser;
+import io.phanisment.urars.parser.file.LineParser;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import org.jspecify.annotations.Nullable;
 

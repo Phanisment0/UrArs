@@ -2,6 +2,7 @@ package io.phanisment.urars.parser.file.config;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 
 import io.phanisment.urars.util.BufferedString;
 
@@ -18,30 +19,42 @@ import io.phanisment.urars.util.BufferedString;
  * if the underlying configuration is malformed.</p>
  */
 public interface IConfig {
+
+	Object get(String key);
+	Object get(String key, Object def);
+
+	<T> T get(String key, Class<T> type);
+	<T> T get(String key, T def, Class<T> type);
+
 	BufferedString getBufferedString(String key);
 	BufferedString getBufferedString(String key, BufferedString def);
 
 	String getString(String key);
 	String getString(String key, String def);
 
-	int getInt(String key);
-	int getInt(String key, int def);
+	Number getNumber(String key);
+	Number getNumber(String key, Number def);
 
-	float getFloat(String key);
-	float getFloat(String key, float def);
-	
-	double getDouble(String key);
-	double getDouble(String key, double def);
-	
-	long getLong(String key);
-	long getLong(String key, long def);
-	
-	boolean getBoolean(String key);
-	boolean getBoolean(String key, boolean def);
+	Integer getInteger(String key);
+	Integer getInteger(String key, Integer def);
 
-	ConfigSection getSection(String key) throws ParseException;
-	ConfigSection getSection(String key, ConfigSection def) throws ParseException;
+	Float getFloat(String key);
+	Float getFloat(String key, Float def);
 
-	List<BufferedString> getList(String key);
-	List<BufferedString> getList(String key, List<BufferedString> def);
+	Double getDouble(String key);
+	Double getDouble(String key, Double def);
+
+	Long getLong(String key);
+	Long getLong(String key, Long def);
+
+	Boolean getBoolean(String key);
+	Boolean getBoolean(String key, Boolean def);
+
+	Map<BufferedString, Object> getMap(String key);
+	ConfigSection getSection(String key);
+
+	List<Object> getList(String key);
+	List<ConfigSection> getListSection(String key);
+	List<BufferedString> getListBufferedString(String key);
+	List<String> getListString(String key);
 }

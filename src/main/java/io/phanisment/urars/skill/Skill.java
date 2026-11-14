@@ -23,7 +23,8 @@ public class Skill {
 		this.config = config;
 
 		this.conditions = load(id, "conditions", () -> config.getConditions("conditions"), new ArrayList<>());
-		this.mechanics = load(id, "mechanics", () -> config.getMechanics("mechanics"), new MechanicsExecutor());
+		this.mechanics = load(id, "skills", () -> config.getMechanics("skills"), new MechanicsExecutor());
+
 		UrArsDebugger.debug("Skill '{}': {} condition(s), {} mechanic(s)", id, conditions.size(), mechanics.size());
 	}
 

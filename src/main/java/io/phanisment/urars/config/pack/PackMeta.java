@@ -1,8 +1,7 @@
 package io.phanisment.urars.config.pack;
 
-import io.phanisment.urars.exception.UrArsParseException;
+import io.phanisment.urars.parser.file.UrArsYaml;
 import io.phanisment.urars.parser.file.config.ConfigSection;
-import io.phanisment.urars.parser.file.parser.Parser;
 import io.phanisment.urars.util.UrArsDebugger;
 
 import java.io.File;
@@ -32,14 +31,14 @@ public record PackMeta(String name, String version, String author, String descri
 		}
 
 		try {
-			var section = new ConfigSection(new Parser(file).parse());
+			var section = new ConfigSection(UrArsYaml.parse(file));
 			return new PackMeta(
 					read(section, "name", def.name),
 					read(section, "version", def.version),
 					read(section, "author", def.author),
 					read(section, "description", def.description)
 			);
-		} catch (IOException | UrArsParseException e) {
+		} catch (IOException e) {
 			UrArsDebugger.warn("Failed to read {} for pack '{}', using defaults", FILE_NAME, folder_name, e);
 			return def;
 		}
@@ -54,19 +53,11 @@ public record PackMeta(String name, String version, String author, String descri
 
 	private static String template(PackMeta meta) {
 		return """
-				$ urars generated pack metadata
-				
-				$ This parser is really simple and (hopefully) fast.
-				$ The structure is: key ( `=` | `{` ) value [ `}` ]
-				$ When you use `=` only a single-line value is allowed.
-				$ When you use `{}` the value can span multiple lines.
-
-				name = %s
-				version = %s
-				author = %s
-				description {
-					%s
-				}
+				name: %s
+				version: %s
+				author: %s
+				description:
+				- %s
 				""".formatted(meta.name, meta.version, meta.author, meta.description);
 	}
 }

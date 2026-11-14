@@ -3,11 +3,12 @@ package io.phanisment.urars.config;
 import io.phanisment.urars.config.pack.Pack;
 import io.phanisment.urars.config.pack.PackFolderRegistry;
 import io.phanisment.urars.config.pack.PackLoader;
-import io.phanisment.urars.exception.UrArsParseException;
+import io.phanisment.urars.item.ItemManager;
+import io.phanisment.urars.item.ItemMeta;
 import io.phanisment.urars.mob.MobMeta;
 import io.phanisment.urars.mob.MobManager;
-import io.phanisment.urars.parser.file.UrArsFileParser;
-import io.phanisment.urars.parser.file.parser.Parser;
+import io.phanisment.urars.parser.file.UrArsYaml;
+import io.phanisment.urars.parser.file.config.ConfigSection;
 import io.phanisment.urars.reload.ReloadResult;
 import io.phanisment.urars.reload.Reloadable;
 import io.phanisment.urars.skill.Skill;
@@ -22,16 +23,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Map;
 import java.util.function.BiConsumer;
 
 public final class ConfigManager implements Reloadable {
 	public static final PackFolderRegistry PACK_FOLDER_REGISTRY = new PackFolderRegistry();
-	private static final String FILE_SUFFIX = ".urars";
+	private static final String FILE_SUFFIX = ".yml";
 
 	private static int failed_files;
 
 	static {
+		PACK_FOLDER_REGISTRY.register("items", folderLoader("items", ItemMeta::new, ItemManager::register));
 		PACK_FOLDER_REGISTRY.register("skills", folderLoader("skills", Skill::new, SkillManager::registerSkill));
 		PACK_FOLDER_REGISTRY.register("mobs", folderLoader("mobs", MobMeta::new, MobManager::registerMob));
 	}
@@ -62,13 +63,14 @@ public final class ConfigManager implements Reloadable {
 
 	private static <T> void loadFile(Pack pack, File file, EntryFactory<T> factory, BiConsumer<Identifier, T> register) {
 		try {
-			Map<String, BufferedString> raw = UrArsFileParser.load(file);
-			for (Map.Entry<String, BufferedString> entry : raw.entrySet()) {
-				var config = new SkillConfigSection(new Parser(entry.getValue()).parse());
-				Identifier id = Identifier.fromNamespaceAndPath(pack.name(), entry.getKey());
+			ConfigSection raw = new ConfigSection(UrArsYaml.parse(file));
+			for (BufferedString key : raw.map().keySet()) {
+				var key_str = key.toString();
+				var config = new SkillConfigSection(raw.getMap(key_str));
+				Identifier id = Identifier.fromNamespaceAndPath(pack.name(), key_str);
 				register.accept(id, factory.create(id, file, config));
 			}
-		} catch (IOException | UrArsParseException e) {
+		} catch (IOException e) {
 			failed_files++;
 			UrArsDebugger.warn("Failed to read file {}", file.getPath(), e);
 		}

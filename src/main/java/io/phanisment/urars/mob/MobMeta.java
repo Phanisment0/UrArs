@@ -58,17 +58,12 @@ public class MobMeta {
 	}
 
 	private static Settings loadSettings(final File file, final SkillConfigSection config) {
-		try {
-			ConfigSection section = config.getSection("settings");
-			if (section == null) return new Settings();
-			return new Settings()
-					.silent(section.getBoolean("silent", false))
-					.invulnerable(section.getBoolean("invulnerable", false))
-					.no_gravity(section.getBoolean("no-gravity", false));
-		} catch (ParseException e) {
-			UrArsDebugger.error("Failed to parse section 'settings' in file '" + file.getPath() + "'", e);
-			return new Settings();
-		}
+		ConfigSection section = config.getSection("settings");
+		if (section == null) return new Settings();
+		return new Settings()
+				.silent(section.getBoolean("silent", false))
+				.invulnerable(section.getBoolean("invulnerable", false))
+				.no_gravity(section.getBoolean("no-gravity", false));
 	}
 
 	@Nullable

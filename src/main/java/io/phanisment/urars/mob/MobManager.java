@@ -1,10 +1,5 @@
 package io.phanisment.urars.mob;
 
-import java.lang.invoke.CallSite;
-import java.lang.invoke.LambdaMetafactory;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -15,18 +10,12 @@ import io.phanisment.urars.registry.GoalDataRegistry;
 import io.phanisment.urars.registry.RegistryScanner;
 import io.phanisment.urars.reload.ReloadResult;
 import io.phanisment.urars.reload.Reloadable;
-import io.phanisment.urars.skill.annotation.RegistryInfo;
-import io.phanisment.urars.skill.config.SkillLineConfig;
-import io.phanisment.urars.util.AnnotationScanner;
 import io.phanisment.urars.util.UrArsDebugger;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-
-import static io.phanisment.urars.UrArs.MOD_ID;
 
 public final class MobManager implements Reloadable {
 	private static final GoalDataRegistry<@NonNull Goal> GOALS = scan("goals", Goal.class);

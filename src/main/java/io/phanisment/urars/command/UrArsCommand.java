@@ -1,15 +1,17 @@
 package io.phanisment.urars.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
-import io.phanisment.urars.UrArs;
-import io.phanisment.urars.parser.file.parser.LineParser;
+import io.phanisment.urars.item.ItemManager;
+import io.phanisment.urars.item.ItemMeta;
 import io.phanisment.urars.mob.MobMeta;
 import io.phanisment.urars.mob.MobManager;
+import io.phanisment.urars.parser.file.LineParser;
 import io.phanisment.urars.reload.ReloadResult;
 import io.phanisment.urars.reload.UrArsReload;
 import io.phanisment.urars.skill.Skill;
@@ -30,6 +32,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
 import static net.minecraft.commands.Commands.literal;
@@ -43,7 +46,12 @@ public class UrArsCommand {
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(literal("urars")
 				.requires(Commands.hasPermission(Commands.LEVEL_ADMINS))
-				.then(literal("cast")
+				.then(literal("give")
+						.then(argument("item", IdentifierArgument.id())
+								.suggests(UrArsCommand::give_suggest)
+								.executes(UrArsCommand::give)
+						)
+				).then(literal("cast")
 						.then(argument("skill", IdentifierArgument.id())
 								.suggests(UrArsCommand::cast_suggest)
 								.executes(UrArsCommand::cast_default)
@@ -133,7 +141,7 @@ public class UrArsCommand {
 		List<ReloadResult> results = UrArsReload.reloadAll();
 		for (ReloadResult result : results) {
 			if (result.result()) ctx.getSource().sendSuccess(() -> Component.literal("[UrArs] " + result.message()), false);
-			else ctx.getSource().sendSuccess(() -> Component.literal("(ERROR) [UrArs] " + result.message()).withColor(0), false);
+			else ctx.getSource().sendSuccess(() -> Component.literal("(ERROR) [UrArs] " + result.message()), false);
 		}
 
 		ctx.getSource().sendSuccess(() -> Component.literal("Reload finished in " + ((System.nanoTime() - start) / 1_000_000) + " ms"), false);
@@ -266,7 +274,7 @@ public class UrArsCommand {
 		String line = StringArgumentType.getString(ctx, "line");
 		UrArsDebugger.debug("Mechanic requested by '{}': {}", actor(source), line);
 		try {
-			LineParser parser = new LineParser(line);
+			var parser = new LineParser(line);
 			parser.parse();
 			SkillLineConfig config = new SkillLineConfig(parser.config());
 			UrArsDebugger.trace("Mechanic parsed: {}", parser);
@@ -332,6 +340,30 @@ public class UrArsCommand {
 			logFailure(source, "execute condition", "input=" + line, e);
 		}
 		return 0;
+	}
+
+	private static CompletableFuture<Suggestions> give_suggest(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
+		String remaining = builder.getRemaining().toLowerCase();
+		for (Identifier id : ItemManager.getItems()) {
+			String item = id.toString();
+			if (item.startsWith(remaining)) builder.suggest(item);
+		}
+		return builder.buildFuture();
+	}
+
+	private static int give(CommandContext<CommandSourceStack> ctx) {
+		CommandSourceStack source = ctx.getSource();
+		if (!(source.getEntity() instanceof ServerPlayer player)) return 0;
+
+		Identifier item_id = ctx.getArgument("item", Identifier.class);
+		ItemMeta meta = ItemManager.getItem(item_id);
+		if (meta == null) return 0;
+
+		ItemStack item = meta.build();
+
+		player.getInventory().add(item);
+		return 1;
+
 	}
 
 	private static String actor(CommandSourceStack source) {

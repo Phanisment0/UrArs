@@ -1,9 +1,9 @@
 package io.phanisment.urars.skill;
 
 import io.phanisment.urars.UrArs;
+import io.phanisment.urars.parser.file.FlagParser;
+import io.phanisment.urars.parser.file.LineParser;
 import io.phanisment.urars.parser.file.config.LineConfig;
-import io.phanisment.urars.parser.file.parser.FlagParser;
-import io.phanisment.urars.parser.file.parser.LineParser;
 import io.phanisment.urars.parser.math.ast.Node;
 import io.phanisment.urars.skill.value.EntityValue;
 import io.phanisment.urars.util.BufferedString;
@@ -44,18 +44,18 @@ public class SkillMechanic implements ISkillAction {
 			BufferedString value = flag.text();
 			if (value.isBlank()) continue;
 			switch (flag.c()) {
-				case '@' -> initializeTargeter(value);
+				case '@' -> this.skill_targeter = parseTargeter(value);
 				case '~' -> this.trigger = value.trimEnd().toString();
 			}
 		}
 	}
 
-	private void initializeTargeter(BufferedString context) throws ParseException {
+	protected SkillTargeter parseTargeter(BufferedString context) throws ParseException {
 		var targeter_parser = new LineParser(context);
 		targeter_parser.parse();
 		LineConfig targeter_config = targeter_parser.config();
 		var factory = SkillManager.getTargeter(targeter_config.key());
-		this.skill_targeter = factory == null ? null : factory.create(new SkillLineConfig(targeter_config));
+		return factory == null ? null : factory.create(new SkillLineConfig(targeter_config));
 	}
 
 	public long getDelay(SkillContext context) {

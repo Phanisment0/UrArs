@@ -18,9 +18,9 @@ public sealed interface Node permits CallNode, IdentifierNode, MemberNode, Strin
 		throw new InvalidMathOperationException("Expected number result but got " + result.getClass().getSimpleName());
 	}
 
-	default boolean evalAsBoolean(EvalContext context) {
+	default Boolean evalAsBoolean(EvalContext context) {
 		IValue<?> result = eval(context);
-		if (result instanceof BooleanValue b) return b.raw();
+		if (result instanceof BooleanValue(Boolean raw)) return raw;
 		throw new InvalidMathOperationException("Expected boolean result but got " + result.getClass().getSimpleName());
 	}
 

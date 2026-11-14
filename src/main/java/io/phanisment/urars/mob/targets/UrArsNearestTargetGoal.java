@@ -11,6 +11,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import static io.phanisment.urars.util.ActionUtils.aliases;
@@ -24,14 +25,14 @@ import static io.phanisment.urars.util.ActionUtils.aliases;
 public class UrArsNearestTargetGoal extends NearestAttackableTargetGoal<LivingEntity> implements IGoalCondition {
 	public UrArsNearestTargetGoal(Mob mob, SkillLineConfig c) {
 		super(mob, LivingEntity.class,
-				c.getInt(aliases("interval", "i"), 10),
+				c.getInteger(aliases("interval", "i"), 10),
 				c.getBoolean(aliases("mustSee", "see"), true),
 				c.getBoolean(aliases("mustReach", "reach"), false),
 				filter(c));
 	}
 
-	private static TargetingConditions.Selector filter(SkillLineConfig c) {
-		Predicate<Entity> matcher = EntityTypeUtils.matcher(c.getBufferedString(aliases("target", "t"), new BufferedString("player")));
-		return (entity, level) -> matcher.test(entity);
+	private static TargetingConditions.Selector filter(SkillLineConfig config) {
+		Predicate<Entity> matcher = EntityTypeUtils.matcher(Objects.requireNonNull(config.getBufferedString(aliases("target", "t"), new BufferedString("player"))));
+		return (entity, _) -> matcher.test(entity);
 	}
 }

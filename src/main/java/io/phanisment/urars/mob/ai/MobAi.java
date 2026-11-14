@@ -3,7 +3,7 @@ package io.phanisment.urars.mob.ai;
 import io.phanisment.urars.mixin.MobAccessor;
 import io.phanisment.urars.mob.IGoalCondition;
 import io.phanisment.urars.mob.MobManager;
-import io.phanisment.urars.parser.file.parser.LineParser;
+import io.phanisment.urars.parser.file.LineParser;
 import io.phanisment.urars.skill.config.SkillConfigSection;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.util.BufferedString;
@@ -55,22 +55,18 @@ public final class MobAi {
 
 	private <T extends Goal> List<Entry<T>> load(SkillConfigSection config, String path, String label, Function<SkillLineConfig, AiGoalFactory<T>> lookup) {
 		List<Entry<T>> results = new ArrayList<>();
-		try {
-			for (LineParser parsed : config.getLine(path)) {
-				try {
-					var line = new SkillLineConfig(parsed.config());
-					AiGoalFactory<T> factory = lookup.apply(line);
-					if (factory == null) {
-						UrArsDebugger.warn("Unknown AI {} '{}'", label, line.key());
-						continue;
-					}
-					results.add(new Entry<>(parsePriority(line.context()), factory, line));
-				} catch (Exception e) {
-					UrArsDebugger.warn("Failed to parse AI line in '" + path + "'", e);
+		for (LineParser parsed : config.getLine(path)) {
+			try {
+				var line = new SkillLineConfig(parsed.config());
+				AiGoalFactory<T> factory = lookup.apply(line);
+				if (factory == null) {
+					UrArsDebugger.warn("Unknown AI {} '{}'", label, line.key());
+					continue;
 				}
+				results.add(new Entry<>(parsePriority(line.context()), factory, line));
+			} catch (Exception e) {
+				UrArsDebugger.warn("Failed to parse AI line in '" + path + "'", e);
 			}
-		} catch (ParseException e) {
-			throw new IllegalStateException("Failed to read '" + path + "'", e);
 		}
 		return results;
 	}

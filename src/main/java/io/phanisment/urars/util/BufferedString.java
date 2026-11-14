@@ -46,10 +46,11 @@ public class BufferedString implements CharSequence, Comparable<BufferedString>,
 		return new BufferedString(new byte[0], 0, 0);
 	}
 
-	public void reset(byte[] buffer) {
+	public BufferedString reset(byte[] buffer) {
 		this.buffer =  buffer == null ? new byte[0] : buffer;
 		this.start = 0;
 		this.end = buffer == null ? 0 : buffer.length;
+		return this;
 	}
 
 	// From here is utility method, used for other developer.

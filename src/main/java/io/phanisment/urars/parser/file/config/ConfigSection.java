@@ -1,202 +1,188 @@
 package io.phanisment.urars.parser.file.config;
 
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import io.phanisment.urars.parser.file.UrArsFileParser;
-import io.phanisment.urars.parser.file.parser.LineParser;
 import io.phanisment.urars.util.BufferedString;
-import io.phanisment.urars.util.ParserUtils;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class ConfigSection implements IConfig {
-	private final Map<String, BufferedString> map;
+	private final Map<BufferedString, Object> map;
+	private final BufferedString lookup_key = BufferedString.empty();
 
-	public ConfigSection(Map<String, BufferedString> map) {
-		this.map = map;
+	public ConfigSection(@NonNull Map<BufferedString, Object> map) {
+		this.map = Objects.requireNonNull(map, "Config map cannot be null");
+	}
+
+	public ConfigSection(ConfigSection copy) {
+		this.map = new HashMap<>(copy.map);
+	}
+
+	public Map<BufferedString, Object> map() {
+		return map;
 	}
 
 	@Override
-	public BufferedString getBufferedString(String key) {
-		return map.get(key);
+	public <T> @Nullable T get(String key, Class<T> type) {
+		return get(key, null, type);
+	}
+
+	@Override
+	public <T> T get(String key, T def, Class<T> type) {
+		Object value = get(key);
+		return type.isInstance(value) ? type.cast(value) : def;
+	}
+
+	public <T> T get(BufferedString key, Class<T> type) {
+		return get(key, null, type);
+	}
+
+	public <T> T get(BufferedString key, T def, Class<T> type) {
+		Object value = map.get(key);
+		return value == null ? def : type.cast(value);
+	}
+
+	@Override
+	public @Nullable Object get(String key) {
+		lookup_key.reset(key.getBytes());
+		return map.get(lookup_key);
+	}
+
+	@Override
+	public Object get(String key, Object def) {
+		lookup_key.reset(key.getBytes());
+		return map.getOrDefault(lookup_key, def);
+	}
+
+	@Override
+	public @Nullable BufferedString getBufferedString(String key) {
+		return getBufferedString(key, null);
 	}
 
 	@Override
 	public BufferedString getBufferedString(String key, BufferedString def) {
-		return map.getOrDefault(key, def);
+		return get(key, def, BufferedString.class);
 	}
 
 	@Override
-	public String getString(String key) {
+	public @Nullable String getString(String key) {
 		return getString(key, null);
 	}
 
 	@Override
 	public String getString(String key, String def) {
-		BufferedString value = map.get(key);
-		if (value == null) return def;
-		return value.toString();
+		BufferedString value = getBufferedString(key);
+		return value == null ? def : value.toString();
 	}
 
 	@Override
-	public int getInt(String key) {
-		return getInt(key, 0);
+	public @Nullable Number getNumber(String key) {
+		return null;
 	}
 
 	@Override
-	public int getInt(String key, int def) {
-		BufferedString value = map.get(key);
-		if (value == null) return def;
-		return value.toInteger();
+	public Number getNumber(String key, Number def) {
+		BufferedString value = getBufferedString(key);
+		return value == null ? def : value.toNumber();
 	}
 
 	@Override
-	public float getFloat(String key) {
-		return getFloat(key, 0);
+	public @Nullable Integer getInteger(String key) {
+		return getInteger(key, null);
 	}
 
 	@Override
-	public float getFloat(String key, float def) {
-		BufferedString value = map.get(key);
-		if (value == null) return def;
-		return value.toInteger();
+	public Integer getInteger(String key, Integer def) {
+		BufferedString value = getBufferedString(key);
+		return value == null ? def : value.toInteger();
 	}
 
 	@Override
-	public double getDouble(String key) {
-		return getDouble(key, 0);
+	public @Nullable Float getFloat(String key) {
+		return getFloat(key, null);
 	}
 
 	@Override
-	public double getDouble(String key, double def) {
-		BufferedString value = map.get(key);
-		if (value == null) return def;
-		return value.toDouble();
+	public Float getFloat(String key, Float def) {
+		BufferedString value = getBufferedString(key);
+		return value == null ? def : value.toFloat();
 	}
 
 	@Override
-	public long getLong(String key) {
-		return getLong(key, 0);
+	public @Nullable Double getDouble(String key) {
+		return getDouble(key, null);
 	}
 
 	@Override
-	public long getLong(String key, long def) {
-		BufferedString value = map.get(key);
-		if (value == null) return def;
-		return value.toLong();
+	public Double getDouble(String key, Double def) {
+		BufferedString value = getBufferedString(key);
+		return value == null ? def : value.toDouble();
 	}
 
 	@Override
-	public boolean getBoolean(String key) {
-		return getBoolean(key, false);
+	public @Nullable Long getLong(String key) {
+		return getLong(key, null);
 	}
 
 	@Override
-	public boolean getBoolean(String key, boolean def) {
-		BufferedString value = map.get(key);
-		if (value == null) return def;
-		return value.trim().toBoolean();
+	public Long getLong(String key, Long def) {
+		BufferedString value = getBufferedString(key);
+		return value == null ? def : value.toLong();
 	}
 
 	@Override
-	public ConfigSection getSection(String key) throws ParseException {
-		return getSection(key, new ConfigSection(new HashMap<>()));
+	public @Nullable Boolean getBoolean(String key) {
+		return getBoolean(key, null);
 	}
 
 	@Override
-	public ConfigSection getSection(String key, ConfigSection def) throws ParseException {
-		BufferedString value = map.get(key);
-		if (value == null) return def;
-		return new ConfigSection(UrArsFileParser.load(value));
+	public Boolean getBoolean(String key, Boolean def) {
+		BufferedString value = getBufferedString(key);
+		return value == null ? def : value.toBoolean();
 	}
 
 	@Override
-	public List<BufferedString> getList(String key) {
-		return getList(key, new ArrayList<>());
+	public @Nullable Map<BufferedString, Object> getMap(String key) {
+		return (Map<BufferedString, Object>)get(key, Map.class);
 	}
 
 	@Override
-	public List<BufferedString> getList(String key, List<BufferedString> def) {
-		BufferedString value = map.get(key);
-		if (value == null) return def;
-		return parseList(value);
+	public @Nullable ConfigSection getSection(String key) {
+		Map<BufferedString, Object> section = getMap(key);
+		return section == null ? null : new ConfigSection(section);
 	}
 
-	protected List<BufferedString> parseList(BufferedString block) {
-		if (block.isEmpty()) return new ArrayList<>();
-		
-		List<BufferedString> result = new ArrayList<>();
-		int current = block.start;
-		int depth = 0;
-		for (int i = block.start; i < block.end; i++) {
-			byte b = block.buffer[i];
+	@Override
+	public @Nullable List<Object> getList(String key) {
+		return (List<Object>)get(key, List.class);
+	}
 
-			if (depth == 0 && b == '#') {
-				if (i < current) result.add(new BufferedString(block.buffer, current, i));
-				while (i < block.end) {
-					b = block.buffer[i];
-					if (ParserUtils.isNewLine(b)) break;
-					i++;
-				}
-				current = i + 1;
-				continue;
-			}
-
-			if (b == '{') depth++;
-			else if (b == '}') depth--;
-			if (depth <= 0 && (b == ';' || b == '-')) {
-				if (i > current) result.add(new BufferedString(block.buffer, current, i));
-				current = i + 1;
-				depth = 0;
-			}
-		}
-
-		if (current < block.end) result.add(new BufferedString(block.buffer, current, block.end));
-
+	@Override
+	public @NonNull List<ConfigSection> getListSection(String key) {
+		List<ConfigSection> result = new ArrayList<>();
+		var list = getList(key);
+		if (list != null) for (Object item : list) if (item instanceof Map<?,?> v) result.add(new ConfigSection((Map<BufferedString, Object>)v));
 		return result;
 	}
 
-	public List<LineParser> getLine(String key) throws ParseException {
-		return getLine(key, new ArrayList<>());
+	@Override
+	public @NonNull List<BufferedString> getListBufferedString(String key) {
+		List<BufferedString> result = new ArrayList<>();
+		var list = getList(key);
+		if (list != null) for (Object item : list) if (item instanceof BufferedString v) result.add(v);
+		return result;
 	}
 
-	public List<LineParser> getLine(String key, List<LineParser> def) throws ParseException {
-		List<BufferedString> value = getList(key);
-		if (value == null) return def;
-		return convertToLineParser(value);
-	}
-
-	public Map<String, BufferedString> getMapSection(String key) throws ParseException {
-		return getMapSection(key, new HashMap<>());
-	}
-
-	public Map<String, BufferedString> getMapSection(String key, Map<String, BufferedString> def) throws ParseException {
-		BufferedString value = map.get(key);
-		if (value == null) return def;
-		return UrArsFileParser.load(value);
-	}
-
-	public Map<String, BufferedString> map() {
-		return map;
+	@Override
+	public @NonNull List<String> getListString(String key) {
+		List<String> result = new ArrayList<>();
+		var list = getList(key);
+		if (list != null) for (Object item : list) if (item instanceof BufferedString v) result.add(v.toString());
+		return result;
 	}
 
 	@Override
 	public String toString() {
 		return map.toString();
-	}
-
-
-	/* -- Utility method --*/
-	protected List<LineParser> convertToLineParser(List<BufferedString> value) throws ParseException {
-		List<LineParser> list = new ArrayList<>();
-		for (BufferedString line : value) {
-			if (line.isBlank()) continue;
-			var parser = new LineParser(line);
-			parser.parse();
-			list.add(parser);
-		}
-		return list;
 	}
 }

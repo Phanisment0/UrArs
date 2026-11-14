@@ -15,7 +15,7 @@ import static io.phanisment.urars.util.ActionUtils.aliases;
 		key = "lookAtPlayer"
 )
 public class UrArsLookAtPlayerGoal extends LookAtPlayerGoal implements IGoalCondition {
-	public UrArsLookAtPlayerGoal(Mob mob, SkillLineConfig c) {
-		super(mob, Player.class, (float) c.getDouble(aliases("range", "r"), 8.0));
+	public UrArsLookAtPlayerGoal(Mob mob, SkillLineConfig config) {
+		super(mob, Player.class, config.getFloat(aliases("range", "r"), 8.0f));
 	}
 }

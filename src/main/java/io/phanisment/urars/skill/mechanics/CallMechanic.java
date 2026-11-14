@@ -1,6 +1,7 @@
 package io.phanisment.urars.skill.mechanics;
 
-import io.phanisment.urars.exception.Unchecked;
+import io.phanisment.urars.exception.MathParserException;
+import io.phanisment.urars.exception.SkillParseException;
 import io.phanisment.urars.parser.math.ast.Node;
 import io.phanisment.urars.parser.math.parser.MathParser;
 import io.phanisment.urars.skill.MechanicsExecutor;
@@ -9,6 +10,7 @@ import io.phanisment.urars.skill.SkillMechanic;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.skill.target.INoTarget;
+import io.phanisment.urars.util.BufferedString;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -25,10 +27,14 @@ public class CallMechanic extends SkillMechanic implements INoTarget {
 		super(config);
 		mechanics = config.getMechanics("s");
 		for (var entry : config.map().entrySet()) {
-			String key = entry.getKey();
-			if (key == null) continue;
+			String key = entry.getKey().toString();
+			if (key.isEmpty()) continue;
 			if (except(key)) continue;
-			params.put(key, Unchecked.parse(() -> new MathParser(entry.getValue()).parse()));
+			try {
+				params.put(key, new MathParser((BufferedString)entry.getValue()).parse());
+			} catch (MathParserException e) {
+				throw new SkillParseException("Failed to parse math key" + key, e);
+			}
 		}
 	}
 

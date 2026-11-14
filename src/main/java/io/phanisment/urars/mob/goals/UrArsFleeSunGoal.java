@@ -15,7 +15,7 @@ import static io.phanisment.urars.util.ActionUtils.aliases;
 )
 public class UrArsFleeSunGoal extends FleeSunGoal  implements IGoalCondition {
 	public UrArsFleeSunGoal(Mob mob, SkillLineConfig config) {
-		super((PathfinderMob)mob, config.getDouble(aliases("speed", "s"), 0));
+		super((PathfinderMob)mob, config.getInteger(aliases("speed", "s"), 0));
 	}
 
 	@Override

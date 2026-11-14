@@ -44,13 +44,13 @@ public final class ParseErrorFormatter {
 			.append('\n');
 
 		for (int current = from; current <= to; current++) {
-			out.append(String.format("%" + width + "d | %s%n", current, lines[current - 1]));
+			out.append(String.format("%%%dd | %%s%%n".formatted(width), current, lines[current - 1]));
 			if (current == line) {
-				for (int i = 0; i < width; i++) out.append(' ');
+				out.repeat(" ", width);
 				out.append(" | ");
-				for (int i = 1; i < column; i++) out.append(' ');
+				out.repeat(" ", Math.max(0, column - 1));
 				int len = Math.max(1, loc.length());
-				for (int i = 0; i < len; i++) out.append('^');
+				out.repeat("^", len);
 				out.append('\n');
 			}
 		}
