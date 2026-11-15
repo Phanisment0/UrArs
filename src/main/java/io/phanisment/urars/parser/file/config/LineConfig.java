@@ -10,21 +10,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
  * Represents a configuration line containing a key, arguments, and context.
  *
- * <p>Unlike {@link ConfigSection}, this class works with raw
- * {@link BufferedString} values rather than nested configuration sections.
+ * <p>Argument values are {@link BufferedString} or {@code List<BufferedString>}.
+ * An argument without a name is stored under the {@code null} key, so any
+ * {@code String} key parameter may be {@code null}.
  */
-public class LineConfig extends ConfigSection {
+public class LineConfig {
 	private final String key;
+	private final Map<BufferedString, Object> arguments;
 	private final BufferedString context;
+	private final BufferedString lookup_key = BufferedString.empty();
 
 	public LineConfig(String key, Map<BufferedString, Object> arguments, BufferedString context) {
-		super(arguments);
 		this.key = key;
+		this.arguments = Objects.requireNonNull(arguments, "Arguments cannot be null");
 		this.context = context;
 	}
 
@@ -36,13 +40,43 @@ public class LineConfig extends ConfigSection {
 		return context;
 	}
 
+	public Map<BufferedString, Object> map() {
+		return arguments;
+	}
+
+	public @Nullable Object get(@Nullable String key) {
+		if (key == null) return arguments.get(null);
+		lookup_key.reset(key.getBytes());
+		return arguments.get(lookup_key);
+	}
+
+	public Object get(@Nullable String key, Object def) {
+		if (key == null) return arguments.getOrDefault(null, def);
+		lookup_key.reset(key.getBytes());
+		return arguments.getOrDefault(lookup_key, def);
+	}
+
+	public <T> @Nullable T get(@Nullable String key, Class<T> type) {
+		return get(key, null, type);
+	}
+
+	public <T> T get(@Nullable String key, T def, Class<T> type) {
+		Object value = get(key);
+		return type.isInstance(value) ? type.cast(value) : def;
+	}
+
+	public boolean has(@Nullable String key) {
+		return get(key) != null;
+	}
+
+
 	public @Nullable BufferedString getBufferedString(String... keys) {
-		return find(keys);
+		return find(keys, BufferedString.class);
 	}
 
 	public BufferedString getBufferedString(String[] keys, BufferedString def) {
-		var value = find(keys);
-		return value == null ? def : value;
+		BufferedString value = find(keys, BufferedString.class);
+		return value != null ? value : def;
 	}
 
 	public @Nullable String getString(String... keys) {
@@ -108,159 +142,72 @@ public class LineConfig extends ConfigSection {
 		return Arrays.asList(part);
 	}
 
-	public @Nullable List<BufferedString> getBufferedList(String... keys) {
-		return map(keys, this::parseList, null);
+	/**
+	 * Returns the already-parsed list for the first matching key,
+	 * or null if no argument holds a list.
+	 */
+	public @Nullable List<BufferedString> getList(String... keys) {
+		return asList(find(keys));
 	}
 
-	/**
-	 * Parses a list configuration value into individual line parsers.
-	 *
-	 * @param keys possible argument keys
-	 * @return parsed line parsers, or null if the argument does not exist
-	 * @throws ParseException if a line cannot be parsed
-	 */
 	public @Nullable List<LineParser> getLine(String... keys) throws ParseException {
-		BufferedString raw = find(keys);
-		return raw == null ? null : toLineParsers(parseList(raw));
+		List<BufferedString> list = getList(keys);
+		return list == null ? null : toLineParsers(list);
 	}
 
-	/**
-	 * Unsupported because line configurations do not contain nested maps.
-	 */
-	@Deprecated
-	@Override
-	public Map<BufferedString, Object> getMap(String key) {
-		throw unsupported("getMap");
-	}
-
-	/**
-	 * Unsupported because line configurations do not contain nested sections.
-	 */
-	@Deprecated
-	@Override
-	public ConfigSection getSection(String key) {
-		throw unsupported("getSection");
-	}
-
-	/**
-	 * Unsupported because line configurations use {@link #getBufferedList(String...)}.
-	 */
-	@Deprecated
-	@Override
-	public List<Object> getList(String key) {
-		throw unsupported("getList");
-	}
-
-	/**
-	 * Unsupported because line configurations do not contain section lists.
-	 */
-	@Deprecated
-	@Override
-	public @NonNull List<ConfigSection> getListSection(String key) {
-		throw unsupported("getListSection");
-	}
-
-	/**
-	 * Unsupported because line configurations use {@link #getBufferedList(String...)}.
-	 */
-	@Deprecated
-	@Override
-	public @NonNull List<BufferedString> getListBufferedString(String key) {
-		throw unsupported("getListBufferedString");
-	}
-
-	/**
-	 * Unsupported because line configurations do not provide converted string lists.
-	 */
-	@Deprecated
-	@Override
-	public @NonNull List<String> getListString(String key) {
-		throw unsupported("getListString");
-	}
-
-	/**
-	 * Converts non-blank input strings into line parsers.
-	 *
-	 * @param items input strings
-	 * @return parsed line parsers
-	 * @throws ParseException if a line cannot be parsed
-	 */
 	protected List<LineParser> toLineParsers(List<BufferedString> items) throws ParseException {
 		List<LineParser> result = new ArrayList<>(items.size());
-
 		for (BufferedString item : items) {
 			if (item.isBlank()) continue;
-
 			LineParser parser = new LineParser(item);
 			parser.parse();
 			result.add(parser);
 		}
-
 		return result;
 	}
 
 	protected <T> T map(String[] keys, Function<BufferedString, T> mapper, T def) {
-		BufferedString value = find(keys);
+		BufferedString value = find(keys, BufferedString.class);
 		return value != null ? mapper.apply(value) : def;
 	}
 
-	protected @Nullable BufferedString find(String... keys) {
-		for (String k : keys) {
-			BufferedString value = get(k, BufferedString.class);
+	/**
+	 * Finds the value associated with the first matching key.
+	 *
+	 * @param keys the keys to search, or null to search the unnamed argument
+	 * @return the first matching value, or null
+	 */
+	protected @Nullable Object find(String... keys) {
+		if (keys == null) return get(null);
+		for (String key : keys) {
+			Object value = get(key);
 			if (value != null) return value;
 		}
 		return null;
 	}
 
 	/**
-	 * Splits a bracketed list into individual non-blank elements.
+	 * Finds the first matching value and returns it if it matches the given type.
 	 *
-	 * <p>Separators inside nested braces or brackets are ignored.
-	 * Empty elements and elements containing only whitespace are excluded.
-	 *
-	 * @param block bracketed list input
-	 * @return non-blank list elements
+	 * @param keys the keys to search
+	 * @param type the expected value type
+	 * @return the matching value, or null if the value has a different type
 	 */
-	public List<BufferedString> parseList(BufferedString block) {
-		List<BufferedString> result = new ArrayList<>();
-
-		if (block.isBlank()) return result;
-		if (block.buffer[block.start] != '[' || block.buffer[block.end - 1] != ']') throw new IllegalArgumentException("List must start with '[' and end with ']'");
-		if (block.length() == 2) return result;
-
-		final int end = block.end - 1;
-		int current = block.start + 1;
-		int depth = 0;
-
-		for (int i = current; i < end; i++) {
-			byte b = block.buffer[i];
-
-			if (b == '{' || b == '[') {
-				depth++;
-			} else if (b == '}' || b == ']') {
-				depth--;
-			} else if (depth == 0 && isSeparator(b)) {
-				addIfNotBlank(result, block.buffer, current, i);
-				current = i + 1;
-			}
-		}
-
-		addIfNotBlank(result, block.buffer, current, end);
-
-		return result;
+	protected <T> @Nullable T find(String[] keys, Class<T> type) {
+		Object value = find(keys);
+		return type.isInstance(value) ? type.cast(value) : null;
 	}
 
-	private static void addIfNotBlank(List<BufferedString> result, byte[] buffer, int start, int end) {
-		if (start >= end) return;
-		BufferedString item = new BufferedString(buffer, start, end);
-		if (!item.isBlank()) result.add(item);
+	protected static @Nullable List<BufferedString> asList(Object value) {
+		return isList(value) ? (List<BufferedString>)value : null; // list item are always BufferedString
 	}
 
-	private static boolean isSeparator(byte c) {
-		return c == ';' || c == '-';
+	protected static boolean isList(Object value) {
+		return value instanceof List<?>;
 	}
 
-	private static UnsupportedOperationException unsupported(String method) {
-		return new UnsupportedOperationException(method + " is not supported by LineConfig");
+	@Override
+	public String toString() {
+		return key + " " + arguments + " " + context;
 	}
 }

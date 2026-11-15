@@ -4,19 +4,10 @@ import io.phanisment.urars.registry.ActionDataRegistry;
 import io.phanisment.urars.registry.RegistryScanner;
 import io.phanisment.urars.reload.ReloadResult;
 import io.phanisment.urars.reload.Reloadable;
-import io.phanisment.urars.skill.annotation.RegistryInfo;
-import io.phanisment.urars.skill.config.SkillLineConfig;
-import io.phanisment.urars.util.AnnotationScanner;
+import io.phanisment.urars.util.BufferedString;
 import io.phanisment.urars.util.UrArsDebugger;
 import net.minecraft.resources.Identifier;
 
-import static io.phanisment.urars.UrArs.MOD_ID;
-
-import java.lang.invoke.CallSite;
-import java.lang.invoke.LambdaMetafactory;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -71,36 +62,45 @@ public final class SkillManager implements Reloadable {
 	}
 
 
-	// Mechanic //
+	// Mechanic
 	public static @Nullable SkillActionFactory<SkillMechanic> getMechanic(Identifier id) {
 		return MECHANICS.get(id);
 	}
 	public static @Nullable SkillActionFactory<SkillMechanic> getMechanic(String alias) {
 		return MECHANICS.get(alias);
 	}
+	public static @Nullable SkillActionFactory<SkillMechanic> getMechanic(BufferedString alias) {
+		return MECHANICS.get(alias.toString());
+	}
 	public static ActionDataRegistry<SkillMechanic> getMechanics() {
 		return MECHANICS;
 	}
 
 
-	// Conditions //
+	// Conditions
 	public static @Nullable SkillActionFactory<SkillCondition> getCondition(Identifier id) {
 		return CONDITIONS.get(id);
 	}
 	public static @Nullable SkillActionFactory<SkillCondition> getCondition(String alias) {
 		return CONDITIONS.get(alias);
 	}
+	public static @Nullable SkillActionFactory<SkillCondition> getCondition(BufferedString alias) {
+		return CONDITIONS.get(alias.toString());
+	}
 	public static ActionDataRegistry<SkillCondition> getConditions() {
 		return CONDITIONS;
 	}
 
 
-	// Targeter //
+	// Targeter
 	public static @Nullable SkillActionFactory<SkillTargeter> getTargeter(Identifier id) {
 		return TARGETERS.get(id);
 	}
 	public static @Nullable SkillActionFactory<SkillTargeter> getTargeter(String alias) {
 		return  TARGETERS.get(alias);
+	}
+	public static @Nullable SkillActionFactory<SkillTargeter> getTargeter(BufferedString alias) {
+		return TARGETERS.get(alias.toString());
 	}
 	public static ActionDataRegistry<SkillTargeter> getTargeters() {
 		return TARGETERS;

@@ -19,19 +19,6 @@ public class ItemMeta {
 
 	private final Identifier type;
 	private final String name;
-	private final List<String> lore;
-	private final Integer custom_model_data;
-	private final Integer max_stack;
-	private final String item_name;
-	private final Integer damaged;
-	private final Integer max_damaged;
-	private final Integer repair_cost;
-	private final Boolean glint;
-	private final String rarity;
-	private final Boolean unbreakable;
-	//private final Identifier item_model;
-	private final Boolean hide_tooltips;
-	//private final FoodProperties food;
 
 	private final MechanicsExecutor skills;
 
@@ -40,20 +27,6 @@ public class ItemMeta {
 
 		type = parseType(config);
 		name = config.getString("name");
-		lore = parseLore(config);
-
-		custom_model_data = config.getInteger("custom-model-data");
-		max_stack = config.getInteger("max-stack");
-		item_name = config.getString("item-name");
-		damaged = config.getInteger("damaged");
-		max_damaged = config.getInteger("max-damaged");
-		repair_cost = config.getInteger("repair-cost");
-		glint = config.getBoolean("glint");
-		rarity = config.getString("rarity");
-		unbreakable = config.getBoolean("unbreakable");
-		//item_model = Identifier.tryParse(config.getString("item-model")); // FIXME: im lazy to check if item exist
-		hide_tooltips = config.getBoolean("hide-tooltips");
-		//food = parseFood(config);
 		skills = config.getMechanics("skills");
 	}
 
@@ -71,40 +44,11 @@ public class ItemMeta {
 		return type_id;
 	}
 
-	private List<String> parseLore(IConfig config) {
-		List<String> list = new ArrayList<>();
-		for (var line : config.getList("lore")) list.add(line.toString());
-		return list;
-	}
-
-	/*private FoodProperties parseFood(IConfig config) {
-		IConfig food = config.getSection("food");
-		return new FoodProperties(
-				food.getInteger("nutrition"),
-				food.getFloat("saturation"),
-				food.getBoolean("can-always-eat")
-		);
-	}*/
-
 	public ItemStack build() {
 		var builder = ItemBuilder.of(type);
 		builder.customData(c -> c.putString(ITEM_KEY, id.toString()));
 
 		if (name != null) builder.nameNoItalic(name);
-		if (!lore.isEmpty()) builder.loreStr(lore);
-
-		if (custom_model_data != null) builder.customModelData(custom_model_data);
-		if (max_stack != null) builder.maxStackSize(max_stack);
-		if (item_name != null) builder.itemName(item_name);
-		if (damaged != null) builder.damage(damaged);
-		if (max_damaged != null) builder.maxDamage(max_damaged);
-		if (repair_cost != null) builder.repairCost(repair_cost);
-		if (rarity != null) builder.rarity(rarity);
-		if (glint != null) builder.glint(glint);
-		if (unbreakable != null) builder.unbreakable(unbreakable);
-		//if (item_model != null) builder.itemModel(item_model);
-		if (hide_tooltips != null) builder.hideTooltip(hide_tooltips);
-		//if (food != null) builder.food(food);
 
 		return builder.get();
 	}

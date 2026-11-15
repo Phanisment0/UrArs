@@ -10,6 +10,7 @@ import io.phanisment.urars.registry.GoalDataRegistry;
 import io.phanisment.urars.registry.RegistryScanner;
 import io.phanisment.urars.reload.ReloadResult;
 import io.phanisment.urars.reload.Reloadable;
+import io.phanisment.urars.util.BufferedString;
 import io.phanisment.urars.util.UrArsDebugger;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -43,6 +44,9 @@ public final class MobManager implements Reloadable {
 	public static @Nullable AiGoalFactory<Goal> getGoal(String alias) {
 		return GOALS.get(alias);
 	}
+	public static @Nullable AiGoalFactory<Goal> getGoal(BufferedString alias) {
+		return GOALS.get(alias.toString());
+	}
 	public static GoalDataRegistry<Goal> getGoals() {
 		return GOALS;
 	}
@@ -54,6 +58,9 @@ public final class MobManager implements Reloadable {
 	}
 	public static @Nullable AiGoalFactory<TargetGoal> getTargetGoal(String alias) {
 		return TARGETS.get(alias);
+	}
+	public static @Nullable AiGoalFactory<TargetGoal> getTargetGoal(BufferedString alias) {
+		return TARGETS.get(alias.toString());
 	}
 	public static GoalDataRegistry<TargetGoal> getTargetGoals() {
 		return TARGETS;

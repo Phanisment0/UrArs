@@ -146,7 +146,6 @@ public class ConfigSection implements IConfig {
 		return (Map<BufferedString, Object>)get(key, Map.class);
 	}
 
-	@Override
 	public @Nullable ConfigSection getSection(String key) {
 		Map<BufferedString, Object> section = getMap(key);
 		return section == null ? null : new ConfigSection(section);
@@ -157,7 +156,6 @@ public class ConfigSection implements IConfig {
 		return (List<Object>)get(key, List.class);
 	}
 
-	@Override
 	public @NonNull List<ConfigSection> getListSection(String key) {
 		List<ConfigSection> result = new ArrayList<>();
 		var list = getList(key);
@@ -173,7 +171,6 @@ public class ConfigSection implements IConfig {
 		return result;
 	}
 
-	@Override
 	public @NonNull List<String> getListString(String key) {
 		List<String> result = new ArrayList<>();
 		var list = getList(key);

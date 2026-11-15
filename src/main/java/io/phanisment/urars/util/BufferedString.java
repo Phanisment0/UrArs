@@ -466,6 +466,6 @@ public class BufferedString implements CharSequence, Comparable<BufferedString>,
 				&& ((buffer[start + 4] == 'e') || (buffer[start + 4] == 'E'));
 	}
 
-	public static record DepthSeparator(char start, char end) {
+	public record DepthSeparator(char start, char end) {
 	}
 }

@@ -5,7 +5,6 @@ import io.phanisment.urars.util.UrArsDebugger;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,13 +31,11 @@ public abstract class AnnotatedRegistry<T, F> {
 		return aliases.size();
 	}
 
-	@Nullable
-	public F get(Identifier id) {
+	public @Nullable F get(Identifier id) {
 		return registry.get(id);
 	}
 
-	@Nullable
-	public F get(String alias) {
+	public @Nullable F get(String alias) {
 		Identifier id = aliases.get(normalize(alias));
 		return id == null ? null : registry.get(id);
 	}

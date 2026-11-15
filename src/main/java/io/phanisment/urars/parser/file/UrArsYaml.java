@@ -77,10 +77,10 @@ public final class UrArsYaml {
 			next();
 
 			Object value;
-			if (vs < ve) value = new BufferedString(buffer, vs, ve);          // key: value
-			else if (has && indent == ind && isItem()) value = list(ind);  // list at same indent as key
-			else if (has && indent > ind) value = map(indent);             // nested map
-			else value = null;                                             // key:
+			if (vs < ve) value = new BufferedString(buffer, vs, ve);      // key: value
+			else if (has && indent == ind && isItem()) value = list(ind); // list at same indent as key
+			else if (has && indent > ind) value = map(indent);            // nested map
+			else value = null;                                            // key:
 
 			if (out.containsKey(key)) throw new UrArsYamlParseException(no, "duplicate key " + key);
 			out.put(key, value);
@@ -162,9 +162,13 @@ public final class UrArsYaml {
 	private static boolean letter(byte c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'); }
 	private static boolean ws(byte c) { return c == ' ' || c == '\t' || c == '\r' || c == '\n'; }
 
-	private UrArsYamlParseException error(String msg) { return new UrArsYamlParseException(no, msg); }
+	private UrArsYamlParseException error(String msg) {
+		return new UrArsYamlParseException(no, msg);
+	}
 
 	public static final class UrArsYamlParseException extends RuntimeException {
-		public UrArsYamlParseException(int line, String msg) { super("line " + line + ": " + msg); }
+		public UrArsYamlParseException(int line, String msg) {
+			super("line " + line + ": " + msg);
+		}
 	}
 }
