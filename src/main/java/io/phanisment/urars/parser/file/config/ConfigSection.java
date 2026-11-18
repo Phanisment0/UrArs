@@ -1,6 +1,7 @@
 package io.phanisment.urars.parser.file.config;
 
 import java.util.*;
+import java.util.function.Function;
 
 import io.phanisment.urars.util.BufferedString;
 import org.jspecify.annotations.NonNull;
@@ -8,14 +9,16 @@ import org.jspecify.annotations.Nullable;
 
 public class ConfigSection implements IConfig {
 	private final Map<BufferedString, Object> map;
-	private final BufferedString lookup_key = BufferedString.empty();
+	private final BufferedString lookup_key;
 
 	public ConfigSection(@NonNull Map<BufferedString, Object> map) {
 		this.map = Objects.requireNonNull(map, "Config map cannot be null");
+		this.lookup_key = BufferedString.empty();
 	}
 
 	public ConfigSection(ConfigSection copy) {
 		this.map = new HashMap<>(copy.map);
+		this.lookup_key = copy.lookup_key.clone();
 	}
 
 	public Map<BufferedString, Object> map() {
@@ -54,6 +57,8 @@ public class ConfigSection implements IConfig {
 		return map.getOrDefault(lookup_key, def);
 	}
 
+
+
 	@Override
 	public @Nullable BufferedString getBufferedString(String key) {
 		return getBufferedString(key, null);
@@ -71,19 +76,17 @@ public class ConfigSection implements IConfig {
 
 	@Override
 	public String getString(String key, String def) {
-		BufferedString value = getBufferedString(key);
-		return value == null ? def : value.toString();
+		return map(key, BufferedString::toString, def);
 	}
 
 	@Override
 	public @Nullable Number getNumber(String key) {
-		return null;
+		return getNumber(key, null);
 	}
 
 	@Override
 	public Number getNumber(String key, Number def) {
-		BufferedString value = getBufferedString(key);
-		return value == null ? def : value.toNumber();
+		return map(key, BufferedString::toNumber, def);
 	}
 
 	@Override
@@ -93,8 +96,7 @@ public class ConfigSection implements IConfig {
 
 	@Override
 	public Integer getInteger(String key, Integer def) {
-		BufferedString value = getBufferedString(key);
-		return value == null ? def : value.toInteger();
+		return map(key, BufferedString::toInteger, def);
 	}
 
 	@Override
@@ -104,8 +106,7 @@ public class ConfigSection implements IConfig {
 
 	@Override
 	public Float getFloat(String key, Float def) {
-		BufferedString value = getBufferedString(key);
-		return value == null ? def : value.toFloat();
+		return map(key, BufferedString::toFloat, def);
 	}
 
 	@Override
@@ -115,8 +116,7 @@ public class ConfigSection implements IConfig {
 
 	@Override
 	public Double getDouble(String key, Double def) {
-		BufferedString value = getBufferedString(key);
-		return value == null ? def : value.toDouble();
+		return map(key, BufferedString::toDouble, def);
 	}
 
 	@Override
@@ -126,8 +126,7 @@ public class ConfigSection implements IConfig {
 
 	@Override
 	public Long getLong(String key, Long def) {
-		BufferedString value = getBufferedString(key);
-		return value == null ? def : value.toLong();
+		return map(key, BufferedString::toLong, def);
 	}
 
 	@Override
@@ -137,8 +136,12 @@ public class ConfigSection implements IConfig {
 
 	@Override
 	public Boolean getBoolean(String key, Boolean def) {
-		BufferedString value = getBufferedString(key);
-		return value == null ? def : value.toBoolean();
+		return map(key, BufferedString::toBoolean, def);
+	}
+
+	protected <T> T map(String key, Function<BufferedString, T> mapper, T def) {
+		BufferedString value = get(key, BufferedString.class);
+		return value != null ? mapper.apply(value) : def;
 	}
 
 	@Override

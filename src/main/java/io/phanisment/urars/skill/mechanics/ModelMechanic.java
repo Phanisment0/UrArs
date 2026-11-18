@@ -43,7 +43,7 @@ public class ModelMechanic extends SkillMechanic implements IEntityTarget {
 	@Override
 	public void castAtEntity(SkillContext ctx, Entity target) {
 		String model_str = model_id.evalAsString(ctx.evalContext());
-		if (model_str.isEmpty()) return;
+		if (model_str == null || model_str.isEmpty()) return;
 
 		var renderer = BetterModel.modelOrNull(model_str);
 		if (renderer == null) return;

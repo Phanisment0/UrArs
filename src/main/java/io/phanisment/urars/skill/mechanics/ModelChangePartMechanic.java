@@ -3,21 +3,20 @@ package io.phanisment.urars.skill.mechanics;
 
 import io.phanisment.urars.parser.math.ast.Node;
 import io.phanisment.urars.skill.SkillContext;
-import io.phanisment.urars.skill.SkillMechanic;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
-import io.phanisment.urars.skill.target.IEntityTarget;
-
-import static io.phanisment.urars.util.ActionUtils.aliases;
-
 import io.phanisment.urars.skill.template.ModeledMechanic;
+
+import kr.toxicity.model.api.BetterModel;
 import kr.toxicity.model.api.bone.BoneName;
 import kr.toxicity.model.api.tracker.EntityTracker;
 import kr.toxicity.model.api.tracker.EntityTrackerRegistry;
+import kr.toxicity.model.api.tracker.TrackerUpdateAction;
 import kr.toxicity.model.api.util.function.BonePredicate;
-import kr.toxicity.model.script.ChangePartScript;
 
 import net.minecraft.world.entity.Entity;
+
+import static io.phanisment.urars.util.ActionUtils.aliases;
 
 @RegistryInfo(
 		author = "Phanisment",
@@ -46,6 +45,12 @@ public class ModelChangePartMechanic extends ModeledMechanic {
 
 		String current_model = new_model_id.isEmpty() ? model_id : new_model_id;
 
-		new ChangePartScript(BonePredicate.name(current_model).notSet(), current_model, BoneName.of(new_part_id)).accept(tracker);
+		var model = BetterModel.modelOrNull(current_model);
+		if (model == null) return;
+
+		var item_stack = model.groupByTree(BoneName.of(new_part_id));
+		if (item_stack == null) return;
+
+		tracker.update(TrackerUpdateAction.itemStack(item_stack.getItemStack()), BonePredicate.name(part_id).notSet());
 	}
 }

@@ -10,8 +10,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ItemMeta {
 	public static final String ITEM_KEY = "urars:item";
@@ -19,6 +17,7 @@ public class ItemMeta {
 
 	private final Identifier type;
 	private final String name;
+	private final Float model_data;
 
 	private final MechanicsExecutor skills;
 
@@ -27,6 +26,7 @@ public class ItemMeta {
 
 		type = parseType(config);
 		name = config.getString("name");
+		model_data = config.getFloat("model-data");
 		skills = config.getMechanics("skills");
 	}
 
@@ -49,6 +49,7 @@ public class ItemMeta {
 		builder.customData(c -> c.putString(ITEM_KEY, id.toString()));
 
 		if (name != null) builder.nameNoItalic(name);
+		if (model_data != null) builder.customModelData(model_data);
 
 		return builder.get();
 	}

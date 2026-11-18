@@ -1,6 +1,7 @@
 package io.phanisment.urars.mob;
 
 import io.phanisment.urars.parser.file.config.ConfigSection;
+import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.util.UrArsDebugger;
 import kr.toxicity.model.api.BetterModel;
 import kr.toxicity.model.api.mod.platform.ModAdapter;
@@ -19,13 +20,16 @@ public record MobModelData(@Nullable String model, float scale, boolean sight_tr
 		);
 	}
 
-	public void apply(final Entity target) {
+	public void apply(SkillContext context, final Entity target) {
 		if (model == null || model.isBlank()) {
 			UrArsDebugger.trace("Skipping empty model for entity '{}'", target.getUUID());
 			return;
 		}
 
 		UrArsDebugger.debug("Applying model '{}' to entity '{}'", model, target.getUUID());
-		BetterModel.model(model).ifPresentOrElse(resource -> resource.getOrCreate(ModAdapter.adapt(target), new TrackerModifier(sight_trace, damage_animation, damage_tint)), () -> UrArsDebugger.warn("Cannot apply model '{}': model was not found", model));
+		BetterModel.model(model).ifPresentOrElse(resource -> {
+			resource.getOrCreate(ModAdapter.adapt(target), new TrackerModifier(sight_trace, damage_animation, damage_tint));
+			context.setStorage("model", model);
+		}, () -> UrArsDebugger.warn("Cannot apply model '{}': model was not found", model));
 	}
 }

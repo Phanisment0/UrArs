@@ -18,7 +18,7 @@ public abstract class ModeledMechanic extends SkillMechanic implements IEntityTa
 
 	public ModeledMechanic(SkillLineConfig config) {
 		super(config);
-		model = config.getMathString(aliases("model", "m", "id", "i"), "");
+		model = config.getMathString(aliases("modelId", "model", "mid", "m"), "");
 	}
 
 	@Override

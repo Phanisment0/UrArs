@@ -1,5 +1,6 @@
 package io.phanisment.urars.skill.mechanics;
 
+import io.phanisment.urars.UrArsComponents;
 import io.phanisment.urars.mob.MobManager;
 import io.phanisment.urars.mob.MobMeta;
 import io.phanisment.urars.parser.math.ast.Node;
@@ -41,6 +42,13 @@ public class SpawnMechanic extends SkillMechanic implements IEntityTarget, ILoca
 		MobMeta meta = MobManager.getMob(id);
 		if (meta == null) return;
 
-		meta.spawn(location);
+		meta.spawn(location, e -> {
+			UrArsComponents.MOB.get(e).owner(ctx.uuid());
+
+			float x = ctx.entity().getXRot();
+			float y = ctx.entity().getYRot();
+			e.setXRot(x);
+			e.setYRot(y);
+		});
 	}
 }

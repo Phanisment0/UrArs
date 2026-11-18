@@ -45,7 +45,7 @@
 					if (event != null && (mechanic.getTrigger() == null || !event.equalsIgnoreCase(mechanic.getTrigger()))) continue;
 					context.global_delay = delay;
 					mechanic.execute(context);
-					delay += mechanic.getDelay(context);
+					delay += mechanic.getSequenceDelay(context);
 				}
 			} finally {
 				context.global_delay = 0L;

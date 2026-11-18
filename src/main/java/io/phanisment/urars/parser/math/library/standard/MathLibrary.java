@@ -83,7 +83,22 @@ public class MathLibrary implements IMathLibrary {
 			double a = d(args.number(0)), b = d(args.number(1)), t = d(args.number(2));
 			return new NumberValue(a + (b - a) * t);
 		}));
-		value.member("random", new FunctionValue(args -> new NumberValue(Math.random())));
+		value.member("random", new FunctionValue(args -> {
+			int count = args.size();
+
+			if (count == 1) {
+				double max = d(args.number(0));
+				return new NumberValue(Math.random() * max);
+			}
+
+			if (count == 2) {
+				double min = d(args.number(0));
+				double max = d(args.number(1));
+				return new NumberValue(min + Math.random() * (max - min));
+			}
+
+			return new NumberValue(Math.random());
+		}));
 
 		// Casts
 		value.member("toInt", new FunctionValue(args -> new NumberValue(args.number(0).intValue())));

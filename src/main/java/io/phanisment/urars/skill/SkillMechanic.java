@@ -62,6 +62,14 @@ public class SkillMechanic implements ISkillAction {
 		return delay.evalAsLong(context.evalContext());
 	}
 
+	/**
+	 * Delay added to every mechanic after this one in the list.
+	 * Normal mechanics return 0, the `delay` argument only affects this line.
+	 */
+	public long getSequenceDelay(SkillContext context) {
+		return 0L;
+	}
+
 	public @Nullable String getTrigger() {
 		return this.trigger;
 	}

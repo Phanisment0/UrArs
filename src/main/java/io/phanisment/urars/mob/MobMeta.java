@@ -1,7 +1,6 @@
 package io.phanisment.urars.mob;
 
 import java.io.File;
-import java.text.ParseException;
 import java.util.function.Consumer;
 
 import io.phanisment.urars.mob.ai.MobAi;
@@ -78,7 +77,7 @@ public class MobMeta {
 
 	private static MechanicsExecutor loadMechanics(final Identifier id, final SkillConfigSection config) {
 		try {
-			return config.getMechanics("mechanics");
+			return config.getMechanics("skills");
 		} catch (Exception e) {
 			UrArsDebugger.error("Failed to load mechanics for mob '" + id + "'", e);
 			return new MechanicsExecutor();
@@ -120,7 +119,6 @@ public class MobMeta {
 			return null;
 		}
 
-		if (entity_model != null) entity_model.apply(entity);
 		mechanics.execute(TriggerType.ON_SPAWN, new SkillContext(entity));
 		UrArsDebugger.debug("Spawned mob '{}': entity='{}', uuid={}", id, entity.getType(), entity.getUUID());
 		return entity;
@@ -132,11 +130,13 @@ public class MobMeta {
 
 		if (extra != null) extra.accept(entity);
 
-		apply(entity);
-		mechanics.execute(TriggerType.ON_PRE_SPAWN, new SkillContext(entity));
+		var context = new SkillContext(entity);
+		apply(context, entity);
+		mechanics.execute(TriggerType.ON_PRE_SPAWN, context);
 	}
 
-	public void apply(final Entity entity) {
+	public void apply(SkillContext context, final Entity entity) {
+		if (entity_model != null) entity_model.apply(context, entity);
 		if (name != null) entity.setCustomName(Component.literal(name));
 		settings.apply(entity);
 		if (ai != null && !ai.isEmpty()) ai.apply(entity);

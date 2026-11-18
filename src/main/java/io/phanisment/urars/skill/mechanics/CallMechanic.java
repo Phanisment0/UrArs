@@ -25,7 +25,8 @@ public class CallMechanic extends SkillMechanic implements INoTarget {
 	protected final Map<String, Node> params = new LinkedHashMap<>();
 	public CallMechanic(SkillLineConfig config) {
 		super(config);
-		mechanics = config.getMechanics("s");
+		if (config.singleArgument()) mechanics = config.getMechanics(null);
+		else mechanics = config.getMechanics("s");
 		for (var entry : config.map().entrySet()) {
 			String key = entry.getKey().toString();
 			if (key.isEmpty()) continue;

@@ -1,12 +1,7 @@
 package io.phanisment.urars.mixin;
 
-import io.phanisment.urars.UrArsComponents;
-import io.phanisment.urars.component.MobComponent;
-import io.phanisment.urars.mob.MobManager;
-import io.phanisment.urars.mob.MobMeta;
-import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.TriggerType;
-import net.minecraft.resources.Identifier;
+import io.phanisment.urars.util.TriggerUtils;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
@@ -21,13 +16,6 @@ public class EntityLoadMixin {
 	private void urars$onLoad(Entity entity, CallbackInfo ci) {
 		if (entity instanceof Player) return;
 		if (!(entity instanceof Mob)) return;
-		MobComponent comp = UrArsComponents.MOB.get(entity);
-		String id = comp.id();
-		if (id == null || id.isEmpty()) return;
-
-		MobMeta mob = MobManager.getMob(Identifier.tryParse(id));
-		if (mob == null) return;
-		mob.apply(entity);
-		mob.mechanics().execute(TriggerType.ON_LOAD, new SkillContext(entity));
+		TriggerUtils.castEntity(entity, TriggerType.ON_LOAD);
 	}
 }

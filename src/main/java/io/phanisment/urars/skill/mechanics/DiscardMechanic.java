@@ -10,7 +10,10 @@ import io.phanisment.urars.skill.target.IEntityTarget;
 
 @RegistryInfo(
 		author = "Phanisment",
-		key = "discard"
+		key = "discard",
+		aliases = {
+				"remove"
+		}
 )
 public class DiscardMechanic extends SkillMechanic implements IEntityTarget {
 	public DiscardMechanic(SkillLineConfig config) {
