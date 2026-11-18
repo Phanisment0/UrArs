@@ -1,7 +1,7 @@
 package urars;
 
 import io.phanisment.urars.parser.file.LineParser;
-import io.phanisment.urars.util.BufferedString;
+import io.phanisment.urars.parser.BufferedString;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;

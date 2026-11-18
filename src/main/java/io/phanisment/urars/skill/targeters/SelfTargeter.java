@@ -12,7 +12,10 @@ import java.util.HashSet;
 
 @RegistryInfo(
 		author = "Phanisment",
-		key = "self"
+		key = "self",
+		aliases = {
+				"s"
+		}
 )
 public class SelfTargeter extends EntityTargeter {
 	public SelfTargeter(SkillLineConfig config) {

@@ -8,6 +8,7 @@ import io.phanisment.urars.parser.math.eval.EvalContext;
 import io.phanisment.urars.parser.math.value.IValue;
 import io.phanisment.urars.skill.value.EntityValue;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -75,8 +76,14 @@ public class SkillContext {
 		throw new IllegalArgumentException("Unknown Player");
 	}
 
+	@SuppressWarnings("resources")
 	public Level level() {
 		return entity.level();
+	}
+
+	@SuppressWarnings("resources")
+	public ServerLevel serverLevel() {
+		return (ServerLevel)level();
 	}
 
 	public LivingEntity livingEntity() throws IllegalArgumentException {

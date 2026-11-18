@@ -11,7 +11,7 @@ import java.util.function.Predicate;
 
 /**
  * Oriented bounding box. Immutable: every transform returns a new instance.
- * Rotations use Minecraft's convention (yaw/pitch in degrees, same as entities).
+ * Rotations use Minecraft's convention (x_rot/y_rot in degrees, same as entities).
  */
 public final class OBB {
 	private static final double EPSILON = 1.0E-6;
@@ -78,7 +78,7 @@ public final class OBB {
 	/**
 	 * Two corners given as offsets from the pivot (local, before rotation).
 	 * Handy for skills: the pivot is the caster, the corners describe the hitbox
-	 * relative to them, and the whole box swings with yaw/pitch.
+	 * relative to them, and the whole box swings with x_rot/y_rot.
 	 */
 	public static OBB ofRelative(Vec3 pivot, Vec3 cornerA, Vec3 cornerB, float yaw, float pitch, float roll) {
 		return of(pivot.add(cornerA), pivot.add(cornerB)).rotate(pivot, yaw, pitch, roll);
@@ -93,7 +93,7 @@ public final class OBB {
 
 	/**
 	 * Rotate around a pivot in world space. Both the center and the axes rotate,
-	 * so the box orbits the pivot. Order: roll, then pitch, then yaw.
+	 * so the box orbits the pivot. Order: roll, then y_rot, then x_rot.
 	 */
 	public OBB rotate(Vec3 pivot, float yaw, float pitch, float roll) {
 		Vec3 newCenter = pivot.add(rotateVec(center.subtract(pivot), yaw, pitch, roll));

@@ -3,7 +3,7 @@ package io.phanisment.urars.parser.file.config;
 import java.util.List;
 import java.util.Map;
 
-import io.phanisment.urars.util.BufferedString;
+import io.phanisment.urars.parser.BufferedString;
 
 public interface IConfig {
 

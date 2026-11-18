@@ -1,7 +1,7 @@
 package io.phanisment.urars.parser.file;
 
 import io.phanisment.urars.parser.file.config.LineConfig;
-import io.phanisment.urars.util.BufferedString;
+import io.phanisment.urars.parser.BufferedString;
 import io.phanisment.urars.util.ParserUtils;
 
 import java.text.ParseException;

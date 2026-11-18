@@ -24,8 +24,8 @@ public class EntityValue extends ObjectValue {
 		number("block_z", entity.getBlockZ());
 
 		// Rotation
-		number("yaw", entity.getYRot());
-		number("pitch", entity.getXRot());
+		number("x_rot", entity.getXRot());
+		number("y_rot", entity.getYRot());
 
 		// Velocity
 		Vec3 velocity = entity.getDeltaMovement();

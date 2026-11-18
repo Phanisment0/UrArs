@@ -5,6 +5,7 @@ import io.phanisment.urars.skill.EntityTargeter;
 import io.phanisment.urars.skill.SkillContext;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 
 import java.util.ArrayList;
@@ -34,7 +35,10 @@ public class EntityUuidTargeter extends EntityTargeter {
 	@Override
 	public Collection<Entity> getEntities(SkillContext ctx) {
 		UUID uuid = UUID.fromString(raw_uuid.evalAsString(ctx.evalContext()));
-		Entity entity = ctx.level().getEntityInAnyDimension(uuid);
+		ServerLevel level = ctx.serverLevel();
+		Entity entity;
+		if (any_dimension.evalAsBoolean(ctx.evalContext())) entity = level.getEntityInAnyDimension(uuid);
+		else entity = level.getEntity(uuid);
 		if (entity != null) return List.of(entity);
 		return new ArrayList<>();
 	}

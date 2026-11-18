@@ -3,7 +3,7 @@ package io.phanisment.urars.parser.file.config;
 import java.util.*;
 import java.util.function.Function;
 
-import io.phanisment.urars.util.BufferedString;
+import io.phanisment.urars.parser.BufferedString;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -18,7 +18,7 @@ public class ConfigSection implements IConfig {
 
 	public ConfigSection(ConfigSection copy) {
 		this.map = new HashMap<>(copy.map);
-		this.lookup_key = copy.lookup_key.clone();
+		this.lookup_key = copy.lookup_key.copy();
 	}
 
 	public Map<BufferedString, Object> map() {

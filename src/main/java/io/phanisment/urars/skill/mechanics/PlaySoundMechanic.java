@@ -37,7 +37,7 @@ public class PlaySoundMechanic extends SkillMechanic implements IEntityTarget {
 
 		this.sound = config.getMathString(aliases("sound", "s"), "minecraft:entity.player.levelup");
 		this.volume = config.getMathNumber(aliases("volume", "v"), 1.0);
-		this.pitch = config.getMathNumber(aliases("pitch", "p"), 1.0);
+		this.pitch = config.getMathNumber(aliases("y_rot", "p"), 1.0);
 
 		this.category = SoundSource.PLAYERS;
 	}

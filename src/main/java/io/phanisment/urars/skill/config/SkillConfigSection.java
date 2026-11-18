@@ -7,7 +7,7 @@ import io.phanisment.urars.skill.MechanicsExecutor;
 import io.phanisment.urars.skill.SkillCondition;
 import io.phanisment.urars.skill.SkillManager;
 import io.phanisment.urars.util.ActionUtils;
-import io.phanisment.urars.util.BufferedString;
+import io.phanisment.urars.parser.BufferedString;
 import org.jspecify.annotations.Nullable;
 
 import java.text.ParseException;

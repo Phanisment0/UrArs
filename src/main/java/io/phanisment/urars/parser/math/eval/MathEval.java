@@ -16,7 +16,7 @@ import io.phanisment.urars.parser.math.value.BooleanValue;
 import io.phanisment.urars.parser.math.value.IValue;
 import io.phanisment.urars.parser.math.value.NumberValue;
 import io.phanisment.urars.parser.math.value.StringValue;
-import io.phanisment.urars.util.BufferedString;
+import io.phanisment.urars.parser.BufferedString;
 
 import static io.phanisment.urars.util.NumberUtils.*;
 

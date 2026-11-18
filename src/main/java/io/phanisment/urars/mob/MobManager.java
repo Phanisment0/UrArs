@@ -10,7 +10,7 @@ import io.phanisment.urars.registry.GoalDataRegistry;
 import io.phanisment.urars.registry.RegistryScanner;
 import io.phanisment.urars.reload.ReloadResult;
 import io.phanisment.urars.reload.Reloadable;
-import io.phanisment.urars.util.BufferedString;
+import io.phanisment.urars.parser.BufferedString;
 import io.phanisment.urars.util.UrArsDebugger;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ai.goal.Goal;

@@ -3,7 +3,7 @@ package io.phanisment.urars.mob.targets;
 import io.phanisment.urars.mob.IGoalCondition;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
-import io.phanisment.urars.util.BufferedString;
+import io.phanisment.urars.parser.BufferedString;
 import io.phanisment.urars.util.EntityTypeUtils;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;

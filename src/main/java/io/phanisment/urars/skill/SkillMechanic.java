@@ -6,7 +6,7 @@ import io.phanisment.urars.parser.file.LineParser;
 import io.phanisment.urars.parser.file.config.LineConfig;
 import io.phanisment.urars.parser.math.ast.Node;
 import io.phanisment.urars.skill.value.EntityValue;
-import io.phanisment.urars.util.BufferedString;
+import io.phanisment.urars.parser.BufferedString;
 import org.jspecify.annotations.Nullable;
 
 import io.phanisment.urars.skill.config.SkillLineConfig;

@@ -1,6 +1,6 @@
 package io.phanisment.urars.parser.math.ast;
 
-import io.phanisment.urars.util.BufferedString;
+import io.phanisment.urars.parser.BufferedString;
 import org.jspecify.annotations.NonNull;
 
 public record IdentifierNode(BufferedString value) implements Node {

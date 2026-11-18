@@ -10,7 +10,9 @@ import io.phanisment.urars.skill.SkillMechanic;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.skill.target.INoTarget;
-import io.phanisment.urars.util.BufferedString;
+import io.phanisment.urars.parser.BufferedString;
+
+import static io.phanisment.urars.util.ActionUtils.aliasNull;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -25,7 +27,7 @@ public class CallMechanic extends SkillMechanic implements INoTarget {
 	protected final Map<String, Node> params = new LinkedHashMap<>();
 	public CallMechanic(SkillLineConfig config) {
 		super(config);
-		if (config.singleArgument()) mechanics = config.getMechanics(null);
+		if (config.singleArgument()) mechanics = config.getMechanics(aliasNull());
 		else mechanics = config.getMechanics("s");
 		for (var entry : config.map().entrySet()) {
 			String key = entry.getKey().toString();

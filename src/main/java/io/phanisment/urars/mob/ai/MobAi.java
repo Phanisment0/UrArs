@@ -6,7 +6,7 @@ import io.phanisment.urars.mob.MobManager;
 import io.phanisment.urars.parser.file.LineParser;
 import io.phanisment.urars.skill.config.SkillConfigSection;
 import io.phanisment.urars.skill.config.SkillLineConfig;
-import io.phanisment.urars.util.BufferedString;
+import io.phanisment.urars.parser.BufferedString;
 import io.phanisment.urars.util.UrArsDebugger;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
@@ -14,7 +14,6 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;

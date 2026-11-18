@@ -1,7 +1,7 @@
 package io.phanisment.urars.parser.file.config;
 
 import io.phanisment.urars.parser.file.LineParser;
-import io.phanisment.urars.util.BufferedString;
+import io.phanisment.urars.parser.BufferedString;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 

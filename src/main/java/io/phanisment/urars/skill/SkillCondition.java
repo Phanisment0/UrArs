@@ -1,7 +1,7 @@
 package io.phanisment.urars.skill;
 
 import io.phanisment.urars.skill.config.SkillLineConfig;
-import io.phanisment.urars.util.BufferedString;
+import io.phanisment.urars.parser.BufferedString;
 import io.phanisment.urars.util.UrArsDebugger;
 import net.minecraft.resources.Identifier;
 

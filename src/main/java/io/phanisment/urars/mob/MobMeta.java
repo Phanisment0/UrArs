@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.function.Consumer;
 
 import io.phanisment.urars.mob.ai.MobAi;
-import io.phanisment.urars.util.BufferedString;
+import io.phanisment.urars.parser.BufferedString;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.Nullable;
 

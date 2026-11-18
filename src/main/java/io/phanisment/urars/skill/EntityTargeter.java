@@ -1,6 +1,5 @@
 package io.phanisment.urars.skill;
 
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 
 import io.phanisment.urars.skill.config.SkillLineConfig;
@@ -23,7 +22,7 @@ public abstract class EntityTargeter extends SkillTargeter {
 	@Override
 	public Collection<Location> getLocations(SkillContext ctx) {
 		List<Location> locs = new ArrayList<>();
-		for (Entity entity : getEntities(ctx)) locs.add(new Location((ServerLevel)entity.level(), entity.position()));
+		for (Entity entity : getEntities(ctx)) locs.add(new Location(entity.level(), entity.position(), entity.getXRot(), entity.getYRot()));
 		return locs;
 	}
 }

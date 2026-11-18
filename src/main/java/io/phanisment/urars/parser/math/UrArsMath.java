@@ -7,7 +7,7 @@ import io.phanisment.urars.parser.math.eval.MathEval;
 import io.phanisment.urars.parser.math.library.IMathLibrary;
 import io.phanisment.urars.parser.math.parser.MathParser;
 import io.phanisment.urars.parser.math.value.IValue;
-import io.phanisment.urars.util.BufferedString;
+import io.phanisment.urars.parser.BufferedString;
 
 import java.util.Map;
 

@@ -1,5 +1,6 @@
-package io.phanisment.urars.util;
+package io.phanisment.urars.parser;
 
+import io.phanisment.urars.util.ParserUtils;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
@@ -7,6 +8,11 @@ import java.util.Arrays;
 import java.util.List;
 
 public class BufferedString implements CharSequence, Comparable<BufferedString>, Cloneable {
+	private static final double[] POW10 = {
+			1e0, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8, 1e9, 1e10, 1e11,
+			1e12, 1e13, 1e14, 1e15, 1e16, 1e17, 1e18, 1e19, 1e20, 1e21, 1e22
+	};
+
 	public byte[] buffer;
 	public int start;
 	public int end;
@@ -47,9 +53,13 @@ public class BufferedString implements CharSequence, Comparable<BufferedString>,
 	}
 
 	public BufferedString reset(byte[] buffer) {
-		this.buffer =  buffer == null ? new byte[0] : buffer;
-		this.start = 0;
-		this.end = buffer == null ? 0 : buffer.length;
+		return reset(buffer == null ? new byte[0] : buffer, 0, buffer == null ? 0 : buffer.length);
+	}
+
+	public BufferedString reset(byte[] buffer, int start, int end) {
+		this.buffer = buffer;
+		this.start = start;
+		this.end = end;
 		return this;
 	}
 
@@ -286,16 +296,60 @@ public class BufferedString implements CharSequence, Comparable<BufferedString>,
 	public byte[] copyBuffer() {
 		return Arrays.copyOf(buffer, buffer.length);
 	}
+	
+	public BufferedString copy() {
+		return new BufferedString(buffer, start, end);
+	}
 
 	@Override
-	public BufferedString clone() {
-		return new BufferedString(buffer, start, end);
+	public BufferedString clone() throws CloneNotSupportedException {
+		return (BufferedString)super.clone();
 	}
 
 	@Override
 	public @NonNull String toString() {
 		if (this.length() == 0) return "";
 		return new String(buffer, start, length());
+	}
+
+	public int toColor() throws NumberFormatException {
+		if (isEmpty()) throw new NumberFormatException("Empty color");
+		int r, g, b, a = 255;
+		if (byteAt(0) == '#') {
+			int digits = length() - 1;
+			if (digits != 6 && digits != 8) throw new NumberFormatException("Invalid hex color length: \"" + this + "\"");
+			r = hexByteAt(1);
+			g = hexByteAt(3);
+			b = hexByteAt(5);
+			if (digits == 8) a = hexByteAt(7);
+		} else {
+			BufferedString[] parts = split(',');
+			if (parts.length != 3 && parts.length != 4) throw new NumberFormatException("Invalid color, expected 3 or 4 components: \"" + this + "\"");
+			r = colorComponent(parts[0]);
+			g = colorComponent(parts[1]);
+			b = colorComponent(parts[2]);
+			if (parts.length == 4) a = colorComponent(parts[3]);
+		}
+		return (a << 24) | (r << 16) | (g << 8) | b;
+	}
+
+	private static int colorComponent(BufferedString part) throws NumberFormatException {
+		if (part.isEmpty()) throw new NumberFormatException("Empty color component");
+		long v = part.toLong();
+		if (v < 0 || v > 255) throw new NumberFormatException("Color component out of range (0-255): " + v);
+		return (int) v;
+	}
+
+	// Reads 2 hex digits starting at index -> 0..255
+	private int hexByteAt(int index) throws NumberFormatException {
+		return (hexDigit(byteAt(index)) << 4) | hexDigit(byteAt(index + 1));
+	}
+
+	private static int hexDigit(byte c) throws NumberFormatException {
+		if (c >= '0' && c <= '9') return c - '0';
+		if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+		if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+		throw new NumberFormatException("Invalid hex digit: '" + (char)c + "'");
 	}
 
 	public Number toNumber() throws NumberFormatException {
@@ -326,11 +380,13 @@ public class BufferedString implements CharSequence, Comparable<BufferedString>,
 	}
 
 	public int toInteger() throws NumberFormatException {
-		return (int)toLong();
+		return toInteger(buffer, start, end);
 	}
 
 	public static int toInteger(byte[] buffer, int start, int end) throws NumberFormatException {
-		return (int)toLong(buffer, start, end);
+		long v = toLong(buffer, start, end);
+		if (v < Integer.MIN_VALUE || v > Integer.MAX_VALUE) throw new NumberFormatException("Int overflow: " + v);
+		return (int)v;
 	}
 
 	public float toFloat() throws NumberFormatException {
@@ -346,45 +402,59 @@ public class BufferedString implements CharSequence, Comparable<BufferedString>,
 	}
 
 	public static double toDouble(byte[] buffer, int start, int end) throws NumberFormatException {
-		if ((end - start) == 0) return 0.0;
+		if (start == end) throw new NumberFormatException("Empty number");
 
 		int pos = start;
 		boolean negative = false;
-
-		if (pos < end && buffer[pos] == '-') {
+		if (buffer[pos] == '-') {
 			negative = true;
 			pos++;
 		}
-		double value = 0;
-		while (pos < end) {
-			byte c = buffer[pos];
-			if (c == '.') break;
-			if (c == ',' || c == '_') {
-				pos++;
+
+		long mantissa = 0;
+		int scale = 0;
+		boolean dot = false, any_digit = false;
+
+		for (; pos < end; pos++) {
+			int c = buffer[pos];
+			if (c == '.') {
+				if (dot) throw invalidNumber(buffer, start, end, pos, "double");
+				dot = true;
 				continue;
 			}
+			if (c == ',' || c == '_') continue;
 			if (c < '0' || c > '9') throw invalidNumber(buffer, start, end, pos, "double");
-			value = value * 10 + (c - '0');
-			pos++;
+			any_digit = true;
+			mantissa = mantissa * 10 + (c - '0');
+			if (dot) scale++;
+			if (mantissa > 1L << 53) return slowDouble(buffer, start, end);
 		}
 
-		if (pos < end && buffer[pos] == '.') {
-			pos++;
-			double decimal = 0.1;
-			while (pos < end) {
-				int c = buffer[pos] & 0xFF;
-				if (c == ',' || c == '_') {
-					pos++;
-					continue;
-				}
-				if (c >= '0' && c <= '9') {
-					value += (c - '0') * decimal;
-					decimal *= 0.1;
-				} else throw invalidNumber(buffer, start, end, pos, "double");
-				pos++;
+		if (!any_digit) throw new NumberFormatException("No digits: \"" + new String(buffer, start, end - start) + "\"");
+		if (scale > 22) return slowDouble(buffer, start, end);
+
+		double v = scale == 0 ? (double)mantissa : mantissa / POW10[scale];
+		return negative ? -v : v;
+	}
+
+	private static double slowDouble(byte[] buffer, int start, int end) {
+		boolean hasSep = false;
+		for (int i = start; i < end; i++) {
+			byte c = buffer[i];
+			if (c == ',' || c == '_') {
+				hasSep = true;
+				break;
 			}
 		}
-		return negative ? -value : value;
+		if (!hasSep) return Double.parseDouble(new String(buffer, start, end - start, java.nio.charset.StandardCharsets.ISO_8859_1));
+
+		// otherwise strip separators
+		StringBuilder sb = new StringBuilder(end - start);
+		for (int i = start; i < end; i++) {
+			char c = (char) (buffer[i] & 0xFF);
+			if (c != ',' && c != '_') sb.append(c);
+		}
+		return Double.parseDouble(sb.toString());
 	}
 
 	public long toLong() throws NumberFormatException {
@@ -392,27 +462,30 @@ public class BufferedString implements CharSequence, Comparable<BufferedString>,
 	}
 
 	public static long toLong(byte[] buffer, int start, int end) throws NumberFormatException {
-		if ((end - start) == 0) return 0;
+		if (start == end) throw new NumberFormatException("Empty number");
 
-		long value = 0;
 		int pos = start;
 		boolean negative = false;
-
-		if (pos < end && buffer[pos] == '-') {
+		if (buffer[pos] == '-') {
 			negative = true;
 			pos++;
 		}
-		while (pos < end) {
-			byte c = buffer[pos];
-			if (c == ',' || c == '_') {
-				pos++;
-				continue;
-			}
+
+		long value = 0;
+		boolean any_digit = false;
+		final long limit = negative ? Long.MIN_VALUE : -Long.MAX_VALUE;
+
+		for (; pos < end; pos++) {
+			int c = buffer[pos];
+			if (c == ',' || c == '_') continue;
 			if (c < '0' || c > '9') throw invalidNumber(buffer, start, end, pos, "long");
-			value = value * 10 + (c - '0');
-			pos++;
+			int d = c - '0';
+			any_digit = true;
+			if (value < (limit + d) / 10) throw new NumberFormatException("Long overflow: \"" + new String(buffer, start, end - start) + "\"");
+			value = value * 10 - d;
 		}
-		return negative ? -value : value;
+		if (!any_digit) throw new NumberFormatException("No digits");
+		return negative ? value : -value;
 	}
 
 	private static NumberFormatException invalidNumber(byte[] buffer, int start, int end, int index, String type) {

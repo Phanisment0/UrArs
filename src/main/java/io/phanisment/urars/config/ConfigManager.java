@@ -14,7 +14,7 @@ import io.phanisment.urars.reload.Reloadable;
 import io.phanisment.urars.skill.Skill;
 import io.phanisment.urars.skill.SkillManager;
 import io.phanisment.urars.skill.config.SkillConfigSection;
-import io.phanisment.urars.util.BufferedString;
+import io.phanisment.urars.parser.BufferedString;
 import io.phanisment.urars.util.UrArsDebugger;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.NonNull;

@@ -13,14 +13,14 @@ import static io.phanisment.urars.util.ActionUtils.aliases;
 
 @RegistryInfo(
 		author = "Phanisment",
-		key = "entityInNear",
+		key = "entityInRadius",
 		aliases = { "eir" }
 )
-public class EntityInNearTargeter extends EntityTargeter {
+public class EntityInRadiusTargeter extends EntityTargeter {
 	protected final Node radius;
 	protected final Node living_only;
 
-	public EntityInNearTargeter(SkillLineConfig config) {
+	public EntityInRadiusTargeter(SkillLineConfig config) {
 		super(config);
 		radius = config.getMathNumber(aliases("radius", "r"), 5d);
 		living_only = config.getMathBoolean(aliases("livingOnly", "living", "l"), true);

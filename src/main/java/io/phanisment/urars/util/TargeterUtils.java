@@ -1,5 +1,6 @@
 package io.phanisment.urars.util;
 
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -30,7 +31,7 @@ public final class TargeterUtils {
 		try {
 			return server.submit(() -> Objects.requireNonNull(findTarget(entity, level, range))).get();
 		} catch (InterruptedException | ExecutionException e) {
-			UrArsDebugger.warn("Somehow its error", e);
+			UrArsDebugger.warn("Somehow its error lol", e);
 			return null;
 		}
 	}
@@ -45,11 +46,60 @@ public final class TargeterUtils {
 			if (state.is(Blocks.BARRIER)) return null;
 			VoxelShape shape = state.getCollisionShape(lvl, pos);
 			return shape.isEmpty() ? null : shape.clip(eye, far_end, pos);
-		}, lvl -> null);
+		}, _ -> null);
 		Vec3 end = block_hit.getLocation();
 		AABB search = entity.getBoundingBox().expandTowards(end.subtract(eye)).inflate(1);
 		Predicate<Entity> filter = e -> e instanceof Entity && e != entity && !e.isSpectator() && e.isPickable() && !(e instanceof Player p);
 		EntityHitResult hit = ProjectileUtil.getEntityHitResult(entity, eye, end, search, filter, eye.distanceTo(end));
 		return hit != null ? hit.getEntity() : null;
+	}
+
+	public static void drawPoint(Level level, Vec3 pos, boolean enabled) {
+		if (!enabled || !(level instanceof ServerLevel server_level)) return;
+		server_level.sendParticles(ParticleTypes.END_ROD, pos.x, pos.y, pos.z,1,0, 0,0,0);
+	}
+
+	public static void drawBox(ServerLevel level, AABB box) {
+		Vec3 min = new Vec3(box.minX, box.minY, box.minZ);
+		Vec3 max = new Vec3(box.maxX, box.maxY, box.maxZ);
+
+		Vec3[] corners = new Vec3[8];
+
+		for (int i = 0; i < 8; i++) corners[i] = new Vec3((i & 1) == 0 ? min.x : max.x, (i & 2) == 0 ? min.y : max.y, (i & 4) == 0 ? min.z : max.z);
+		for (int i = 0; i < 8; i++) {
+			for (int bit : new int[]{1, 2, 4}) {
+				int j = i ^ bit;
+				if (j <= i) continue;
+				drawLine(level, corners[i], corners[j]);
+			}
+		}
+	}
+
+	public static void drawBox(Level level, OBB box) {
+		if (!(level instanceof ServerLevel server_level)) return;
+		Vec3[] corners = box.getCorners();
+
+		// Connect the 8 corners into 12 edges.
+		// Each corner has three neighboring corners.
+		for (int i = 0; i < corners.length; i++) {
+			for (int bit : new int[]{1, 2, 4}) {
+				int j = i ^ bit;
+				if (j <= i) continue;
+				drawLine(server_level, corners[i], corners[j]);
+			}
+		}
+	}
+
+	private static void drawLine(ServerLevel level, Vec3 from, Vec3 to) {
+		double distance = from.distanceTo(to);
+
+		// One particle approximately every 0.25 blocks.
+		int steps = Math.clamp((int)Math.ceil(distance / 0.25), 1, 64);
+
+		for (int i = 0; i <= steps; i++) {
+			double progress = (double) i / steps;
+			Vec3 point = from.lerp(to, progress);
+			level.sendParticles(ParticleTypes.END_ROD, point.x, point.y, point.z, 1, 0, 0, 0, 0);
+		}
 	}
 }

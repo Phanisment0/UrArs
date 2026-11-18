@@ -7,7 +7,7 @@ import io.phanisment.urars.exception.MathParserException;
 import io.phanisment.urars.parser.math.ast.*;
 import io.phanisment.urars.parser.math.lexer.MathLexer;
 import io.phanisment.urars.parser.math.lexer.MathLexer.Token;
-import io.phanisment.urars.util.BufferedString;
+import io.phanisment.urars.parser.BufferedString;
 
 public class MathParser {
 	private static final int PREC_TERNARY = 1;
