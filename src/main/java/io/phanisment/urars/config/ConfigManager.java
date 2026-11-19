@@ -3,6 +3,7 @@ package io.phanisment.urars.config;
 import io.phanisment.urars.config.pack.Pack;
 import io.phanisment.urars.config.pack.PackFolderRegistry;
 import io.phanisment.urars.config.pack.PackLoader;
+import io.phanisment.urars.exception.UrArsParserException;
 import io.phanisment.urars.item.ItemManager;
 import io.phanisment.urars.item.ItemMeta;
 import io.phanisment.urars.mob.MobMeta;
@@ -70,7 +71,7 @@ public final class ConfigManager implements Reloadable {
 				Identifier id = Identifier.fromNamespaceAndPath(pack.name(), key_str);
 				register.accept(id, factory.create(id, file, config));
 			}
-		} catch (IOException e) {
+		} catch (IOException | UrArsParserException e) {
 			failed_files++;
 			UrArsDebugger.warn("Failed to read file {}", file.getPath(), e);
 		}

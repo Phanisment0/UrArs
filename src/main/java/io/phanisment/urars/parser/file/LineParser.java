@@ -2,7 +2,6 @@ package io.phanisment.urars.parser.file;
 
 import io.phanisment.urars.parser.file.config.LineConfig;
 import io.phanisment.urars.parser.BufferedString;
-import io.phanisment.urars.util.ParserUtils;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -10,106 +9,108 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.phanisment.urars.util.ParserUtils.isWhitespace;
+
 /**
  * IDENTIFIER{KEY=VALUE;KEY=VALUE} CONTEXT
  */
-public class LineParser {
-	private final BufferedString line;
+public final class LineParser {
+	private final byte[] buffer;
+	private final int end;
+	private int pos;
 
 	private String key;
-	private final Map<BufferedString, Object> arguments = new HashMap<>(8);
+	private final Map<BufferedString, Object> arguments = new HashMap<>(4);
 	private BufferedString context;
 
-	/**
-	 * Shortcut to test parsing with string
-	 *
-	 * @param line to parse
-	 */
-	public LineParser(final String line) {
-		this(new BufferedString(line));
+	private LineParser(final byte[] buffer, final int start, final int end) {
+		this.buffer = buffer;
+		this.pos = start;
+		this.end = end;
 	}
 
-	public LineParser(final BufferedString line) {
-		this.line = line;
+	/** Shortcut to test parsing with a string. */
+	public static LineConfig parse(final String line) throws ParseException {
+		return parse(new BufferedString(line), true);
 	}
 
-	public String key() {
-		return key;
+	public static LineConfig parse(final BufferedString line) throws ParseException {
+		return parse(line.buffer, line.start, line.end, true);
 	}
 
-	public BufferedString context() {
-		return context;
+	public static LineConfig parse(final BufferedString line, final boolean include_context) throws ParseException {
+		return parse(line.buffer, line.start, line.end, include_context);
 	}
 
-	public LineConfig config() {
-		return new LineConfig(key, arguments, context);
+	public static LineConfig parse(final byte[] buffer, final int start, final int end, final boolean include_context) throws ParseException {
+		return new LineParser(buffer, start, end).run(include_context);
 	}
 
-	public void parse() throws ParseException {
-		parse(true);
-	}
-
-	public void parse(final boolean include_context) throws ParseException {
-		final byte[] buffer = line.buffer;
-		final int end = line.end;
-		int start = line.start;
-
-		// skip whitespace
-		while (start < end && ParserUtils.isWhitespace(buffer[start])) start++;
-		if (start >= end) return;
+	private LineConfig run(final boolean include_context) throws ParseException {
+		skipWhitespace();
+		if (pos >= end) return config();
 
 		// key
-		int key_start = start;
-		while (start < end && buffer[start] != '{' && !ParserUtils.isWhitespace(buffer[start])) start++;
-		key = new String(buffer, key_start, start - key_start); // Because String.equals not support BufferedString, cant get data in map using BufferedString
+		final int key_start = pos;
+		while (pos < end && buffer[pos] != '{' && !isWhitespace(buffer[pos])) pos++;
+		key = new String(buffer, key_start, pos - key_start); // String.equals does not support BufferedString, so the key stays a String
 
-		while (start < end && ParserUtils.isWhitespace(buffer[start])) start++;
-		if (start >= end) return;
+		skipWhitespace();
+		if (pos >= end) return config();
 
 		// arguments
-		if (buffer[start] == '{') {
-			int arg_start = ++start;
-			int depth = 1;
-			int seg_start = arg_start;
-			int nest = 0; // depth inside the arg list for ';' splitting
-
-			while (start < end) {
-				byte c = buffer[start];
-				if (c == '{' || c == '[') {
-					depth++;
-					nest++;
-				} else if (c == '}' || c == ']') {
-					depth--;
-					if (c == '}' && depth == 0) {
-						splitArg(seg_start, start);
-						start++;
-						break;
-					}
-					nest--;
-				} else if (c == ';' && nest == 0) {
-					splitArg(seg_start, start);
-					seg_start = start + 1;
-				}
-				start++;
-			}
-			if (depth != 0) throw new ParseException("Missing '}'", start);
-		}
+		if (buffer[pos] == '{') parseArguments();
 
 		// context
 		if (include_context) {
-			while (start < end && ParserUtils.isWhitespace(buffer[start])) start++;
-			if (start < end) context = new BufferedString(buffer, start, end);
+			skipWhitespace();
+			if (pos < end) context = new BufferedString(buffer, pos, end);
 		}
+		return config();
 	}
 
-	private void splitArg(int start, int end) {
+	private void parseArguments() throws ParseException {
+		int depth = 1;
+		int seg_start = ++pos;
+		int nest = 0; // depth inside the arg list for ';' splitting
+
+		while (pos < end) {
+			final byte c = buffer[pos];
+			if (c == '{' || c == '[') {
+				depth++;
+				nest++;
+			} else if (c == '}' || c == ']') {
+				depth--;
+				if (c == '}' && depth == 0) {
+					splitArg(seg_start, pos);
+					pos++;
+					break;
+				}
+				nest--;
+			} else if (c == ';' && nest == 0) {
+				splitArg(seg_start, pos);
+				seg_start = pos + 1;
+			}
+			pos++;
+		}
+		if (depth != 0) throw new ParseException("Missing '}'", pos);
+	}
+
+	private void skipWhitespace() {
+		while (pos < end && isWhitespace(buffer[pos])) pos++;
+	}
+
+	private LineConfig config() {
+		return new LineConfig(key, arguments, context);
+	}
+
+	private void splitArg(final int start, final int end) {
 		if (start >= end) return;
-		final byte[] buffer = line.buffer;
 
 		int eq = -1;
 		int depth = 0;
 		for (int i = start; i < end; i++) {
-			byte b = buffer[i];
+			final byte b = buffer[i];
 			if (b == '{' || b == '[') depth++;
 			else if (b == '}' || b == ']') depth--;
 			else if (b == '=' && depth == 0) {
@@ -126,21 +127,21 @@ public class LineParser {
 	 * Returns a {@code List<BufferedString>} if the value is a single bracketed
 	 * list, otherwise the raw {@link BufferedString}.
 	 */
-	private static Object value(byte[] buf, int start, int end) {
+	private static Object value(final byte[] buf, final int start, final int end) {
 		int s = start;
 		int e = end;
-		while (s < e && ParserUtils.isWhitespace(buf[s])) s++;
-		while (e > s && ParserUtils.isWhitespace(buf[e - 1])) e--;
+		while (s < e && isWhitespace(buf[s])) s++;
+		while (e > s && isWhitespace(buf[e - 1])) e--;
 
 		if (s < e && buf[s] == '[' && closingBracket(buf, s, e) == e - 1) return parseList(buf, s + 1, e - 1);
 		return new BufferedString(buf, start, end);
 	}
 
 	/** Index of the ']' matching the '[' at {@code open}, or -1. */
-	private static int closingBracket(byte[] buf, int open, int end) {
+	private static int closingBracket(final byte[] buf, final int open, final int end) {
 		int depth = 0;
 		for (int i = open; i < end; i++) {
-			byte b = buf[i];
+			final byte b = buf[i];
 			if (b == '[' || b == '{') depth++;
 			else if (b == ']' || b == '}') {
 				depth--;
@@ -154,13 +155,13 @@ public class LineParser {
 	 * Splits list content (between the brackets) into non-blank elements.
 	 * Separators inside nested braces/brackets are ignored.
 	 */
-	private static List<BufferedString> parseList(byte[] buf, int start, int end) {
-		List<BufferedString> result = new ArrayList<>();
+	private static List<BufferedString> parseList(final byte[] buf, final int start, final int end) {
+		final List<BufferedString> result = new ArrayList<>();
 		int current = start;
 		int depth = 0;
 
 		for (int i = start; i < end; i++) {
-			byte b = buf[i];
+			final byte b = buf[i];
 			if (b == '{' || b == '[') depth++;
 			else if (b == '}' || b == ']') depth--;
 			else if (depth == 0 && (b == ';' || b == '-')) {
@@ -172,15 +173,9 @@ public class LineParser {
 		return result;
 	}
 
-	private static void addIfNotBlank(List<BufferedString> result, byte[] buf, int start, int end) {
+	private static void addIfNotBlank(final List<BufferedString> result, final byte[] buf, final int start, final int end) {
 		if (start >= end) return;
-		var item = new BufferedString(buf, start, end);
+		final var item = new BufferedString(buf, start, end);
 		if (!item.isBlank()) result.add(item);
-	}
-
-
-	@Override
-	public String toString() {
-		return key + " " + arguments + " " + context;
 	}
 }

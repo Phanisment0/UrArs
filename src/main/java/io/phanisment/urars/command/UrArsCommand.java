@@ -12,6 +12,7 @@ import io.phanisment.urars.item.ItemMeta;
 import io.phanisment.urars.mob.MobMeta;
 import io.phanisment.urars.mob.MobManager;
 import io.phanisment.urars.parser.file.LineParser;
+import io.phanisment.urars.parser.file.config.LineConfig;
 import io.phanisment.urars.reload.ReloadResult;
 import io.phanisment.urars.reload.UrArsReload;
 import io.phanisment.urars.skill.Skill;
@@ -274,9 +275,8 @@ public class UrArsCommand {
 		String line = StringArgumentType.getString(ctx, "line");
 		UrArsDebugger.debug("Mechanic requested by '{}': {}", actor(source), line);
 		try {
-			var parser = new LineParser(line);
-			parser.parse();
-			SkillLineConfig config = new SkillLineConfig(parser.config());
+			LineConfig parser = LineParser.parse(line);
+			SkillLineConfig config = new SkillLineConfig(parser);
 			UrArsDebugger.trace("Mechanic parsed: {}", parser);
 
 			SkillActionFactory<SkillMechanic> factory = SkillManager.getMechanic(config.key());
@@ -317,9 +317,8 @@ public class UrArsCommand {
 		String line = StringArgumentType.getString(ctx, "line");
 		UrArsDebugger.debug("Condition requested by '{}': {}", actor(source), line);
 		try {
-			LineParser parser = new LineParser(line);
-			parser.parse();
-			SkillLineConfig config = new SkillLineConfig(parser.config());
+			LineConfig parser = LineParser.parse(line);
+			SkillLineConfig config = new SkillLineConfig(parser);
 			UrArsDebugger.trace("Condition parsed: {}", parser);
 
 			SkillActionFactory<SkillCondition> factory = SkillManager.getCondition(config.key());

@@ -93,7 +93,7 @@ public class SkillLineConfig extends LineConfig {
 		if (isList(value)) try {
 			List<BufferedString> lists = asList(value);
 			if (lists != null) {
-				List<LineParser> lines = toLineParsers(lists);
+				List<LineConfig> lines = toLine(lists);
 				UrArsDebugger.debug("Mechanics config lines: {}", lines);
 
 				executor.addAll(ActionUtils.createAll(lines, "mechanic", config -> {

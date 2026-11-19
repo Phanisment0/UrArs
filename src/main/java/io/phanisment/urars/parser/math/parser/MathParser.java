@@ -10,14 +10,14 @@ import io.phanisment.urars.parser.math.lexer.MathLexer.Token;
 import io.phanisment.urars.parser.BufferedString;
 
 public class MathParser {
-	private static final int PREC_TERNARY = 1;
-	private static final int PREC_OR      = 2;
-	private static final int PREC_AND     = 3;
-	private static final int PREC_EQ      = 4;
-	private static final int PREC_CMP     = 5;
-	private static final int PREC_ADD     = 10;
-	private static final int PREC_MUL     = 20;
-	private static final int PREC_PREFIX  = 30;
+	private static final int PREC_TERNARY = 1,
+			PREC_OR = 2,
+			PREC_AND = 3,
+			PREC_EQ = 4,
+			PREC_CMP = 5,
+			PREC_ADD = 10,
+			PREC_MUL = 20,
+			PREC_PREFIX  = 30;
 
 	private final MathLexer lexer;
 

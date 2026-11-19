@@ -3,6 +3,7 @@ package io.phanisment.urars.skill.config;
 import io.phanisment.urars.UrArs;
 import io.phanisment.urars.parser.file.LineParser;
 import io.phanisment.urars.parser.file.config.ConfigSection;
+import io.phanisment.urars.parser.file.config.LineConfig;
 import io.phanisment.urars.skill.MechanicsExecutor;
 import io.phanisment.urars.skill.SkillCondition;
 import io.phanisment.urars.skill.SkillManager;
@@ -21,7 +22,7 @@ public class SkillConfigSection extends ConfigSection {
 		super(map);
 	}
 
-	public @Nullable List<LineParser> getLine(String key) {
+	public @Nullable List<LineConfig> getLine(String key) {
 		try {
 			return toLineParsers(getListBufferedString(key));
 		} catch (ParseException e) {
@@ -35,7 +36,7 @@ public class SkillConfigSection extends ConfigSection {
 	}
 
 	public MechanicsExecutor getMechanics(String key, MechanicsExecutor def) {
-		List<LineParser> lines = getLine(key);
+		List<LineConfig> lines = getLine(key);
 		if (lines == null) return def;
 
 		MechanicsExecutor executor = new MechanicsExecutor();
@@ -51,7 +52,7 @@ public class SkillConfigSection extends ConfigSection {
 	}
 
 	public List<SkillCondition> getConditions(String key, List<SkillCondition> def) {
-		List<LineParser> lines = getLine(key);
+		List<LineConfig> lines = getLine(key);
 		if (lines == null) return def;
 
 		return ActionUtils.createAll(lines, "condition", config -> {
@@ -60,11 +61,10 @@ public class SkillConfigSection extends ConfigSection {
 		});
 	}
 
-	protected List<LineParser> toLineParsers(List<BufferedString> items) throws ParseException {
-		List<LineParser> result = new ArrayList<>(items.size());
+	protected List<LineConfig> toLineParsers(List<BufferedString> items) throws ParseException {
+		List<LineConfig> result = new ArrayList<>(items.size());
 		for (BufferedString item : items) {
-			var parser = new LineParser(item);
-			parser.parse();
+			var parser = LineParser.parse(item);
 			result.add(parser);
 		}
 		return result;

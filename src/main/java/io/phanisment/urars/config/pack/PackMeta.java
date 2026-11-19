@@ -1,5 +1,6 @@
 package io.phanisment.urars.config.pack;
 
+import io.phanisment.urars.exception.UrArsParserException;
 import io.phanisment.urars.parser.file.UrArsYaml;
 import io.phanisment.urars.parser.file.config.ConfigSection;
 import io.phanisment.urars.util.UrArsDebugger;
@@ -38,7 +39,7 @@ public record PackMeta(String name, String version, String author, String descri
 					read(section, "author", def.author),
 					read(section, "description", def.description)
 			);
-		} catch (IOException e) {
+		} catch (IOException | UrArsParserException e) {
 			UrArsDebugger.warn("Failed to read {} for pack '{}', using defaults", FILE_NAME, folder_name, e);
 			return def;
 		}

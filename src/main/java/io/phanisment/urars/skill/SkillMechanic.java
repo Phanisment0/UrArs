@@ -39,8 +39,8 @@ public class SkillMechanic implements ISkillAction {
 
 	private void parseContext(@Nullable BufferedString context) throws ParseException {
 		if (context == null || context.isBlank()) return;
-		FlagParser parser = new FlagParser(context);
-		for (FlagParser.Flag flag : parser.parse()) {
+		var parser = FlagParser.parse(context);
+		for (var flag : parser) {
 			BufferedString value = flag.text();
 			if (value.isBlank()) continue;
 			switch (flag.c()) {
@@ -51,11 +51,9 @@ public class SkillMechanic implements ISkillAction {
 	}
 
 	protected SkillTargeter parseTargeter(BufferedString context) throws ParseException {
-		var targeter_parser = new LineParser(context);
-		targeter_parser.parse();
-		LineConfig targeter_config = targeter_parser.config();
-		var factory = SkillManager.getTargeter(targeter_config.key());
-		return factory == null ? null : factory.create(new SkillLineConfig(targeter_config));
+		var config = LineParser.parse(context);
+		var factory = SkillManager.getTargeter(config.key());
+		return factory == null ? null : factory.create(new SkillLineConfig(config));
 	}
 
 	public long getDelay(SkillContext context) {

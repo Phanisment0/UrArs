@@ -1,6 +1,7 @@
 package io.phanisment.urars.util;
 
 import io.phanisment.urars.parser.file.LineParser;
+import io.phanisment.urars.parser.file.config.LineConfig;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import org.jspecify.annotations.Nullable;
 
@@ -16,11 +17,11 @@ public final class ActionUtils {
 		return new String[]{null};
 	}
 
-	public static <T> List<T> createAll(List<LineParser> lines, String kind, LineFactory<T> factory) {
+	public static <T> List<T> createAll(List<LineConfig> lines, String kind, LineFactory<T> factory) {
 		List<T> result = new ArrayList<>(lines.size());
-		for (LineParser line : lines) {
+		for (var line : lines) {
 			try {
-				var config = new SkillLineConfig(line.config());
+				var config = new SkillLineConfig(line);
 				T created = factory.create(config);
 				if (created == null) {
 					UrArsDebugger.warn("Unknown {} '{}' in line: {}", kind, config.key(), line);

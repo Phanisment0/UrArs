@@ -1,65 +1,77 @@
 package io.phanisment.urars.parser.file;
 
 import io.phanisment.urars.parser.BufferedString;
-import io.phanisment.urars.util.ParserUtils;
 import org.jspecify.annotations.NonNull;
 
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FlagParser {
-	private final BufferedString input;
+import static io.phanisment.urars.util.ParserUtils.*;
 
-	public FlagParser(BufferedString input) {
-		this.input = input;
+public final class FlagParser {
+	private final byte[] buffer;
+	private final int end;
+	private int pos;
+
+	private FlagParser(final byte[] buffer, final int start, final int end) {
+		this.buffer = buffer;
+		this.pos = start;
+		this.end = end;
 	}
 
-	public List<Flag> parse() throws ParseException {
-		final byte[] buf = input.buffer;
-		final int limit = input.end;
-		int i = input.start;
+	public static List<Flag> parse(final String input) throws ParseException {
+		return parse(new BufferedString(input));
+	}
 
+	public static List<Flag> parse(final BufferedString input) throws ParseException {
+		return parse(input.buffer, input.start, input.end);
+	}
+
+	public static List<Flag> parse(final byte[] buffer, final int start, final int end) throws ParseException {
+		return new FlagParser(buffer, start, end).run();
+	}
+
+	public static boolean isPrefix(final int c) {
+		return c == '@' || c == '~';
+	}
+
+	private List<Flag> run() throws ParseException {
 		List<Flag> result = null;
 
-		while (i < limit) {
+		while (pos < end) {
 			// skip whitespace/newlines between flags
-			int c = buf[i] & 0xFF;
-			if (ParserUtils.isWhitespace(c) || ParserUtils.isNewLine(c)) {
-				i++;
+			int c = buffer[pos];
+			if (isWhitespace(c) || isNewLine(c)) {
+				pos++;
 				continue;
 			}
 
-			if (!isPrefix(c)) throw new ParseException("Expected '@' or '~'", i);
-			i++; // consume prefix
+			if (!isPrefix(c)) throw new ParseException("Expected '@' or '~'", pos);
+			pos++; // consume prefix
 
-			int start = i;
+			int text_start = pos;
 			int depth = 0;
-			while (i < limit) {
-				int b = buf[i] & 0xFF;
+			while (pos < end) {
+				int b = buffer[pos];
 				if (b == '{') {
 					depth++;
 				} else if (b == '}') {
 					if (depth > 0) depth--;
-				} else if (depth == 0 && (isPrefix(b) || ParserUtils.isNewLine(b))) break;
-				i++;
+				} else if (depth == 0 && (isPrefix(b) || isNewLine(b))) break;
+				pos++;
 			}
-			if (depth != 0) throw new ParseException("Missing '}'", i);
+			if (depth != 0) throw new ParseException("Missing '}'", pos);
 
 			// trim trailing whitespace
-			int end = i;
-			while (end > start && ParserUtils.isWhitespace(buf[end - 1] & 0xFF)) end--;
+			int text_end = pos;
+			while (text_end > text_start && isWhitespace(buffer[text_end - 1])) text_end--;
 
 			if (result == null) result = new ArrayList<>(2);
-			result.add(new Flag(c, new BufferedString(buf, start, end)));
+			result.add(new Flag(c, new BufferedString(buffer, text_start, text_end)));
 		}
 
 		return result == null ? List.of() : result;
-	}
-
-	public boolean isPrefix(int c) {
-		return c == '@'
-				|| c == '~';
 	}
 
 	public record Flag(int c, BufferedString text) {

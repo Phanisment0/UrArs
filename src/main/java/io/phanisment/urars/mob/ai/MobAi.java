@@ -4,6 +4,7 @@ import io.phanisment.urars.mixin.MobAccessor;
 import io.phanisment.urars.mob.IGoalCondition;
 import io.phanisment.urars.mob.MobManager;
 import io.phanisment.urars.parser.file.LineParser;
+import io.phanisment.urars.parser.file.config.LineConfig;
 import io.phanisment.urars.skill.config.SkillConfigSection;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.parser.BufferedString;
@@ -54,9 +55,11 @@ public final class MobAi {
 
 	private <T extends Goal> List<Entry<T>> load(SkillConfigSection config, String path, String label, Function<SkillLineConfig, AiGoalFactory<T>> lookup) {
 		List<Entry<T>> results = new ArrayList<>();
-		for (LineParser parsed : config.getLine(path)) {
+		var lines = config.getLine(path);
+		if (lines == null) return results;
+		for (LineConfig parsed : lines) {
 			try {
-				var line = new SkillLineConfig(parsed.config());
+				var line = new SkillLineConfig(parsed);
 				AiGoalFactory<T> factory = lookup.apply(line);
 				if (factory == null) {
 					UrArsDebugger.warn("Unknown AI {} '{}'", label, line.key());

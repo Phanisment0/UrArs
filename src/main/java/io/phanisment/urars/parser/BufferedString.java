@@ -1,12 +1,54 @@
 package io.phanisment.urars.parser;
 
-import io.phanisment.urars.util.ParserUtils;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static io.phanisment.urars.util.ParserUtils.*;
+
+/**
+ * A lightweight string representation backed by a byte array.
+ *
+ * <p>Unlike {@link String}, this class supports zero-copy slicing.
+ * Operations such as {@link #slice(int, int)}, {@link #trim()}, and
+ * {@link #subSequence(int, int)} share the original buffer instead
+ * of allocating a new byte array.</p>
+ *
+ * <p>The actual string content is determined by three fields:</p>
+ * <ul>
+ *     <li>{@code buffer}: The underlying byte array.</li>
+ *     <li>{@code start}: The inclusive starting index.</li>
+ *     <li>{@code end}: The exclusive ending index.</li>
+ * </ul>
+ *
+ * <p>For example, a buffer containing {@code "Hello World"} can represent
+ * {@code "Hello"} using {@code start = 0} and {@code end = 5} without
+ * creating another array.</p>
+ *
+ * <p>This class also supports comparison with {@link String} instances.
+ * This is useful when using {@code BufferedString} as a key in a map
+ * whose keys are regular strings:</p>
+ *
+ * <pre>{@code
+ * var map = Map.of("Example", true);
+ * map.get(new BufferedString("Example")); // true
+ * }</pre>
+ *
+ * <p>However, the reverse lookup does not work because
+ * {@link String#equals(Object)} does not recognize {@code BufferedString}.</p>
+ *
+ * <p><b>Important:</b> This class is mutable. Its buffer and range can be
+ * changed through {@link #reset(byte[])}, {@link #reset(byte[], int, int)},
+ * or direct field access. Do not modify instances while they are being
+ * used as map keys.</p>
+ *
+ * <p>The byte-oriented operations assume that the input represents
+ * single-byte characters. This implementation is primarily intended
+ * for parser input rather than general Unicode text processing.</p>
+ */
 public class BufferedString implements CharSequence, Comparable<BufferedString>, Cloneable {
 	private static final double[] POW10 = {
 			1e0, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8, 1e9, 1e10, 1e11,
@@ -52,11 +94,31 @@ public class BufferedString implements CharSequence, Comparable<BufferedString>,
 		return new BufferedString(new byte[0], 0, 0);
 	}
 
-	public BufferedString reset(byte[] buffer) {
+	/**
+	 * Replaces the underlying buffer and resets the range to cover the
+	 * entire supplied array.
+	 *
+	 * <p>A null input is treated as an empty byte array.</p>
+	 *
+	 * @param buffer the new byte array
+	 * @return this instance for method chaining
+	 */
+	public BufferedString reset(byte @Nullable [] buffer) {
 		return reset(buffer == null ? new byte[0] : buffer, 0, buffer == null ? 0 : buffer.length);
 	}
 
-	public BufferedString reset(byte[] buffer, int start, int end) {
+	/**
+	 * Replaces the underlying buffer and its active range.
+	 *
+	 * <p>No data is copied. The instance will directly reference
+	 * the supplied array.</p>
+	 *
+	 * @param buffer the new byte array
+	 * @param start the inclusive starting index
+	 * @param end the exclusive ending index
+	 * @return this instance for method chaining
+	 */
+	public BufferedString reset(byte @NonNull [] buffer, int start, int end) {
 		this.buffer = buffer;
 		this.start = start;
 		this.end = end;
@@ -200,20 +262,20 @@ public class BufferedString implements CharSequence, Comparable<BufferedString>,
 	public BufferedString trim() {
 		int start = this.start;
 		int end = this.end;
-		while (start < end && ParserUtils.isWhitespace(buffer[start])) start++;
-		while (end > start && ParserUtils.isWhitespace(buffer[end - 1])) end--;
+		while (start < end && isWhitespace(buffer[start])) start++;
+		while (end > start && isWhitespace(buffer[end - 1])) end--;
 		return new BufferedString(buffer, start, end);
 	}
 
 	public BufferedString trimStart() {
 		int start = this.start;
-		while (start < this.end && ParserUtils.isWhitespace(buffer[start])) start++;
+		while (start < this.end && isWhitespace(buffer[start])) start++;
 		return new BufferedString(buffer, start, this.end);
 	}
 
 	public BufferedString trimEnd() {
 		int end = this.end;
-		while (end > this.start && ParserUtils.isWhitespace(buffer[end - 1])) end--;
+		while (end > this.start && isWhitespace(buffer[end - 1])) end--;
 		return new BufferedString(buffer, this.start, end);
 	}
 
@@ -308,7 +370,7 @@ public class BufferedString implements CharSequence, Comparable<BufferedString>,
 
 	@Override
 	public @NonNull String toString() {
-		if (this.length() == 0) return "";
+		if (isEmpty()) return "";
 		return new String(buffer, start, length());
 	}
 
@@ -497,16 +559,6 @@ public class BufferedString implements CharSequence, Comparable<BufferedString>,
 		if (length() == 3) return isYes();
 		if (length() == 1) return buffer[start] == '1';
 		return false;
-	}
-
-	public static int toUppercase(int c) {
-		if (c >= 'a' && c <= 'z') return c - 32;
-		return c;
-	}
-
-	public static int toLowercase(int c) {
-		if (c >= 'A' && c <= 'Z') return c + 32;
-		return c;
 	}
 
 	public boolean isYes() {

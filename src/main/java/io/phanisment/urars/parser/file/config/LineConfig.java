@@ -150,17 +150,16 @@ public class LineConfig {
 		return asList(find(keys));
 	}
 
-	public @Nullable List<LineParser> getLine(String... keys) throws ParseException {
+	public @Nullable List<LineConfig> getLine(String... keys) throws ParseException {
 		List<BufferedString> list = getList(keys);
-		return list == null ? null : toLineParsers(list);
+		return list == null ? null : toLine(list);
 	}
 
-	protected List<LineParser> toLineParsers(List<BufferedString> items) throws ParseException {
-		List<LineParser> result = new ArrayList<>(items.size());
+	protected List<LineConfig> toLine(List<BufferedString> items) throws ParseException {
+		List<LineConfig> result = new ArrayList<>(items.size());
 		for (BufferedString item : items) {
 			if (item.isBlank()) continue;
-			LineParser parser = new LineParser(item);
-			parser.parse();
+			LineConfig parser = LineParser.parse(item);
 			result.add(parser);
 		}
 		return result;
