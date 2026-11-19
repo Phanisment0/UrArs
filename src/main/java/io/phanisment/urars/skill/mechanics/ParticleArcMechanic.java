@@ -31,7 +31,7 @@ public class ParticleArcMechanic extends AbstractShapeMechanic {
 	}
 
 	@Override
-	protected List<Vec3> shape(Cast cast) {
+	protected List<Vec3> shape(ParticleCastData cast) {
 		var eval = cast.eval();
 		double r = radius.evalAsDouble(eval);
 		double span = Math.toRadians(angle.evalAsDouble(eval));

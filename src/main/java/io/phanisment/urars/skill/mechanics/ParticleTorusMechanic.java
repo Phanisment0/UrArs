@@ -20,22 +20,22 @@ public class ParticleTorusMechanic extends AbstractShapeMechanic {
 	protected final Node radius;     // distance from center to the tube's center
 	protected final Node tube;       // tube radius
 	protected final Node points;     // points around the big ring
-	protected final Node tubePoints; // points around the tube
+	protected final Node tube_points; // points around the tube
 
 	public ParticleTorusMechanic(SkillLineConfig config) {
 		super(config);
 		this.radius     = config.getMathNumber(aliases("radius", "rad"), 1);
 		this.tube       = config.getMathNumber(aliases("tube"), 0.25);
 		this.points     = config.getMathNumber(aliases("points"), 48);
-		this.tubePoints = config.getMathNumber(aliases("tubePoints"), 12);
+		this.tube_points = config.getMathNumber(aliases("tubePoints"), 12);
 	}
 
 	@Override
-	protected List<Vec3> shape(Cast cast) {
+	protected List<Vec3> shape(ParticleCastData cast) {
 		var eval = cast.eval();
 		double r = radius.evalAsDouble(eval), minor = tube.evalAsDouble(eval);
 		int n = limit(points.evalAsInt(eval));
-		int tn = Math.max(1, Math.min(tubePoints.evalAsInt(eval), MAX_POINTS / n));
+		int tn = Math.max(1, Math.min(tube_points.evalAsInt(eval), MAX_POINTS / n));
 
 		return baked("torus:" + r + ":" + minor + ":" + n + ":" + tn, () -> ShapeMath.surface(n, tn, (u, v) -> {
 			double a = u * Math.PI * 2, b = v * Math.PI * 2;

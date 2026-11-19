@@ -30,7 +30,7 @@ public class ParticlePyramidMechanic extends AbstractShapeMechanic {
 	}
 
 	@Override
-	protected List<Vec3> shape(Cast cast) {
+	protected List<Vec3> shape(ParticleCastData cast) {
 		var eval = cast.eval();
 		double half = width.evalAsDouble(eval) / 2, h = height.evalAsDouble(eval);
 		int n = Math.max(2, Math.min(points.evalAsInt(eval), MAX_POINTS / 8));

@@ -27,7 +27,7 @@ public class ParticleDomeMechanic extends AbstractShapeMechanic {
 	}
 
 	@Override
-	protected List<Vec3> shape(Cast cast) {
+	protected List<Vec3> shape(ParticleCastData cast) {
 		var eval = cast.eval();
 		int n = limit(points.evalAsInt(eval));
 		double r = radius.evalAsDouble(eval);

@@ -30,7 +30,7 @@ public class ParticleRectMechanic extends AbstractShapeMechanic {
 	}
 
 	@Override
-	protected List<Vec3> shape(Cast cast) {
+	protected List<Vec3> shape(ParticleCastData cast) {
 		var eval = cast.eval();
 		double hx = width.evalAsDouble(eval) / 2, hz = length.evalAsDouble(eval) / 2;
 		int n = Math.clamp(points.evalAsInt(eval), 2, MAX_POINTS / 4);

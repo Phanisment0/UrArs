@@ -34,7 +34,7 @@ public class ParticleDoubleHelixMechanic extends AbstractShapeMechanic {
 	}
 
 	@Override
-	protected List<Vec3> shape(Cast cast) {
+	protected List<Vec3> shape(ParticleCastData cast) {
 		var eval = cast.eval();
 		double r = radius.evalAsDouble(eval), h = height.evalAsDouble(eval), tn = turns.evalAsDouble(eval);
 		int n = Math.clamp(points.evalAsInt(eval), 1, MAX_POINTS / 3);

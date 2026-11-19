@@ -31,12 +31,11 @@ public class ParticleWaveMechanic extends AbstractShapeMechanic {
 	}
 
 	@Override
-	protected List<Vec3> shape(Cast cast) {
+	protected List<Vec3> shape(ParticleCastData cast) {
 		var eval = cast.eval();
 		double len = length.evalAsDouble(eval), amp = amplitude.evalAsDouble(eval), w = waves.evalAsDouble(eval);
 		int n = limit(points.evalAsInt(eval));
 
-		return baked("wave:" + len + ":" + amp + ":" + w + ":" + n, () -> ShapeMath.shape(n, t ->
-				new Vec3(Math.sin(t * w * Math.PI * 2) * amp, t * len, 0)));
+		return baked("wave:" + len + ":" + amp + ":" + w + ":" + n, () -> ShapeMath.shape(n, t -> new Vec3(Math.sin(t * w * Math.PI * 2) * amp, t * len, 0)));
 	}
 }

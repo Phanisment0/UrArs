@@ -31,7 +31,7 @@ public class ParticleGridMechanic extends AbstractShapeMechanic {
 	}
 
 	@Override
-	protected List<Vec3> shape(Cast cast) {
+	protected List<Vec3> shape(ParticleCastData cast) {
 		var eval = cast.eval();
 		double w = width.evalAsDouble(eval), l = length.evalAsDouble(eval);
 		int c = limit(cols.evalAsInt(eval));

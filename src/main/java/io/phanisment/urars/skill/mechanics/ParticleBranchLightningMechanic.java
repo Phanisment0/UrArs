@@ -42,7 +42,7 @@ public class ParticleBranchLightningMechanic extends AbstractShapeMechanic {
 	}
 
 	@Override
-	protected List<Vec3> shape(Cast cast) {
+	protected List<Vec3> shape(ParticleCastData cast) {
 		var eval = cast.eval();
 		Builder b = new Builder(
 				Math.abs(jitter.evalAsDouble(eval)), Math.clamp(chance.evalAsDouble(eval), 0, 1), Math.clamp(depth.evalAsInt(eval), 0, 6), Math.clamp(fork.evalAsDouble(eval), 0.05, 1),

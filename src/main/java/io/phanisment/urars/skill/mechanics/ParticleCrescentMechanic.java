@@ -4,7 +4,6 @@ import io.phanisment.urars.parser.math.ast.Node;
 import io.phanisment.urars.skill.annotation.RegistryInfo;
 import io.phanisment.urars.skill.config.SkillLineConfig;
 import io.phanisment.urars.skill.template.particle.AbstractShapeMechanic;
-import io.phanisment.urars.util.ShapeMath;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
@@ -32,7 +31,7 @@ public class ParticleCrescentMechanic extends AbstractShapeMechanic {
 	}
 
 	@Override
-	protected List<Vec3> shape(Cast cast) {
+	protected List<Vec3> shape(ParticleCastData cast) {
 		var eval = cast.eval();
 		double r = radius.evalAsDouble(eval);
 		double d = r * offset.evalAsDouble(eval), ri = r * inner.evalAsDouble(eval);

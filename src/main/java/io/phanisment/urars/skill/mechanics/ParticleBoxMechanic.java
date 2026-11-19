@@ -38,7 +38,7 @@ public class ParticleBoxMechanic extends AbstractShapeMechanic {
 	}
 
 	@Override
-	protected List<Vec3> shape(Cast cast) {
+	protected List<Vec3> shape(ParticleCastData cast) {
 		var eval = cast.eval();
 		double hx = width.evalAsDouble(eval) / 2;
 		double hy = height.evalAsDouble(eval) / 2;

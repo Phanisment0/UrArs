@@ -17,29 +17,36 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public final class TargeterUtils {
 
 	public static @Nullable Entity getTargetedEntity(Entity entity, int range) {
-		if (!(entity.level() instanceof  ServerLevel level)) return null;
-		MinecraftServer server = level.getServer();
+		if (entity == null || !(entity.level() instanceof ServerLevel level)) return null;
+		return onServerThread(level, () -> findTarget(entity, level, range));
+	}
 
-		if (server.isSameThread()) return findTarget(entity, level, range);
-		try {
-			return server.submit(() -> Objects.requireNonNull(findTarget(entity, level, range))).get();
-		} catch (InterruptedException | ExecutionException e) {
-			UrArsDebugger.warn("Somehow its error lol", e);
-			return null;
-		}
+	public static @Nullable Location getTargetedLocation(Entity entity, double range) {
+		if (entity == null || !(entity.level() instanceof ServerLevel level)) return null;
+		return onServerThread(level, () -> rayEnd(entity, level, range));
 	}
 
 	public static @Nullable Entity findTarget(Entity entity, ServerLevel level, int range) {
 		Vec3 eye = entity.getEyePosition();
-		Vec3 dir = entity.getViewVector(1);
-		Vec3 far_end = eye.add(dir.scale(range));
+		Vec3 end = rayEnd(entity, level, range).pos();
+
+		AABB search = entity.getBoundingBox().expandTowards(end.subtract(eye)).inflate(1);
+		Predicate<Entity> filter = e -> e != entity && !e.isSpectator() && e.isPickable() && !(e instanceof Player);
+		EntityHitResult hit = ProjectileUtil.getEntityHitResult(entity, eye, end, search, filter, eye.distanceTo(end));
+		return hit != null ? hit.getEntity() : null;
+	}
+
+	/** First block hit along the look direction, or the end of the ray if nothing is hit. Carries the entity's rotation. */
+	public static Location rayEnd(Entity entity, ServerLevel level, double range) {
+		Vec3 eye = entity.getEyePosition();
+		Vec3 far_end = eye.add(entity.getViewVector(1).scale(range));
 
 		BlockHitResult block_hit = BlockGetter.<BlockHitResult, Level>traverseBlocks(eye, far_end, level, (lvl, pos) -> {
 			BlockState state = lvl.getBlockState(pos);
@@ -47,11 +54,20 @@ public final class TargeterUtils {
 			VoxelShape shape = state.getCollisionShape(lvl, pos);
 			return shape.isEmpty() ? null : shape.clip(eye, far_end, pos);
 		}, _ -> null);
-		Vec3 end = block_hit.getLocation();
-		AABB search = entity.getBoundingBox().expandTowards(end.subtract(eye)).inflate(1);
-		Predicate<Entity> filter = e -> e instanceof Entity && e != entity && !e.isSpectator() && e.isPickable() && !(e instanceof Player p);
-		EntityHitResult hit = ProjectileUtil.getEntityHitResult(entity, eye, end, search, filter, eye.distanceTo(end));
-		return hit != null ? hit.getEntity() : null;
+
+		Vec3 end = block_hit != null ? block_hit.getLocation() : far_end;
+		return new Location(level, end, entity.getXRot(), entity.getYRot());
+	}
+
+	private static <T> @Nullable T onServerThread(ServerLevel level, Supplier<T> task) {
+		MinecraftServer server = level.getServer();
+		if (server.isSameThread()) return task.get();
+		try {
+			return server.submit(task).get();
+		} catch (InterruptedException | ExecutionException e) {
+			UrArsDebugger.warn("Failed to run targeter on server thread", e);
+			return null;
+		}
 	}
 
 	public static void drawPoint(Level level, Vec3 pos, boolean enabled) {

@@ -18,7 +18,7 @@ import static io.phanisment.urars.util.ActionUtils.*;
 )
 public class ParticleVortexMechanic extends AbstractShapeMechanic {
 	protected final Node radius;    // radius at the top
-	protected final Node minRadius; // radius at the bottom
+	protected final Node min_radius; // radius at the bottom
 	protected final Node height;
 	protected final Node turns;
 	protected final Node points;
@@ -26,16 +26,16 @@ public class ParticleVortexMechanic extends AbstractShapeMechanic {
 	public ParticleVortexMechanic(SkillLineConfig config) {
 		super(config);
 		this.radius    = config.getMathNumber(aliases("radius", "rad"), 2);
-		this.minRadius = config.getMathNumber(aliases("minRadius"), 0.2);
+		this.min_radius = config.getMathNumber(aliases("minRadius"), 0.2);
 		this.height    = config.getMathNumber(aliases("height", "h"), 4);
 		this.turns     = config.getMathNumber(aliases("turns"), 5);
 		this.points    = config.getMathNumber(aliases("points"), 100);
 	}
 
 	@Override
-	protected List<Vec3> shape(Cast cast) {
+	protected List<Vec3> shape(ParticleCastData cast) {
 		var eval = cast.eval();
-		double top = radius.evalAsDouble(eval), bottom = minRadius.evalAsDouble(eval);
+		double top = radius.evalAsDouble(eval), bottom = min_radius.evalAsDouble(eval);
 		double h = height.evalAsDouble(eval), tn = turns.evalAsDouble(eval);
 		int n = limit(points.evalAsInt(eval));
 

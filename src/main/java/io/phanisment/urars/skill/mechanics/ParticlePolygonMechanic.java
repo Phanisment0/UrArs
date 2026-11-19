@@ -30,7 +30,7 @@ public class ParticlePolygonMechanic extends AbstractShapeMechanic {
 	}
 
 	@Override
-	protected List<Vec3> shape(Cast cast) {
+	protected List<Vec3> shape(ParticleCastData cast) {
 		var eval = cast.eval();
 		double r = radius.evalAsDouble(eval);
 		int s = Math.max(3, Math.min(sides.evalAsInt(eval), 64));

@@ -16,7 +16,7 @@ public class ParticleMechanic extends AbstractParticleMechanic {
 	}
 
 	@Override
-	protected void emit(Cast cast) {
-		cast.spawn(cast.origin());
+	protected void emit(ParticleCastData cast) {
+		cast.spawn(cast.origin().pos());
 	}
 }

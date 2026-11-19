@@ -35,7 +35,7 @@ public class ParticleLissajousMechanic extends AbstractShapeMechanic {
 	}
 
 	@Override
-	protected List<Vec3> shape(Cast cast) {
+	protected List<Vec3> shape(ParticleCastData cast) {
 		var eval = cast.eval();
 		double r = radius.evalAsDouble(eval);
 		double fx = freq_x.evalAsDouble(eval), fy = freq_y.evalAsDouble(eval), fz = freq_z.evalAsDouble(eval);

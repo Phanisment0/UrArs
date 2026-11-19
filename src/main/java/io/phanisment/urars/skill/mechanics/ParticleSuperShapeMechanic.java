@@ -17,7 +17,7 @@ import static io.phanisment.urars.util.ActionUtils.*;
 		namespace = "fx"
 )
 public class ParticleSuperShapeMechanic extends AbstractShapeMechanic {
-	protected final Node radius; // outer radius after normalising
+	protected final Node radius;
 	protected final Node m;
 	protected final Node n1;
 	protected final Node n2;
@@ -35,7 +35,7 @@ public class ParticleSuperShapeMechanic extends AbstractShapeMechanic {
 	}
 
 	@Override
-	protected List<Vec3> shape(Cast cast) {
+	protected List<Vec3> shape(ParticleCastData cast) {
 		var eval = cast.eval();
 		double r = radius.evalAsDouble(eval), mm = m.evalAsDouble(eval);
 		double a1 = n1.evalAsDouble(eval) == 0 ? 1 : n1.evalAsDouble(eval);

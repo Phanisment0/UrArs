@@ -32,7 +32,7 @@ public class ParticleStarMechanic extends AbstractShapeMechanic {
 	}
 
 	@Override
-	protected List<Vec3> shape(Cast cast) {
+	protected List<Vec3> shape(ParticleCastData cast) {
 		var eval = cast.eval();
 		double outer = radius.evalAsDouble(eval), in = inner.evalAsDouble(eval);
 		int s = Math.clamp(spikes.evalAsInt(eval), 2, 64);

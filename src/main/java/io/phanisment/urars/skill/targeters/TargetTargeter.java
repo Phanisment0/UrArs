@@ -29,9 +29,7 @@ public class TargetTargeter extends EntityTargeter {
 
 	@Override
 	public Collection<Entity> getEntities(SkillContext ctx) {
-		List<Entity> targets = new ArrayList<>();
 		Entity target = TargeterUtils.getTargetedEntity(ctx.entity(), range.evalAsInt(ctx.evalContext()));
-		targets.add(target);
-		return targets;
+		return target == null ? List.of() : List.of(target);
 	}
 }
